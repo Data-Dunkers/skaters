@@ -163,6 +163,12 @@
             transition: all 0.15s;
         }
         .bool-btn:hover { border-color: #555; color: #fff; }
+        .bool-btn:disabled {
+            opacity: 0.45;
+            cursor: not-allowed;
+            border-color: #3a3a3a;
+            color: #777;
+        }
         .bool-btn.active-yes {
             background: var(--success-dim);
             border-color: var(--success);
@@ -206,6 +212,28 @@
             transition: background 0.2s;
         }
         .attempt-dot.filled { background: var(--primary); border-color: var(--primary); }
+
+        /* ── SPEED TIMER ── */
+        .speed-timer-display {
+            width: 100%;
+            padding: 10px 12px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            background: #121212;
+            color: var(--primary);
+            font-family: 'Barlow Condensed', sans-serif;
+            font-size: 1.15rem;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            text-align: center;
+            margin-bottom: 0.6rem;
+        }
+        .timer-btn-row { display: flex; gap: 0.75rem; }
+        .timer-btn-row .bool-btn { flex: 1; }
+        .timer-running {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(255,102,0,0.12);
+        }
 
         /* ── SUBMIT ── */
         .submit-btn {
@@ -342,7 +370,7 @@
     <div class="form-section">
         <div class="section-label">Shot Data</div>
 
-        <div class="form-group" style="margin-bottom:1rem;">
+        <div class="form-group conditional-field" id="field_attempt_number" style="margin-bottom:1rem;">
             <label for="attempt_number">Attempt #</label>
             <input type="number" id="attempt_number" name="attempt_number" min="1" max="6" placeholder="1 – 6" required>
             <div class="attempt-tracker" id="attemptDots">
@@ -352,6 +380,15 @@
                 <div class="attempt-dot" data-dot="4"></div>
                 <div class="attempt-dot" data-dot="5"></div>
                 <div class="attempt-dot" data-dot="6"></div>
+            </div>
+        </div>
+
+        <div class="form-group conditional-field hidden" id="field_speed_timer" style="margin-bottom:1rem;">
+            <label>Speed Winger Timer</label>
+            <div class="speed-timer-display" id="speedTimerDisplay">0.00s / 30.00s</div>
+            <div class="timer-btn-row">
+                <button type="button" class="bool-btn" onclick="startSpeedTimer()">Start</button>
+                <button type="button" class="bool-btn" onclick="resetSpeedTimer()">Reset</button>
             </div>
         </div>
 
@@ -372,8 +409,8 @@
         <div class="form-group" style="margin-bottom:1rem;">
             <label>Result</label>
             <div class="bool-group">
-                <button type="button" class="bool-btn" id="btn_yes" onclick="setSuccess(true)">✓ Hit</button>
-                <button type="button" class="bool-btn" id="btn_no"  onclick="setSuccess(false)">✗ Miss</button>
+                <button type="button" class="bool-btn" id="btn_yes" onclick="handleResultClick(true)">✓ Hit</button>
+                <button type="button" class="bool-btn" id="btn_no"  onclick="handleResultClick(false)">✗ Miss</button>
             </div>
             <input type="hidden" id="success_hidden" name="success">
         </div>
@@ -423,7 +460,7 @@ const ACTIVITY_CONFIG = {
     'Playmaker':              { target_zone: true,  time_seconds: false, hint: 'Wrist shot · All 5 holes · Same distance' },
     'Power Forward':          { target_zone: false, time_seconds: false, hint: 'Close-range · Any low zone · Right at the net' },
     'Two-way Forward':        { target_zone: true,  time_seconds: false, hint: '6 different distances/angles · 2 ft away' },
-    'Speed Winger':           { target_zone: false, time_seconds: true,  hint: '6 quick shots · Timed within 30 sec · 2 ft away' },
+    'Speed Winger':           { target_zone: false, time_seconds: false, hint: '6 quick shots · Timed within 30 sec · 2 ft away' },
     'Defensive Defenseman':   { target_zone: true,  time_seconds: false, hint: 'Blue line · Bottom corners & five-hole only' },
     'Offensive Defenseman':   { target_zone: true,  time_seconds: false, hint: 'Blue line · Top corners only · Not timed' },
 };
@@ -432,6 +469,12 @@ const ACTIVITY_CONFIG = {
 let successValue = null; // true | false | null
 let nicknameReminderActive = false;
 let lastReminderNickname = null;
+let speedTimerRunning = false;
+let speedTimerStartMs = 0;
+let speedTimerElapsedMs = 0;
+let speedTimerIntervalId = null;
+let speedWingerCompleted = false;
+const SPEED_TIMER_LIMIT_MS = 30000;
 
 // ── ON LOAD ─────────────────────────────────────────────────────
 window.onload = () => {
@@ -447,9 +490,13 @@ window.onload = () => {
     // Clear reminder if nickname is edited.
     document.getElementById('nickname').addEventListener('input', () => {
         resetAttemptToOne();
+        resetSpeedTimer();
         setNicknameReminder(false);
         lastReminderNickname = null;
     });
+
+    renderSpeedTimer();
+    setSpeedModeUI(false);
 };
 
 // ── ACTIVITY SELECTION ──────────────────────────────────────────
@@ -466,6 +513,8 @@ document.getElementById('activity').addEventListener('change', function () {
     // Clear values for hidden fields
     if (!cfg.target_zone)  document.getElementById('target_zone').value  = '';
     if (!cfg.time_seconds) document.getElementById('time_seconds').value = '';
+
+    setSpeedModeUI(this.value === 'Speed Winger');
 });
 
 function toggleField(id, show) {
@@ -482,15 +531,29 @@ function setSuccess(val) {
     document.getElementById('btn_no').className  = 'bool-btn' + (val === false ? ' active-no'  : '');
 }
 
+function handleResultClick(val) {
+    if (document.getElementById('activity').value === 'Speed Winger') {
+        handleSpeedWingerShot(val);
+        return;
+    }
+    setSuccess(val);
+}
+
 // ── ATTEMPT DOTS ─────────────────────────────────────────────────
 function updateDots() {
     const val = parseInt(document.getElementById('attempt_number').value, 10);
+    const isSpeedWinger = document.getElementById('activity').value === 'Speed Winger';
+    const nicknameHighlighted = document.getElementById('nickname').classList.contains('nickname-reminder');
+    const filledCount = Number.isNaN(val)
+        ? 0
+        : (nicknameHighlighted ? val : (isSpeedWinger ? (speedWingerCompleted ? 6 : Math.max(val - 1, 0)) : val));
     document.querySelectorAll('.attempt-dot').forEach(dot => {
-        dot.classList.toggle('filled', parseInt(dot.dataset.dot, 10) <= val);
+        dot.classList.toggle('filled', parseInt(dot.dataset.dot, 10) <= filledCount);
     });
 }
 
 function resetAttemptToOne() {
+    speedWingerCompleted = false;
     document.getElementById('attempt_number').value = 1;
     updateDots();
 }
@@ -500,19 +563,123 @@ function setNicknameReminder(active) {
     document.getElementById('nickname').classList.toggle('nickname-reminder', active);
 }
 
+function setSpeedModeUI(isSpeedWinger) {
+    toggleField('field_attempt_number', true);
+    toggleField('field_speed_timer', isSpeedWinger);
+    document.getElementById('submitBtn').style.display = isSpeedWinger ? 'none' : 'block';
+    document.getElementById('attempt_number').style.display = isSpeedWinger ? 'none' : 'block';
+    document.querySelector('label[for="attempt_number"]').style.display = isSpeedWinger ? 'none' : 'block';
+
+    if (isSpeedWinger && !speedTimerRunning) {
+        setSuccess(null);
+    }
+
+    if (!isSpeedWinger) {
+        resetSpeedTimer();
+    }
+
+    updateResultButtonsState();
+}
+
+function renderSpeedTimer() {
+    const display = document.getElementById('speedTimerDisplay');
+    const seconds = (speedTimerElapsedMs / 1000).toFixed(2);
+    display.textContent = `${seconds}s / 30.00s`;
+    display.classList.toggle('timer-running', speedTimerRunning);
+}
+
+function tickSpeedTimer() {
+    const now = performance.now();
+    speedTimerElapsedMs = Math.min(now - speedTimerStartMs, SPEED_TIMER_LIMIT_MS);
+    renderSpeedTimer();
+    if (speedTimerElapsedMs >= SPEED_TIMER_LIMIT_MS) {
+        stopSpeedTimer();
+    }
+}
+
+function stopSpeedTimer() {
+    speedTimerRunning = false;
+    if (speedTimerIntervalId !== null) {
+        clearInterval(speedTimerIntervalId);
+        speedTimerIntervalId = null;
+    }
+    renderSpeedTimer();
+    updateResultButtonsState();
+}
+
+function startSpeedTimer() {
+    if (document.getElementById('activity').value !== 'Speed Winger') return;
+    if (speedTimerRunning) return;
+    if (speedTimerElapsedMs >= SPEED_TIMER_LIMIT_MS) {
+        speedTimerElapsedMs = 0;
+    }
+    speedTimerRunning = true;
+    speedTimerStartMs = performance.now() - speedTimerElapsedMs;
+    speedTimerIntervalId = setInterval(tickSpeedTimer, 30);
+    tickSpeedTimer();
+    updateResultButtonsState();
+}
+
+function resetSpeedTimer() {
+    stopSpeedTimer();
+    speedTimerElapsedMs = 0;
+    resetAttemptToOne();
+    renderSpeedTimer();
+    updateResultButtonsState();
+}
+
+function updateResultButtonsState() {
+    const isSpeedWinger = document.getElementById('activity').value === 'Speed Winger';
+    const shouldDisable = isSpeedWinger && !speedTimerRunning;
+    document.getElementById('btn_yes').disabled = shouldDisable;
+    document.getElementById('btn_no').disabled = shouldDisable;
+}
+
+async function handleSpeedWingerShot(val) {
+    if (!speedTimerRunning) {
+        showStatus('Start the 30-second timer before logging Speed Winger shots.', 'error');
+        return;
+    }
+
+    const attempt = parseInt(document.getElementById('attempt_number').value, 10);
+    if (attempt > 6) {
+        showStatus('All 6 Speed Winger attempts are already logged.', 'error');
+        return;
+    }
+
+    const timeSeconds = Number((speedTimerElapsedMs / 1000).toFixed(2));
+    await handleSubmit({
+        forcedSuccess: val,
+        forcedTimeSeconds: timeSeconds,
+    });
+}
+
 // ── SUBMIT ───────────────────────────────────────────────────────
-async function handleSubmit() {
+async function handleSubmit(options = {}) {
     // Basic validation
     const group    = document.getElementById('group_number').value.trim();
     const nick     = document.getElementById('nickname').value.trim();
     const activity = document.getElementById('activity').value;
     const attempt  = document.getElementById('attempt_number').value;
+    const successToSend = options.forcedSuccess !== undefined ? options.forcedSuccess : successValue;
+    let timeToSend = null;
+
+    if (options.forcedTimeSeconds !== undefined) {
+        timeToSend = options.forcedTimeSeconds;
+    } else if ((ACTIVITY_CONFIG[activity] || {}).time_seconds) {
+        const parsed = parseFloat(document.getElementById('time_seconds').value);
+        timeToSend = Number.isNaN(parsed) ? null : parsed;
+    }
 
     if (!group || !nick || !activity || !attempt) {
         showStatus('Please fill in all required fields.', 'error'); return;
     }
-    if (successValue === null) {
+    if (successToSend === null) {
         showStatus('Please mark the shot as Hit or Miss.', 'error'); return;
+    }
+
+    if (activity === 'Speed Winger' && options.forcedTimeSeconds === undefined) {
+        showStatus('Use Start + Hit/Miss buttons to log Speed Winger shots.', 'error'); return;
     }
 
     const cfg = ACTIVITY_CONFIG[activity] || {};
@@ -527,9 +694,9 @@ async function handleSubmit() {
         nickname:       nick,
         activity:       activity,
         attempt_number: parseInt(attempt, 10),
-        success:        successValue,
+        success:        successToSend,
         target_zone:    cfg.target_zone  ? (document.getElementById('target_zone').value  || null) : null,
-        time_seconds:   cfg.time_seconds ? (parseFloat(document.getElementById('time_seconds').value) || null) : null,
+        time_seconds:   timeToSend,
     };
 
     localStorage.setItem('lastNickname', nick);
@@ -551,6 +718,13 @@ async function handleSubmit() {
         updateDots();
         setSuccess(null);          // clear hit/miss
         document.getElementById('time_seconds').value = '';
+
+        if (activity === 'Speed Winger' && parseInt(attempt, 10) >= 6) {
+            speedWingerCompleted = true;
+            updateDots();
+            stopSpeedTimer();
+            showStatus('Speed Winger run complete: 6 shots logged.', 'success');
+        }
 
         // Reminder flow:
         // 1) attempt #6 turns reminder on (once per nickname)
