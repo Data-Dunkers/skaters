@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>🏀 Ball Zone Tracker</title>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #0b0c10;
+  --panel: #111318;
+  --border: #1c1e26;
+  --orange: #ff6b1a;
+  --orange-dim: rgba(255,107,26,0.12);
+  --orange-glow: rgba(255,107,26,0.35);
+  --green: #00ffaa;
+  --red: #ff3a6e;
+  --text: #dde0ea;
+  --muted: #4a4d62;
+}
+
+html, body { width:100%; height:100%; background:var(--bg); color:var(--text); font-family:'Courier New',Courier,monospace; overflow:hidden; }
+#app { display:flex; flex-direction:column; height:100vh; }
+
+/* ── HEADER ── */
+#header {
+  display:flex; align-items:center; justify-content:space-between;
+  padding:9px 18px; background:var(--panel);
+  border-bottom:1px solid var(--border); flex-shrink:0;
+}
+#title {
+  font-family:Impact,'Arial Narrow',sans-serif;
+  font-size:1.45rem; letter-spacing:5px; text-transform:uppercase;
+  color:var(--orange); text-shadow:0 0 22px var(--orange-glow);
+}
+#header-right { display:flex; align-items:center; gap:10px; }
+
+/* Camera picker */
+#cam-select {
+  background:var(--bg); color:var(--text);
+  border:1px solid var(--border); border-radius:4px;
+  padding:4px 10px; font-family:'Courier New',monospace;
+  font-size:0.68rem; letter-spacing:1px; max-width:220px;
+  cursor:pointer;
+}
+#cam-select:focus { outline:none; border-color:var(--orange); }
+
+#start-btn {
+  padding:4px 14px; border-radius:4px;
+  background:var(--orange); color:#fff;
+  border:none; font-family:'Courier New',monospace;
+  font-size:0.68rem; letter-spacing:1px; text-transform:uppercase;
+  cursor:pointer; transition:background 0.2s;
+}
+#start-btn:hover { background:#ff8c44; }
+#start-btn:disabled { background:var(--muted); cursor:default; }
+
+/* Tune toggle */
+#tune-toggle {
+  padding:4px 12px; border-radius:20px;
+  background:var(--bg); border:1px solid var(--border);
+  font-family:'Courier New',monospace; font-size:0.65rem;
+  letter-spacing:1.5px; text-transform:uppercase;
+  color:var(--muted); cursor:pointer; transition:all 0.2s;
+}
+#tune-toggle:hover { border-color:var(--orange); color:var(--orange); }
+
+/* Status pill */
+#status-pill {
+  display:flex; align-items:center; gap:7px;
+  padding:4px 13px; border-radius:20px;
+  background:var(--bg); border:1px solid var(--border);
+  font-size:0.68rem; letter-spacing:1.5px; text-transform:uppercase;
+  color:var(--muted); transition:all 0.3s; white-space:nowrap;
+}
+#status-pill.ready { border-color:var(--green); color:var(--green); }
+#status-dot { width:6px; height:6px; border-radius:50%; background:var(--muted); transition:background 0.3s; flex-shrink:0; }
+#status-pill.ready #status-dot { background:var(--green); box-shadow:0 0 7px var(--green); animation:blink 1.8s infinite; }
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.35} }
+
+/* ── MAIN ── */
+#main { display:flex; flex:1; overflow:hidden; }
+
+/* ── CAMERA AREA ── */
+#camera-wrap { position:relative; flex:1; background:#000; overflow:hidden; }
+#video { width:100%; height:100%; object-fit:cover; display:block; transform:scaleX(-1); }
+#overlay { position:absolute; top:0; left:0; width:100%; height:100%; pointer-events:none; }
+
+/* ── TUNE PANEL ── */
+#tune-panel {
+  position:absolute; top:0; right:0; width:236px;
+  background:rgba(17,19,24,0.96); border-left:1px solid var(--border);
+  border-bottom:1px solid var(--border); border-radius:0 0 0 8px;
+  padding:14px 16px; z-index:20;
+  display:none; flex-direction:column; gap:10px;
+  backdrop-filter:blur(6px);
+}
+#tune-panel.open { display:flex; }
+.tune-row { display:flex; flex-direction:column; gap:4px; }
+.tune-label { font-size:0.58rem; letter-spacing:1.5px; text-transform:uppercase; color:var(--muted); display:flex; justify-content:space-between; }
+.tune-label span { color:var(--orange); }
+input[type=range] { -webkit-appearance:none; width:100%; height:2px; background:var(--border); border-radius:2px; outline:none; cursor:pointer; }
+input[type=range]::-webkit-slider-thumb { -webkit-appearance:none; width:12px; height:12px; border-radius:50%; background:var(--orange); cursor:pointer; box-shadow:0 0 6px var(--orange-glow); }
+#hue-preview { height:18px; border-radius:3px; margin-top:2px; position:relative;
+  background:linear-gradient(to right,hsl(0,100%,50%),hsl(30,100%,50%),hsl(60,100%,50%),hsl(90,100%,50%),hsl(120,100%,50%),hsl(150,100%,50%),hsl(180,100%,50%),hsl(210,100%,50%),hsl(240,100%,50%),hsl(270,100%,50%),hsl(300,100%,50%),hsl(330,100%,50%),hsl(360,100%,50%)); }
+#hue-range-vis { position:absolute; top:0; height:100%; border-radius:3px; background:rgba(255,255,255,0.3); border:1px solid rgba(255,255,255,0.7); pointer-events:none; }
+.tune-btn-row { display:flex; gap:8px; margin-top:2px; }
+.tune-btn {
+  flex:1; padding:5px; background:var(--bg);
+  border:1px solid var(--border); color:var(--muted);
+  font-family:'Courier New',monospace; font-size:0.6rem;
+  letter-spacing:1px; text-transform:uppercase;
+  cursor:pointer; border-radius:3px; transition:all 0.2s;
+}
+.tune-btn:hover { border-color:var(--orange); color:var(--orange); }
+
+/* ── ZONES ── */
+.zone {
+  position:absolute; display:flex; flex-direction:column;
+  align-items:center; justify-content:center;
+  pointer-events:none;
+  transition:background 0.15s, border-color 0.15s, box-shadow 0.15s;
+}
+.zone-num  { font-family:Impact,'Arial Narrow',sans-serif; font-size:2.6rem; color:rgba(255,255,255,0.18); line-height:1; transition:color 0.15s; }
+.zone-name { font-size:0.52rem; letter-spacing:2.5px; text-transform:uppercase; color:rgba(255,255,255,0.1); margin-top:3px; transition:color 0.15s; }
+.zone-bar-wrap { width:55%; height:3px; background:rgba(255,255,255,0.07); border-radius:2px; margin-top:8px; overflow:hidden; opacity:0; transition:opacity 0.2s; }
+.zone-bar { height:100%; width:0%; border-radius:2px; background:var(--red); }
+
+#z1 { top:0; left:0; width:27%; height:30%; border-bottom:1px solid rgba(255,255,255,0.06); border-right:1px solid rgba(255,255,255,0.06); border-radius:0 0 6px 0; background:rgba(255,255,255,0.015); }
+#z2 { top:0; right:0; width:27%; height:30%; border-bottom:1px solid rgba(255,255,255,0.06); border-left:1px solid rgba(255,255,255,0.06); border-radius:0 0 0 6px; background:rgba(255,255,255,0.015); }
+#z3 { bottom:0; left:0; width:27%; height:30%; border-top:1px solid rgba(255,255,255,0.06); border-right:1px solid rgba(255,255,255,0.06); border-radius:0 6px 0 0; background:rgba(255,255,255,0.015); }
+#z4 { bottom:0; right:0; width:27%; height:30%; border-top:1px solid rgba(255,255,255,0.06); border-left:1px solid rgba(255,255,255,0.06); border-radius:6px 0 0 0; background:rgba(255,255,255,0.015); }
+#z5 { bottom:0; left:50%; transform:translateX(-50%); width:21%; height:30%; border-top:1px solid rgba(255,255,255,0.06); border-left:1px solid rgba(255,255,255,0.06); border-right:1px solid rgba(255,255,255,0.06); border-radius:6px 6px 0 0; background:rgba(255,255,255,0.015); }
+
+.zone.active   { background:rgba(255,107,26,0.09)!important; border-color:rgba(255,107,26,0.5)!important; box-shadow:inset 0 0 28px rgba(255,107,26,0.1); }
+.zone.active   .zone-num  { color:var(--orange); }
+.zone.active   .zone-name { color:rgba(255,107,26,0.65); }
+.zone.cooldown { background:rgba(255,58,110,0.05)!important; border-color:rgba(255,58,110,0.22)!important; }
+.zone.cooldown .zone-num  { color:var(--muted); }
+.zone.cooldown .zone-name { color:var(--muted); }
+.zone.cooldown .zone-bar-wrap { opacity:1; }
+
+/* Debug preview */
+#debug-wrap { position:absolute; bottom:10px; right:10px; border:1px solid var(--border); border-radius:4px; overflow:hidden; opacity:0.8; display:none; }
+#debug-canvas { display:block; width:160px; height:90px; }
+#debug-label { font-size:0.5rem; letter-spacing:1px; text-transform:uppercase; color:var(--muted); text-align:center; padding:2px 0; background:var(--panel); }
+
+/* ── SIDE PANEL ── */
+#side-panel { width:196px; flex-shrink:0; background:var(--panel); border-left:1px solid var(--border); display:flex; flex-direction:column; overflow:hidden; }
+#panel-title { font-family:Impact,'Arial Narrow',sans-serif; font-size:0.82rem; letter-spacing:4px; text-transform:uppercase; color:var(--muted); padding:13px 16px 9px; border-bottom:1px solid var(--border); }
+#zone-stats { flex:1; display:flex; flex-direction:column; padding:10px 0; gap:1px; }
+.stat-row { display:flex; align-items:center; gap:9px; padding:9px 14px; border-radius:4px; margin:0 7px; transition:background 0.2s; }
+.stat-row.active   { background:var(--orange-dim); }
+.stat-row.cooldown { background:rgba(255,58,110,0.06); }
+.s-num   { font-family:Impact,'Arial Narrow',sans-serif; font-size:1rem; color:var(--orange); width:16px; text-align:center; flex-shrink:0; }
+.s-name  { font-size:0.6rem; letter-spacing:1px; text-transform:uppercase; color:var(--muted); flex:1; }
+.s-count { font-family:Impact,'Arial Narrow',sans-serif; font-size:1.65rem; color:var(--text); line-height:1; min-width:28px; text-align:right; transition:color 0.2s; }
+.stat-row.active .s-count { color:var(--orange); }
+.stat-div { height:1px; background:var(--border); margin:5px 14px; }
+#reset-btn { margin:0 14px 10px; padding:7px; background:transparent; border:1px solid var(--border); border-radius:4px; color:var(--muted); font-family:'Courier New',monospace; font-size:0.62rem; letter-spacing:2px; text-transform:uppercase; cursor:pointer; transition:all 0.2s; }
+#reset-btn:hover { border-color:var(--orange); color:var(--orange); background:var(--orange-dim); }
+#total-row { display:flex; align-items:center; justify-content:space-between; padding:11px 16px; border-top:1px solid var(--border); }
+#total-label { font-size:0.6rem; letter-spacing:2px; text-transform:uppercase; color:var(--muted); }
+#total-count { font-family:Impact,'Arial Narrow',sans-serif; font-size:2.1rem; color:var(--orange); text-shadow:0 0 14px var(--orange-glow); line-height:1; }
+
+/* Flash */
+#flash { position:fixed; inset:0; background:var(--orange); opacity:0; pointer-events:none; z-index:50; transition:opacity 0.05s; }
+</style>
+</head>
+<body>
+<div id="flash"></div>
+<div id="app">
+  <div id="header">
+    <div id="title">🏀 Zone Tracker</div>
+    <div id="header-right">
+      <select id="cam-select"><option>Enumerating cameras…</option></select>
+      <button id="start-btn" onclick="startCamera()" disabled>Start</button>
+      <button id="tune-toggle" onclick="toggleTune()">⚙ Tune</button>
+      <div id="status-pill"><div id="status-dot"></div><span id="status-text">Select camera</span></div>
+    </div>
+  </div>
+
+  <div id="main">
+    <div id="camera-wrap">
+      <video id="video" autoplay muted playsinline></video>
+      <canvas id="overlay"></canvas>
+
+      <div id="tune-panel">
+        <div class="tune-row">
+          <div class="tune-label">Hue Min <span id="lbl-hmin">0</span>°</div>
+          <input type="range" id="sl-hmin" min="0" max="360" value="5" oninput="syncTune()">
+        </div>
+        <div class="tune-row">
+          <div class="tune-label">Hue Max <span id="lbl-hmax">0</span>°</div>
+          <input type="range" id="sl-hmax" min="0" max="360" value="35" oninput="syncTune()">
+        </div>
+        <div id="hue-preview"><div id="hue-range-vis"></div></div>
+        <div class="tune-row">
+          <div class="tune-label">Min Saturation <span id="lbl-sat">0</span>%</div>
+          <input type="range" id="sl-sat" min="0" max="100" value="55" oninput="syncTune()">
+        </div>
+        <div class="tune-row">
+          <div class="tune-label">Min Brightness <span id="lbl-bri">0</span>%</div>
+          <input type="range" id="sl-bri" min="0" max="100" value="40" oninput="syncTune()">
+        </div>
+        <div class="tune-row">
+          <div class="tune-label">Min Blob px <span id="lbl-blobmin">0</span></div>
+          <input type="range" id="sl-blobmin" min="100" max="8000" value="800" oninput="syncTune()">
+        </div>
+        <div class="tune-row">
+          <div class="tune-label">Max Blob px <span id="lbl-blobmax">0</span></div>
+          <input type="range" id="sl-blobmax" min="500" max="80000" value="25000" oninput="syncTune()">
+        </div>
+        <div class="tune-btn-row">
+          <button class="tune-btn" onclick="toggleDebug()">Debug Mask</button>
+          <button class="tune-btn" onclick="resetTune()">Reset</button>
+        </div>
+      </div>
+
+      <div class="zone" id="z1"><div class="zone-num">1</div><div class="zone-name">Top Left</div><div class="zone-bar-wrap"><div class="zone-bar"></div></div></div>
+      <div class="zone" id="z2"><div class="zone-num">2</div><div class="zone-name">Top Right</div><div class="zone-bar-wrap"><div class="zone-bar"></div></div></div>
+      <div class="zone" id="z3"><div class="zone-num">3</div><div class="zone-name">Bot Left</div><div class="zone-bar-wrap"><div class="zone-bar"></div></div></div>
+      <div class="zone" id="z4"><div class="zone-num">4</div><div class="zone-name">Bot Right</div><div class="zone-bar-wrap"><div class="zone-bar"></div></div></div>
+      <div class="zone" id="z5"><div class="zone-num">5</div><div class="zone-name">Bot Mid</div><div class="zone-bar-wrap"><div class="zone-bar"></div></div></div>
+
+      <div id="debug-wrap">
+        <div id="debug-label">Colour Mask</div>
+        <canvas id="debug-canvas" width="160" height="90"></canvas>
+      </div>
+    </div>
+
+    <div id="side-panel">
+      <div id="panel-title">Zone Counts</div>
+      <div id="zone-stats">
+        <div class="stat-row" id="sr1"><div class="s-num">1</div><div class="s-name">Top Left</div><div class="s-count" id="c1">0</div></div>
+        <div class="stat-row" id="sr2"><div class="s-num">2</div><div class="s-name">Top Right</div><div class="s-count" id="c2">0</div></div>
+        <div class="stat-div"></div>
+        <div class="stat-row" id="sr3"><div class="s-num">3</div><div class="s-name">Bot Left</div><div class="s-count" id="c3">0</div></div>
+        <div class="stat-row" id="sr4"><div class="s-num">4</div><div class="s-name">Bot Right</div><div class="s-count" id="c4">0</div></div>
+        <div class="stat-div"></div>
+        <div class="stat-row" id="sr5"><div class="s-num">5</div><div class="s-name">Bot Mid</div><div class="s-count" id="c5">0</div></div>
+      </div>
+      <button id="reset-btn" onclick="resetCounts()">↺ Reset Counts</button>
+      <div id="total-row">
+        <div id="total-label">Total</div>
+        <div id="total-count">0</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════
+//  CONFIG
+// ═══════════════════════════════════════
+const COOLDOWN_MS = 5000;
+const PROC_W = 320;
+const PROC_H = 180;
+
+let CFG = { hMin:5, hMax:35, sMin:55, bMin:40, blobMin:800, blobMax:25000 };
+
+const ZONES = [
+  { id:1, xMin:0,     xMax:0.27,  yMin:0,    yMax:0.30 },
+  { id:2, xMin:0.73,  xMax:1,     yMin:0,    yMax:0.30 },
+  { id:3, xMin:0,     xMax:0.27,  yMin:0.70, yMax:1    },
+  { id:4, xMin:0.73,  xMax:1,     yMin:0.70, yMax:1    },
+  { id:5, xMin:0.395, xMax:0.605, yMin:0.70, yMax:1    },
+];
+
+// ═══════════════════════════════════════
+//  STATE
+// ═══════════════════════════════════════
+const counts      = {1:0,2:0,3:0,4:0,5:0};
+const cooldownEnd = {1:0,2:0,3:0,4:0,5:0};
+const activeNow   = new Set();
+let loopStarted   = false;
+let debugVisible  = false;
+
+// ═══════════════════════════════════════
+//  ELEMENTS
+// ═══════════════════════════════════════
+const video       = document.getElementById('video');
+const overlay     = document.getElementById('overlay');
+const octx        = overlay.getContext('2d');
+const debugCanvas = document.getElementById('debug-canvas');
+const dctx        = debugCanvas.getContext('2d');
+const flash       = document.getElementById('flash');
+const statusPill  = document.getElementById('status-pill');
+const statusText  = document.getElementById('status-text');
+const camSelect   = document.getElementById('cam-select');
+const startBtn    = document.getElementById('start-btn');
+
+// Off-screen processing canvas
+const proc  = document.createElement('canvas');
+proc.width  = PROC_W;
+proc.height = PROC_H;
+const pctx  = proc.getContext('2d', { willReadFrequently: true });
+
+// ═══════════════════════════════════════
+//  CAMERA SETUP
+// ═══════════════════════════════════════
+async function listCameras() {
+  try {
+    const s = await navigator.mediaDevices.getUserMedia({ video: true });
+    s.getTracks().forEach(t => t.stop());
+  } catch(e) {}
+
+  const devices = await navigator.mediaDevices.enumerateDevices();
+  const cameras = devices.filter(d => d.kind === 'videoinput');
+
+  camSelect.innerHTML = '';
+  cameras.forEach((cam, i) => {
+    const opt = document.createElement('option');
+    opt.value = cam.deviceId;
+    opt.textContent = cam.label || ('Camera ' + (i + 1));
+    camSelect.appendChild(opt);
+  });
+
+  startBtn.disabled = cameras.length === 0;
+  statusText.textContent = cameras.length + ' camera(s) found';
+}
+
+async function startCamera() {
+  const deviceId = camSelect.value;
+  if (!deviceId) return;
+
+  if (video.srcObject) video.srcObject.getTracks().forEach(t => t.stop());
+  loopStarted = false;
+
+  statusText.textContent = 'Starting…';
+  statusPill.classList.remove('ready');
+  startBtn.disabled = true;
+
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({
+      video: { deviceId: { exact: deviceId } }
+    });
+    video.srcObject = stream;
+    await video.play();
+
+    resizeOverlay();
+    statusText.textContent = 'Detecting';
+    statusPill.classList.add('ready');
+    startBtn.disabled = false;
+    startBtn.textContent = 'Restart';
+
+    if (!loopStarted) {
+      loopStarted = true;
+      requestAnimationFrame(loop);
+    }
+  } catch(e) {
+    statusText.textContent = 'Error: ' + e.message;
+    startBtn.disabled = false;
+  }
+}
+
+function resizeOverlay() {
+  overlay.width  = overlay.parentElement.clientWidth;
+  overlay.height = overlay.parentElement.clientHeight;
+}
+window.addEventListener('resize', resizeOverlay);
+
+// ═══════════════════════════════════════
+//  MAIN LOOP
+// ═══════════════════════════════════════
+function loop() {
+  requestAnimationFrame(loop);
+  if (video.readyState < 2) return;
+
+  // Draw downscaled frame
+  pctx.drawImage(video, 0, 0, PROC_W, PROC_H);
+  const imgData = pctx.getImageData(0, 0, PROC_W, PROC_H);
+  const data    = imgData.data;
+
+  // Build orange pixel mask
+  const mask = new Uint8Array(PROC_W * PROC_H);
+  for (let i = 0; i < PROC_W * PROC_H; i++) {
+    if (isOrange(data[i*4], data[i*4+1], data[i*4+2])) mask[i] = 1;
+  }
+
+  // Find blobs
+  const blobs = findBlobs(mask, PROC_W, PROC_H)
+    .filter(b => b.size >= CFG.blobMin && b.size <= CFG.blobMax)
+    .map(b => ({ ...b, cx: 1 - b.cx, bx: 1 - b.bx - b.bw })); // mirror x
+
+  // Zone hit detection
+  const now = Date.now();
+  activeNow.clear();
+
+  for (const blob of blobs) {
+    for (const zone of ZONES) {
+      if (blob.cx >= zone.xMin && blob.cx <= zone.xMax &&
+          blob.cy >= zone.yMin && blob.cy <= zone.yMax) {
+        activeNow.add(zone.id);
+        if (now >= cooldownEnd[zone.id]) {
+          counts[zone.id]++;
+          cooldownEnd[zone.id] = now + COOLDOWN_MS;
+          updatePanel();
+          triggerFlash();
+        }
+      }
+    }
+  }
+
+  // Draw bounding boxes on overlay
+  const ow = overlay.width, oh = overlay.height;
+  octx.clearRect(0, 0, ow, oh);
+
+  for (const blob of blobs) {
+    const x = blob.bx * ow, y = blob.by * oh;
+    const w = blob.bw * ow, h = blob.bh * oh;
+
+    octx.save();
+    octx.strokeStyle = '#ff6b1a';
+    octx.lineWidth   = 2;
+    octx.shadowColor = '#ff6b1a';
+    octx.shadowBlur  = 14;
+    octx.strokeRect(x, y, w, h);
+
+    // Corner ticks
+    const t = Math.min(10, w * 0.25, h * 0.25);
+    octx.strokeStyle = '#fff';
+    octx.lineWidth   = 1.5;
+    octx.shadowBlur  = 0;
+    octx.beginPath();
+    octx.moveTo(x,     y+t);   octx.lineTo(x,   y);   octx.lineTo(x+t,   y);
+    octx.moveTo(x+w-t, y);     octx.lineTo(x+w, y);   octx.lineTo(x+w,   y+t);
+    octx.moveTo(x,     y+h-t); octx.lineTo(x,   y+h); octx.lineTo(x+t,   y+h);
+    octx.moveTo(x+w-t, y+h);   octx.lineTo(x+w, y+h); octx.lineTo(x+w,   y+h-t);
+    octx.stroke();
+
+    octx.fillStyle = '#ff6b1a';
+    octx.font = 'bold 11px Courier New';
+    octx.fillText('🏀 ' + blob.size + 'px', x + 3, y > 16 ? y - 5 : y + h + 13);
+    octx.restore();
+  }
+
+  // Update zone overlays
+  for (const zone of ZONES) {
+    const el  = document.getElementById('z' + zone.id);
+    const sr  = document.getElementById('sr' + zone.id);
+    const bar = el.querySelector('.zone-bar');
+    const isCool   = now < cooldownEnd[zone.id];
+    const isActive = activeNow.has(zone.id);
+    el.classList.toggle('active',   isActive && !isCool);
+    el.classList.toggle('cooldown', isCool);
+    sr.classList.toggle('active',   isActive && !isCool);
+    sr.classList.toggle('cooldown', isCool);
+    bar.style.width = isCool ? ((cooldownEnd[zone.id] - now) / COOLDOWN_MS * 100) + '%' : '0%';
+  }
+
+  // Debug mask
+  if (debugVisible) {
+    const dw = debugCanvas.width, dh = debugCanvas.height;
+    dctx.drawImage(proc, 0, 0, dw, dh);
+    const di = dctx.getImageData(0, 0, dw, dh);
+    const dd = di.data;
+    for (let py = 0; py < dh; py++) {
+      for (let px = 0; px < dw; px++) {
+        const mx  = Math.floor(px / dw * PROC_W);
+        const my  = Math.floor(py / dh * PROC_H);
+        const idx = (py * dw + px) * 4;
+        if (mask[my * PROC_W + mx]) {
+          dd[idx]=255; dd[idx+1]=100; dd[idx+2]=0; dd[idx+3]=220;
+        } else {
+          dd[idx+3] = Math.floor(dd[idx+3] * 0.35);
+        }
+      }
+    }
+    dctx.putImageData(di, 0, 0);
+  }
+}
+
+// ═══════════════════════════════════════
+//  COLOUR DETECTION  (RGB → HSV)
+// ═══════════════════════════════════════
+function isOrange(r, g, b) {
+  const rn = r/255, gn = g/255, bn = b/255;
+  const max = Math.max(rn,gn,bn), min = Math.min(rn,gn,bn), d = max - min;
+  if (max === 0 || d === 0) return false;
+  if ((d/max)*100 < CFG.sMin) return false;
+  if (max*100 < CFG.bMin) return false;
+  let h;
+  if      (max === rn) h = ((gn-bn)/d) % 6;
+  else if (max === gn) h = (bn-rn)/d + 2;
+  else                 h = (rn-gn)/d + 4;
+  h = ((h*60) + 360) % 360;
+  return h >= CFG.hMin && h <= CFG.hMax;
+}
+
+// ═══════════════════════════════════════
+//  BLOB FINDER  (union-find)
+// ═══════════════════════════════════════
+function findBlobs(mask, w, h) {
+  const label  = new Int32Array(w * h).fill(-1);
+  const parent = [];
+
+  function find(x) {
+    while (parent[x] !== x) { parent[x] = parent[parent[x]]; x = parent[x]; }
+    return x;
+  }
+  function union(a, b) {
+    a = find(a); b = find(b);
+    if (a !== b) parent[a] = b;
+  }
+
+  let next = 0;
+  for (let y = 0; y < h; y++) {
+    for (let x = 0; x < w; x++) {
+      const i = y*w + x;
+      if (!mask[i]) continue;
+      const up   = y > 0 && mask[(y-1)*w+x]   ? label[(y-1)*w+x] : -1;
+      const left = x > 0 && mask[y*w+(x-1)]   ? label[y*w+(x-1)] : -1;
+      if (up === -1 && left === -1) { label[i] = next; parent.push(next++); }
+      else if (up === -1)   { label[i] = left; }
+      else if (left === -1) { label[i] = up; }
+      else { label[i] = up; union(up, left); }
+    }
+  }
+
+  const blobs = {};
+  for (let y = 0; y < h; y++) {
+    for (let x = 0; x < w; x++) {
+      const i = y*w + x;
+      if (!mask[i]) continue;
+      const root = find(label[i]);
+      if (!blobs[root]) blobs[root] = { size:0, xSum:0, ySum:0, x1:w, y1:h, x2:0, y2:0 };
+      const b = blobs[root];
+      b.size++; b.xSum += x; b.ySum += y;
+      if (x < b.x1) b.x1=x; if (y < b.y1) b.y1=y;
+      if (x > b.x2) b.x2=x; if (y > b.y2) b.y2=y;
+    }
+  }
+
+  return Object.values(blobs).map(b => ({
+    size: b.size,
+    cx:   b.xSum / b.size / w,
+    cy:   b.ySum / b.size / h,
+    bx:   b.x1 / w,
+    by:   b.y1 / h,
+    bw:   (b.x2 - b.x1 + 1) / w,
+    bh:   (b.y2 - b.y1 + 1) / h,
+  }));
+}
+
+// ═══════════════════════════════════════
+//  UI
+// ═══════════════════════════════════════
+function updatePanel() {
+  let total = 0;
+  for (const z of ZONES) { document.getElementById('c'+z.id).textContent = counts[z.id]; total += counts[z.id]; }
+  document.getElementById('total-count').textContent = total;
+}
+function resetCounts() {
+  for (const z of ZONES) { counts[z.id]=0; cooldownEnd[z.id]=0; }
+  activeNow.clear(); updatePanel();
+}
+function triggerFlash() { flash.style.opacity='0.07'; setTimeout(()=>{ flash.style.opacity='0'; },80); }
+function toggleTune()  { document.getElementById('tune-panel').classList.toggle('open'); }
+function toggleDebug() {
+  debugVisible = !debugVisible;
+  document.getElementById('debug-wrap').style.display = debugVisible ? 'block' : 'none';
+}
+function resetTune() {
+  document.getElementById('sl-hmin').value   = 5;
+  document.getElementById('sl-hmax').value   = 35;
+  document.getElementById('sl-sat').value    = 55;
+  document.getElementById('sl-bri').value    = 40;
+  document.getElementById('sl-blobmin').value = 800;
+  document.getElementById('sl-blobmax').value = 25000;
+  syncTune();
+}
+function syncTune() {
+  CFG.hMin    = +document.getElementById('sl-hmin').value;
+  CFG.hMax    = +document.getElementById('sl-hmax').value;
+  CFG.sMin    = +document.getElementById('sl-sat').value;
+  CFG.bMin    = +document.getElementById('sl-bri').value;
+  CFG.blobMin = +document.getElementById('sl-blobmin').value;
+  CFG.blobMax = +document.getElementById('sl-blobmax').value;
+  document.getElementById('lbl-hmin').textContent    = CFG.hMin;
+  document.getElementById('lbl-hmax').textContent    = CFG.hMax;
+  document.getElementById('lbl-sat').textContent     = CFG.sMin;
+  document.getElementById('lbl-bri').textContent     = CFG.bMin;
+  document.getElementById('lbl-blobmin').textContent = CFG.blobMin;
+  document.getElementById('lbl-blobmax').textContent = CFG.blobMax;
+  const vis = document.getElementById('hue-range-vis');
+  vis.style.left  = (CFG.hMin / 360 * 100) + '%';
+  vis.style.width = ((CFG.hMax - CFG.hMin) / 360 * 100) + '%';
+}
+
+syncTune();
+listCameras();
+</script>
+</body>
+</html>
