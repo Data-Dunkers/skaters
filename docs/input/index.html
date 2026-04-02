@@ -126,6 +126,11 @@
             transition: border-color 0.2s, box-shadow 0.2s;
             appearance: none;
         }
+        #nickname.nickname-reminder {
+            background-color: rgba(255, 102, 0, 0.2);
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(255, 102, 0, 0.14);
+        }
         input:focus, select:focus {
             outline: none;
             border-color: var(--border-focus);
@@ -323,7 +328,6 @@
             <select id="activity" name="activity" required>
                 <option value="" disabled selected>Select your activity…</option>
                 <option value="Sniper">Sniper</option>
-                <option value="Distance">Distance</option>
                 <option value="Playmaker">Playmaker</option>
                 <option value="Power Forward">Power Forward</option>
                 <option value="Two-way Forward">Two-way Forward</option>
@@ -416,7 +420,6 @@ const PB_URL = 'https://api.datadunkers.ca/api/collections/data_skaters_activiti
 // time_seconds: true = show, false = hide
 const ACTIVITY_CONFIG = {
     'Sniper':                 { target_zone: true,  time_seconds: false, hint: 'Wrist shot · Top corners · Mid-distance' },
-    'Distance':               { target_zone: true,  time_seconds: true,  hint: 'Timed · Top corners · 2 angles · Mid-distance' },
     'Playmaker':              { target_zone: true,  time_seconds: false, hint: 'Wrist shot · All 5 holes · Same distance' },
     'Power Forward':          { target_zone: false, time_seconds: false, hint: 'Close-range · Any low zone · Right at the net' },
     'Two-way Forward':        { target_zone: true,  time_seconds: false, hint: '6 different distances/angles · 2 ft away' },
@@ -427,6 +430,8 @@ const ACTIVITY_CONFIG = {
 
 // ── STATE ───────────────────────────────────────────────────────
 let successValue = null; // true | false | null
+let nicknameReminderActive = false;
+let lastReminderNickname = null;
 
 // ── ON LOAD ─────────────────────────────────────────────────────
 window.onload = () => {
@@ -438,6 +443,13 @@ window.onload = () => {
 
     // Wire attempt dots
     document.getElementById('attempt_number').addEventListener('input', updateDots);
+
+    // Clear reminder if nickname is edited.
+    document.getElementById('nickname').addEventListener('input', () => {
+        resetAttemptToOne();
+        setNicknameReminder(false);
+        lastReminderNickname = null;
+    });
 };
 
 // ── ACTIVITY SELECTION ──────────────────────────────────────────
@@ -445,6 +457,7 @@ document.getElementById('activity').addEventListener('change', function () {
     const cfg  = ACTIVITY_CONFIG[this.value] || {};
     const hint = document.getElementById('activityHint');
 
+    resetAttemptToOne();
     hint.textContent = cfg.hint || '';
 
     toggleField('field_target_zone',   cfg.target_zone);
@@ -475,6 +488,16 @@ function updateDots() {
     document.querySelectorAll('.attempt-dot').forEach(dot => {
         dot.classList.toggle('filled', parseInt(dot.dataset.dot, 10) <= val);
     });
+}
+
+function resetAttemptToOne() {
+    document.getElementById('attempt_number').value = 1;
+    updateDots();
+}
+
+function setNicknameReminder(active) {
+    nicknameReminderActive = active;
+    document.getElementById('nickname').classList.toggle('nickname-reminder', active);
 }
 
 // ── SUBMIT ───────────────────────────────────────────────────────
@@ -528,6 +551,17 @@ async function handleSubmit() {
         updateDots();
         setSuccess(null);          // clear hit/miss
         document.getElementById('time_seconds').value = '';
+
+        // Reminder flow:
+        // 1) attempt #6 turns reminder on (once per nickname)
+        // 2) if reminder is already on, next successful shot turns it off
+        const attemptNum = parseInt(attempt, 10);
+        if (nicknameReminderActive) {
+            setNicknameReminder(false);
+        } else if (attemptNum === 6 && nick !== lastReminderNickname) {
+            setNicknameReminder(true);
+            lastReminderNickname = nick;
+        }
 
         updateStats(nick);
 
