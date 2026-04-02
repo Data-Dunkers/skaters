@@ -1,0 +1,889 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Data Skaters — Player Card Generator</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,400;0,600;0,700;0,800;0,900;1,700&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --dell-blue: #0076CE;
+    --dell-dark: #003B6F;
+    --dell-light: #5BB3E8;
+    --ice: #E8F4FD;
+    --ice2: #C5E3F5;
+    --orange: #F26622;
+    --white: #FFFFFF;
+    --dark: #0A1628;
+    --mid: #1A3A5C;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: #060F1E;
+    color: var(--white);
+    font-family: 'Barlow', sans-serif;
+    min-height: 100vh;
+    background-image: 
+      radial-gradient(ellipse at 20% 50%, rgba(0,118,206,0.15) 0%, transparent 60%),
+      radial-gradient(ellipse at 80% 20%, rgba(91,179,232,0.1) 0%, transparent 50%);
+  }
+
+  /* ── HEADER ── */
+  header {
+    text-align: center;
+    padding: 36px 20px 24px;
+    position: relative;
+  }
+  header::after {
+    content: '';
+    display: block;
+    width: 60px;
+    height: 3px;
+    background: var(--dell-blue);
+    margin: 16px auto 0;
+  }
+  .header-eyebrow {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: var(--dell-light);
+    margin-bottom: 8px;
+  }
+  h1 {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: clamp(36px, 5vw, 56px);
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: var(--white);
+    line-height: 1;
+  }
+  h1 span { color: var(--dell-blue); }
+
+  /* ── MAIN LAYOUT ── */
+  .app-wrap {
+    display: flex;
+    gap: 32px;
+    max-width: 1300px;
+    margin: 0 auto;
+    padding: 20px 24px 60px;
+    align-items: flex-start;
+  }
+
+  /* ── FORM PANEL ── */
+  .form-panel {
+    flex: 0 0 320px;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 16px;
+    padding: 28px 24px;
+    backdrop-filter: blur(10px);
+    position: sticky;
+    top: 20px;
+  }
+  .form-section-title {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--dell-light);
+    margin: 20px 0 12px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid rgba(91,179,232,0.2);
+  }
+  .form-section-title:first-child { margin-top: 0; }
+  .field {
+    margin-bottom: 12px;
+  }
+  label {
+    display: block;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.5);
+    margin-bottom: 5px;
+  }
+  input[type="text"], input[type="number"], select {
+    width: 100%;
+    background: rgba(255,255,255,0.07);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 8px;
+    color: var(--white);
+    font-family: 'Barlow', sans-serif;
+    font-size: 14px;
+    padding: 9px 12px;
+    transition: border-color 0.2s, background 0.2s;
+    -webkit-appearance: none;
+  }
+  input[type="text"]:focus, input[type="number"]:focus, select:focus {
+    outline: none;
+    border-color: var(--dell-blue);
+    background: rgba(0,118,206,0.1);
+  }
+  select option { background: #1A3A5C; color: white; }
+
+  .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+  /* Photo upload */
+  .photo-upload {
+    border: 2px dashed rgba(0,118,206,0.4);
+    border-radius: 10px;
+    padding: 18px;
+    text-align: center;
+    cursor: pointer;
+    transition: border-color 0.2s, background 0.2s;
+    background: rgba(0,118,206,0.05);
+    position: relative;
+  }
+  .photo-upload:hover { border-color: var(--dell-blue); background: rgba(0,118,206,0.1); }
+  .photo-upload input { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; }
+  .photo-upload svg { display: block; margin: 0 auto 8px; opacity: 0.5; }
+  .photo-upload span { font-size: 12px; color: rgba(255,255,255,0.5); display: block; }
+  .photo-upload strong { font-size: 13px; color: var(--dell-light); display: block; }
+  #photo-preview {
+    width: 100%;
+    height: 100px;
+    object-fit: cover;
+    border-radius: 6px;
+    display: none;
+    margin-top: 10px;
+  }
+
+  /* Generate button */
+  .btn-generate {
+    width: 100%;
+    margin-top: 20px;
+    padding: 14px;
+    background: var(--dell-blue);
+    color: white;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 16px;
+    font-weight: 800;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.1s;
+  }
+  .btn-generate:hover { background: #0086EB; }
+  .btn-generate:active { transform: scale(0.98); }
+
+  /* ── PREVIEW PANEL ── */
+  .preview-panel {
+    flex: 1;
+    min-width: 0;
+  }
+  .preview-label {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.3);
+    margin-bottom: 16px;
+  }
+  .canvas-row {
+    display: flex;
+    gap: 24px;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    margin-bottom: 20px;
+  }
+  .canvas-wrap {
+    text-align: center;
+  }
+  .canvas-wrap p {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 12px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.35);
+    margin-bottom: 8px;
+  }
+  canvas {
+    border-radius: 18px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.06);
+    display: block;
+  }
+  .download-row {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .btn-dl {
+    padding: 11px 22px;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.14);
+    border-radius: 8px;
+    color: white;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: background 0.2s, border-color 0.2s;
+  }
+  .btn-dl:hover { background: rgba(0,118,206,0.3); border-color: var(--dell-blue); }
+
+  @media (max-width: 800px) {
+    .app-wrap { flex-direction: column; }
+    .form-panel { position: static; flex: none; width: 100%; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-eyebrow">Powered by Dell Technologies</div>
+  <h1>Data <span>Skaters</span></h1>
+  <div style="font-size:13px;color:rgba(255,255,255,0.4);margin-top:8px;font-family:'Barlow Condensed',sans-serif;letter-spacing:1px;">Player Card Generator</div>
+</header>
+
+<div class="app-wrap">
+
+  <!-- FORM -->
+  <div class="form-panel">
+
+    <div class="form-section-title">Photo</div>
+    <div class="photo-upload" id="photo-drop">
+      <input type="file" id="photo-input" accept="image/*">
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+        <rect x="3" y="3" width="18" height="18" rx="3"/>
+        <circle cx="8.5" cy="8.5" r="1.5"/>
+        <polyline points="21 15 16 10 5 21"/>
+      </svg>
+      <strong>Upload Player Photo</strong>
+      <span>Click or drag an image here</span>
+      <img id="photo-preview" alt="preview">
+    </div>
+
+    <div class="form-section-title">Player Info</div>
+    <div class="field">
+      <label>Name</label>
+      <input type="text" id="f-name" value="Alex Tundra" placeholder="Full name">
+    </div>
+    <div class="field-row">
+      <div class="field">
+        <label>Number</label>
+        <input type="number" id="f-number" value="17" min="1" max="99">
+      </div>
+      <div class="field">
+        <label>Position</label>
+        <select id="f-position">
+          <option>Centre</option>
+          <option>Left Wing</option>
+          <option>Right Wing</option>
+          <option>Defenceman</option>
+          <option>Goalie</option>
+        </select>
+      </div>
+    </div>
+    <div class="field-row">
+      <div class="field">
+        <label>Height</label>
+        <input type="text" id="f-height" value="5'10&quot;" placeholder='5&apos;10"'>
+      </div>
+      <div class="field">
+        <label>Handedness</label>
+        <select id="f-hand">
+          <option>Right</option>
+          <option>Left</option>
+        </select>
+      </div>
+    </div>
+    <div class="field">
+      <label>Birth Month</label>
+      <select id="f-month">
+        <option>January</option><option>February</option><option>March</option>
+        <option>April</option><option>May</option><option>June</option>
+        <option>July</option><option>August</option><option>September</option>
+        <option>October</option><option>November</option><option>December</option>
+      </select>
+    </div>
+
+    <div class="form-section-title">Stats</div>
+    <div class="field-row">
+      <div class="field">
+        <label>Goals</label>
+        <input type="number" id="f-goals" value="12" min="0">
+      </div>
+      <div class="field">
+        <label>Assists</label>
+        <input type="number" id="f-assists" value="18" min="0">
+      </div>
+    </div>
+    <div class="field-row">
+      <div class="field">
+        <label>Accuracy %</label>
+        <input type="number" id="f-accuracy" value="74" min="0" max="100">
+      </div>
+      <div class="field">
+        <label>React. Time (ms)</label>
+        <input type="number" id="f-reaction" value="210" min="0">
+      </div>
+    </div>
+
+    <button class="btn-generate" onclick="generateCards()">⬡ Generate Card</button>
+  </div>
+
+  <!-- PREVIEW -->
+  <div class="preview-panel">
+    <div class="preview-label">Card Preview — 2.5 × 3.5 in</div>
+    <div class="canvas-row">
+      <div class="canvas-wrap">
+        <p>Front</p>
+        <canvas id="front-canvas" width="750" height="1050" style="width:300px;height:420px;"></canvas>
+      </div>
+      <div class="canvas-wrap">
+        <p>Back</p>
+        <canvas id="back-canvas" width="750" height="1050" style="width:300px;height:420px;"></canvas>
+      </div>
+    </div>
+    <div class="download-row">
+      <button class="btn-dl" onclick="downloadCard('front')">↓ Download Front</button>
+      <button class="btn-dl" onclick="downloadCard('back')">↓ Download Back</button>
+      <button class="btn-dl" onclick="downloadBoth()">↓ Download Both (Combined)</button>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// ─── LOGO PLACEHOLDERS ────────────────────────────────────────────────────────
+// These are placeholder logos as rounded-rect label badges.
+// Replace drawLogoPlaceholder calls with ctx.drawImage(logoImg, x, y, w, h)
+// once you have the real assets.
+
+function drawLogoPlaceholder(ctx, label, x, y, w, h, bg, fg) {
+  ctx.save();
+  roundRect(ctx, x, y, w, h, 6);
+  ctx.fillStyle = bg || 'rgba(255,255,255,0.12)';
+  ctx.fill();
+  ctx.font = `bold ${Math.floor(h * 0.38)}px "Barlow Condensed", sans-serif`;
+  ctx.fillStyle = fg || '#FFFFFF';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText(label, x + w / 2, y + h / 2);
+  ctx.restore();
+}
+
+// ─── UTILITY ─────────────────────────────────────────────────────────────────
+function roundRect(ctx, x, y, w, h, r) {
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.lineTo(x + w - r, y);
+  ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+  ctx.lineTo(x + w, y + h - r);
+  ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+  ctx.lineTo(x + r, y + h);
+  ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+  ctx.lineTo(x, y + r);
+  ctx.quadraticCurveTo(x, y, x + r, y);
+  ctx.closePath();
+}
+
+function val(id) { return document.getElementById(id).value.trim(); }
+
+let playerPhotoDataURL = null;
+
+// ─── PHOTO UPLOAD ─────────────────────────────────────────────────────────────
+document.getElementById('photo-input').addEventListener('change', function(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(ev) {
+    playerPhotoDataURL = ev.target.result;
+    const prev = document.getElementById('photo-preview');
+    prev.src = playerPhotoDataURL;
+    prev.style.display = 'block';
+    document.querySelector('.photo-upload strong').textContent = 'Photo loaded ✓';
+    generateCards();
+  };
+  reader.readAsDataURL(file);
+});
+
+// ─── LIVE REGENERATION ───────────────────────────────────────────────────────
+document.querySelectorAll('input, select').forEach(el => {
+  el.addEventListener('input', () => generateCards());
+  el.addEventListener('change', () => generateCards());
+});
+
+// ─── FRONT CARD ───────────────────────────────────────────────────────────────
+function drawFront(ctx, W, H, data) {
+  ctx.clearRect(0, 0, W, H);
+
+  // ── Background
+  const bgGrad = ctx.createLinearGradient(0, 0, 0, H);
+  bgGrad.addColorStop(0, '#001B3A');
+  bgGrad.addColorStop(0.5, '#003B6F');
+  bgGrad.addColorStop(1, '#001020');
+  ctx.fillStyle = bgGrad;
+  ctx.fillRect(0, 0, W, H);
+
+  // ── Player photo (full bleed top ~68%)
+  const photoH = Math.floor(H * 0.68);
+  if (data.photo) {
+    const img = new Image();
+    img.onload = function() {
+      // draw cropped to top area
+      ctx.save();
+      roundRect(ctx, 0, 0, W, H, 30);
+      ctx.clip();
+
+      // cover-fit the photo
+      const iw = img.naturalWidth, ih = img.naturalHeight;
+      const scale = Math.max(W / iw, photoH / ih);
+      const dw = iw * scale, dh = ih * scale;
+      const dx = (W - dw) / 2, dy = 0;
+      ctx.drawImage(img, dx, dy, dw, dh);
+
+      // gradient overlay so bottom text is readable
+      const grad = ctx.createLinearGradient(0, photoH * 0.3, 0, photoH);
+      grad.addColorStop(0, 'rgba(0,27,58,0)');
+      grad.addColorStop(0.6, 'rgba(0,27,58,0.6)');
+      grad.addColorStop(1, 'rgba(0,27,58,0.98)');
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, W, photoH);
+
+      ctx.restore();
+      drawFrontOverlay(ctx, W, H, photoH, data);
+    };
+    img.src = data.photo;
+  } else {
+    // Silhouette placeholder
+    ctx.save();
+    roundRect(ctx, 0, 0, W, H, 30);
+    ctx.clip();
+    const sGrad = ctx.createLinearGradient(0, 0, 0, photoH);
+    sGrad.addColorStop(0, '#002244');
+    sGrad.addColorStop(1, '#001B3A');
+    ctx.fillStyle = sGrad;
+    ctx.fillRect(0, 0, W, photoH);
+    // silhouette icon
+    ctx.fillStyle = 'rgba(255,255,255,0.06)';
+    ctx.beginPath();
+    ctx.arc(W/2, photoH * 0.42, 110, 0, Math.PI*2);
+    ctx.fill();
+    ctx.fillStyle = 'rgba(255,255,255,0.04)';
+    ctx.beginPath();
+    ctx.ellipse(W/2, photoH * 0.85, 160, 80, 0, 0, Math.PI*2);
+    ctx.fill();
+    const grad = ctx.createLinearGradient(0, photoH * 0.5, 0, photoH);
+    grad.addColorStop(0, 'rgba(0,27,58,0)');
+    grad.addColorStop(1, 'rgba(0,27,58,0.97)');
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, W, photoH);
+    ctx.restore();
+    drawFrontOverlay(ctx, W, H, photoH, data);
+  }
+}
+
+function drawFrontOverlay(ctx, W, H, photoH, data) {
+  // ── Diagonal accent stripe
+  ctx.save();
+  roundRect(ctx, 0, 0, W, H, 30);
+  ctx.clip();
+  ctx.fillStyle = 'rgba(0,118,206,0.18)';
+  ctx.beginPath();
+  ctx.moveTo(0, photoH - 120);
+  ctx.lineTo(W, photoH - 200);
+  ctx.lineTo(W, photoH - 160);
+  ctx.lineTo(0, photoH - 80);
+  ctx.closePath();
+  ctx.fill();
+  ctx.restore();
+
+  // ── Top-left: Series badge
+  ctx.save();
+  ctx.font = 'bold 22px "Barlow Condensed", sans-serif';
+  ctx.fillStyle = 'rgba(255,255,255,0.85)';
+  ctx.textAlign = 'left';
+  ctx.textBaseline = 'top';
+  ctx.fillText('DATA SKATERS', 36, 36);
+  // small underline
+  ctx.fillStyle = '#0076CE';
+  ctx.fillRect(36, 64, 180, 3);
+  ctx.restore();
+
+  // ── Top-right: Player number
+  ctx.save();
+  ctx.font = 'italic 900 130px "Barlow Condensed", sans-serif';
+  ctx.fillStyle = 'rgba(255,255,255,0.08)';
+  ctx.textAlign = 'right';
+  ctx.textBaseline = 'top';
+  ctx.fillText('#' + (data.number || '00'), W - 30, 10);
+  ctx.font = 'italic 800 72px "Barlow Condensed", sans-serif';
+  ctx.fillStyle = 'rgba(255,255,255,0.9)';
+  ctx.fillText('#' + (data.number || '00'), W - 32, 28);
+  ctx.restore();
+
+  // ── Bottom name plate
+  const plateY = photoH - 10;
+  const plateH = H - plateY;
+
+  // Plate background
+  ctx.save();
+  ctx.fillStyle = '#001428';
+  ctx.fillRect(0, plateY, W, plateH);
+  ctx.restore();
+
+  // Dell blue accent bar
+  ctx.fillStyle = '#0076CE';
+  ctx.fillRect(0, plateY, W, 5);
+
+  // Position label
+  ctx.save();
+  ctx.font = '600 24px "Barlow Condensed", sans-serif';
+  ctx.fillStyle = '#5BB3E8';
+  ctx.textAlign = 'left';
+  ctx.textBaseline = 'top';
+  ctx.letterSpacing = '3px';
+  ctx.fillText((data.position || 'PLAYER').toUpperCase(), 36, plateY + 22);
+  ctx.restore();
+
+  // Name — first name
+  const nameParts = (data.name || 'Player Name').split(' ');
+  const firstName = nameParts.slice(0, -1).join(' ') || nameParts[0];
+  const lastName = nameParts.length > 1 ? nameParts[nameParts.length - 1] : '';
+
+  ctx.save();
+  ctx.textAlign = 'left';
+  ctx.textBaseline = 'top';
+
+  ctx.font = '700 56px "Barlow Condensed", sans-serif';
+  ctx.fillStyle = 'rgba(255,255,255,0.7)';
+  ctx.fillText(firstName.toUpperCase(), 34, plateY + 52);
+
+  ctx.font = 'italic 900 80px "Barlow Condensed", sans-serif';
+  ctx.fillStyle = '#FFFFFF';
+  ctx.fillText(lastName.toUpperCase(), 34, plateY + 102);
+  ctx.restore();
+
+  // Handedness badge
+  ctx.save();
+  ctx.font = 'bold 20px "Barlow Condensed", sans-serif';
+  ctx.textAlign = 'right';
+  ctx.textBaseline = 'top';
+  ctx.fillStyle = 'rgba(255,255,255,0.5)';
+  ctx.fillText(data.hand + ' HAND', W - 36, plateY + 28);
+  ctx.restore();
+
+  // Height
+  ctx.save();
+  ctx.font = '600 24px "Barlow Condensed", sans-serif';
+  ctx.textAlign = 'right';
+  ctx.textBaseline = 'top';
+  ctx.fillStyle = 'rgba(255,255,255,0.6)';
+  ctx.fillText(data.height, W - 36, plateY + 56);
+  ctx.restore();
+
+  // Quick stats row
+  const statsY = plateY + 200;
+  const stats = [
+    { label: 'G', value: data.goals },
+    { label: 'A', value: data.assists },
+    { label: 'PTS', value: parseInt(data.goals || 0) + parseInt(data.assists || 0) },
+  ];
+  const sw = W / 3;
+  stats.forEach((s, i) => {
+    const cx = sw * i + sw / 2;
+    if (i > 0) {
+      ctx.save();
+      ctx.strokeStyle = 'rgba(255,255,255,0.1)';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(sw * i, statsY - 16);
+      ctx.lineTo(sw * i, statsY + 60);
+      ctx.stroke();
+      ctx.restore();
+    }
+    ctx.save();
+    ctx.textAlign = 'center';
+    ctx.font = 'bold 52px "Barlow Condensed", sans-serif';
+    ctx.fillStyle = '#FFFFFF';
+    ctx.textBaseline = 'top';
+    ctx.fillText(s.value, cx, statsY);
+    ctx.font = '600 20px "Barlow Condensed", sans-serif';
+    ctx.fillStyle = '#5BB3E8';
+    ctx.fillText(s.label, cx, statsY + 56);
+    ctx.restore();
+  });
+
+  // Bottom logo row
+  const logoY = H - 78;
+  drawLogoPlaceholder(ctx, 'DELL', 36, logoY, 120, 46, '#0076CE', '#FFFFFF');
+  drawLogoPlaceholder(ctx, 'PS43', 168, logoY, 90, 46, 'rgba(255,255,255,0.1)', '#FFFFFF');
+  drawLogoPlaceholder(ctx, 'LOTUS 8', 270, logoY, 110, 46, 'rgba(255,255,255,0.1)', '#FFFFFF');
+  drawLogoPlaceholder(ctx, 'MFNERC', 392, logoY, 120, 46, 'rgba(255,255,255,0.1)', '#FFFFFF');
+
+  // Card border
+  ctx.save();
+  roundRect(ctx, 2, 2, W - 4, H - 4, 29);
+  ctx.strokeStyle = 'rgba(0,118,206,0.5)';
+  ctx.lineWidth = 4;
+  ctx.stroke();
+  ctx.restore();
+
+  // Inner glow border
+  ctx.save();
+  roundRect(ctx, 8, 8, W - 16, H - 16, 24);
+  ctx.strokeStyle = 'rgba(255,255,255,0.04)';
+  ctx.lineWidth = 2;
+  ctx.stroke();
+  ctx.restore();
+}
+
+// ─── BACK CARD ────────────────────────────────────────────────────────────────
+function drawBack(ctx, W, H, data) {
+  ctx.clearRect(0, 0, W, H);
+
+  // Background
+  const bgGrad = ctx.createLinearGradient(0, 0, W, H);
+  bgGrad.addColorStop(0, '#001428');
+  bgGrad.addColorStop(0.5, '#002244');
+  bgGrad.addColorStop(1, '#001020');
+  ctx.fillStyle = bgGrad;
+  ctx.fillRect(0, 0, W, H);
+
+  // Rink lines decoration (faint)
+  ctx.save();
+  ctx.strokeStyle = 'rgba(0,118,206,0.12)';
+  ctx.lineWidth = 3;
+  // Centre circle
+  ctx.beginPath();
+  ctx.arc(W / 2, 280, 200, 0, Math.PI * 2);
+  ctx.stroke();
+  ctx.beginPath();
+  ctx.arc(W / 2, 280, 20, 0, Math.PI * 2);
+  ctx.stroke();
+  // Blue lines
+  ctx.beginPath();
+  ctx.moveTo(60, 140); ctx.lineTo(W - 60, 140);
+  ctx.stroke();
+  ctx.beginPath();
+  ctx.moveTo(60, 420); ctx.lineTo(W - 60, 420);
+  ctx.stroke();
+  // Red line (centre)
+  ctx.strokeStyle = 'rgba(220,30,30,0.15)';
+  ctx.beginPath();
+  ctx.moveTo(60, 280); ctx.lineTo(W - 60, 280);
+  ctx.stroke();
+  ctx.restore();
+
+  // Card border
+  ctx.save();
+  roundRect(ctx, 2, 2, W - 4, H - 4, 29);
+  ctx.strokeStyle = 'rgba(0,118,206,0.5)';
+  ctx.lineWidth = 4;
+  ctx.stroke();
+  roundRect(ctx, 8, 8, W - 16, H - 16, 24);
+  ctx.strokeStyle = 'rgba(255,255,255,0.04)';
+  ctx.lineWidth = 2;
+  ctx.stroke();
+  ctx.restore();
+
+  // Header
+  ctx.save();
+  ctx.fillStyle = '#0076CE';
+  ctx.fillRect(0, 0, W, 90);
+  roundRect(ctx, 0, 0, W, 90, 29);
+  ctx.fillStyle = '#0076CE';
+  ctx.fill();
+  ctx.restore();
+
+  // Header fix corners bottom
+  ctx.fillStyle = '#0076CE';
+  ctx.fillRect(0, 60, W, 30);
+
+  ctx.save();
+  ctx.font = 'italic 900 52px "Barlow Condensed", sans-serif';
+  ctx.fillStyle = '#FFFFFF';
+  ctx.textAlign = 'left';
+  ctx.textBaseline = 'middle';
+  ctx.fillText('DATA SKATERS', 36, 46);
+  ctx.font = 'bold 36px "Barlow Condensed", sans-serif';
+  ctx.fillStyle = 'rgba(255,255,255,0.6)';
+  ctx.textAlign = 'right';
+  ctx.fillText('#' + (data.number || '00'), W - 36, 46);
+  ctx.restore();
+
+  // Name block
+  const nameParts = (data.name || 'Player Name').split(' ');
+  const firstName = nameParts.slice(0, -1).join(' ') || nameParts[0];
+  const lastName = nameParts.length > 1 ? nameParts[nameParts.length - 1] : '';
+
+  ctx.save();
+  ctx.textAlign = 'left';
+  ctx.textBaseline = 'top';
+  ctx.font = '600 28px "Barlow Condensed", sans-serif';
+  ctx.fillStyle = 'rgba(255,255,255,0.5)';
+  ctx.fillText(firstName.toUpperCase(), 36, 108);
+  ctx.font = 'italic 800 52px "Barlow Condensed", sans-serif';
+  ctx.fillStyle = '#FFFFFF';
+  ctx.fillText(lastName.toUpperCase(), 36, 136);
+  ctx.font = '600 22px "Barlow Condensed", sans-serif';
+  ctx.fillStyle = '#5BB3E8';
+  ctx.fillText(data.position.toUpperCase(), 36, 196);
+  ctx.restore();
+
+  // ── Stats table ──────────────────────────────────────────────────────────────
+  const statsData = [
+    ['GOALS', data.goals, 'ASSISTS', data.assists],
+    ['ACCURACY', data.accuracy + '%', 'POINTS', parseInt(data.goals||0)+parseInt(data.assists||0)],
+    ['REACTION', data.reaction + ' ms', 'HEIGHT', data.height],
+    ['BIRTH MONTH', data.month, 'SHOOTS', data.hand],
+  ];
+
+  const tableY = 265;
+  const rowH = 74;
+  const colW = W / 2;
+
+  statsData.forEach((row, ri) => {
+    const y = tableY + ri * rowH;
+
+    // Row background (alternate)
+    ctx.save();
+    ctx.fillStyle = ri % 2 === 0 ? 'rgba(0,118,206,0.1)' : 'rgba(255,255,255,0.04)';
+    if (ri === 0) {
+      ctx.fillRect(0, y, W, rowH);
+    } else {
+      ctx.fillRect(0, y, W, rowH);
+    }
+    ctx.restore();
+
+    // Divider line
+    ctx.save();
+    ctx.strokeStyle = 'rgba(255,255,255,0.06)';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(0, y + rowH); ctx.lineTo(W, y + rowH);
+    ctx.stroke();
+    // Middle vertical
+    ctx.beginPath();
+    ctx.moveTo(W/2, y + 8); ctx.lineTo(W/2, y + rowH - 8);
+    ctx.stroke();
+    ctx.restore();
+
+    // Left cell
+    ctx.save();
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'top';
+    ctx.font = '600 18px "Barlow Condensed", sans-serif';
+    ctx.fillStyle = '#5BB3E8';
+    ctx.fillText(row[0], 36, y + 12);
+    ctx.font = 'bold 34px "Barlow Condensed", sans-serif';
+    ctx.fillStyle = '#FFFFFF';
+    ctx.fillText(String(row[1]), 36, y + 32);
+    ctx.restore();
+
+    // Right cell
+    ctx.save();
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'top';
+    ctx.font = '600 18px "Barlow Condensed", sans-serif';
+    ctx.fillStyle = '#5BB3E8';
+    ctx.fillText(row[2], colW + 30, y + 12);
+    ctx.font = 'bold 34px "Barlow Condensed", sans-serif';
+    ctx.fillStyle = '#FFFFFF';
+    ctx.fillText(String(row[3]), colW + 30, y + 32);
+    ctx.restore();
+  });
+
+  // ── Logos at bottom ──────────────────────────────────────────────────────────
+  const logoY = H - 130;
+  // Dell blue separator
+  ctx.fillStyle = '#0076CE';
+  ctx.fillRect(36, logoY - 14, W - 72, 3);
+
+  ctx.save();
+  ctx.font = '600 16px "Barlow Condensed", sans-serif';
+  ctx.fillStyle = 'rgba(255,255,255,0.3)';
+  ctx.textAlign = 'left';
+  ctx.textBaseline = 'top';
+  ctx.fillText('POWERED BY', 36, logoY);
+  ctx.restore();
+
+  drawLogoPlaceholder(ctx, 'DELL', 36, logoY + 22, 120, 46, '#0076CE', '#FFFFFF');
+  drawLogoPlaceholder(ctx, 'PS43', 168, logoY + 22, 90, 46, 'rgba(255,255,255,0.1)', '#FFFFFF');
+  drawLogoPlaceholder(ctx, 'LOTUS 8', 270, logoY + 22, 110, 46, 'rgba(255,255,255,0.1)', '#FFFFFF');
+  drawLogoPlaceholder(ctx, 'MFNERC', 392, logoY + 22, 120, 46, 'rgba(255,255,255,0.1)', '#FFFFFF');
+
+  // Website / tagline
+  ctx.save();
+  ctx.font = '600 18px "Barlow Condensed", sans-serif';
+  ctx.fillStyle = 'rgba(255,255,255,0.2)';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'bottom';
+  ctx.fillText('datadunkers.ca  ·  #dataskaters', W / 2, H - 22);
+  ctx.restore();
+}
+
+// ─── GENERATE ─────────────────────────────────────────────────────────────────
+function generateCards() {
+  const data = {
+    name:     val('f-name') || 'Player Name',
+    number:   val('f-number') || '00',
+    position: val('f-position') || 'Centre',
+    height:   val('f-height') || '—',
+    hand:     val('f-hand') || 'Right',
+    month:    val('f-month') || 'January',
+    goals:    val('f-goals') || '0',
+    assists:  val('f-assists') || '0',
+    accuracy: val('f-accuracy') || '0',
+    reaction: val('f-reaction') || '0',
+    photo:    playerPhotoDataURL,
+  };
+
+  const fc = document.getElementById('front-canvas');
+  const bc = document.getElementById('back-canvas');
+  const fCtx = fc.getContext('2d');
+  const bCtx = bc.getContext('2d');
+
+  drawFront(fCtx, fc.width, fc.height, data);
+  drawBack(bCtx, bc.width, bc.height, data);
+}
+
+// ─── DOWNLOAD ─────────────────────────────────────────────────────────────────
+function downloadCard(side) {
+  const canvas = document.getElementById(side + '-canvas');
+  const a = document.createElement('a');
+  a.href = canvas.toDataURL('image/png');
+  a.download = 'data-skaters-' + side + '.png';
+  a.click();
+}
+
+function downloadBoth() {
+  const fc = document.getElementById('front-canvas');
+  const bc = document.getElementById('back-canvas');
+  const W = fc.width;
+  const H = fc.height;
+  const gap = 40;
+
+  const combo = document.createElement('canvas');
+  combo.width = W * 2 + gap;
+  combo.height = H;
+  const ctx = combo.getContext('2d');
+  ctx.fillStyle = '#060F1E';
+  ctx.fillRect(0, 0, combo.width, combo.height);
+  ctx.drawImage(fc, 0, 0);
+  ctx.drawImage(bc, W + gap, 0);
+
+  const a = document.createElement('a');
+  a.href = combo.toDataURL('image/png');
+  a.download = 'data-skaters-card-both-sides.png';
+  a.click();
+}
+
+// ─── INIT ──────────────────────────────────────────────────────────────────────
+generateCards();
+</script>
+</body>
+</html>
