@@ -1,0 +1,711 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Skaters Traits</title>
+    <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #FF6600;
+            --primary-dim: rgba(255, 102, 0, 0.15);
+            --bg-dark: #0076CE;
+            --bg-card: #181818;
+            --bg-input: #222222;
+            --text-main: #FFFFFF;
+            --text-muted: #888888;
+            --border: #2a2a2a;
+            --border-focus: #FF6600;
+            --success: #22C55E;
+            --success-dim: rgba(34, 197, 94, 0.15);
+            --error: #EF4444;
+            --error-dim: rgba(239, 68, 68, 0.15);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Barlow', sans-serif;
+            background-color: var(--bg-dark);
+            background-image:
+                radial-gradient(ellipse at 20% 0%, rgba(255,102,0,0.07) 0%, transparent 60%),
+                radial-gradient(ellipse at 80% 100%, rgba(255,102,0,0.04) 0%, transparent 60%);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 2rem 1rem 4rem;
+        }
+
+        .page-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        .page-header .eyebrow {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-size: 0.75rem;
+            font-weight: 600;
+            letter-spacing: 0.25em;
+            text-transform: uppercase;
+            color: var(--primary);
+            margin-bottom: 0.4rem;
+        }
+        .page-header h1 {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-size: 3rem;
+            font-weight: 800;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            line-height: 1;
+            color: var(--text-main);
+        }
+        .page-header h1 span { color: var(--primary); }
+        .page-header p {
+            margin-top: 0.5rem;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        .card {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 2rem;
+            width: 100%;
+            max-width: 640px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+        }
+
+        .form-section { margin-bottom: 1.75rem; }
+
+        .section-label {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-size: 0.75rem;
+            font-weight: 700;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: var(--primary);
+            margin-bottom: 1rem;
+            padding-bottom: 0.4rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .form-row {
+            display: grid;
+            gap: 1rem;
+        }
+        .form-row.cols-2 { grid-template-columns: 1fr 1fr; }
+        .form-row.cols-3 { grid-template-columns: repeat(3, 1fr); }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.4rem;
+        }
+
+        label {
+            font-size: 0.78rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+        }
+
+        input[type="text"],
+        input[type="number"],
+        select,
+        button {
+            font-family: 'Barlow', sans-serif;
+        }
+
+        input[type="text"],
+        input[type="number"],
+        select {
+            width: 100%;
+            padding: 11px 14px;
+            background-color: var(--bg-input);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text-main);
+            font-size: 1rem;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            appearance: none;
+        }
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--border-focus);
+            box-shadow: 0 0 0 3px rgba(255,102,0,0.12);
+        }
+        input[readonly] {
+            color: #ffbe8a;
+            border-color: #4a2a12;
+        }
+
+        select {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23888' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 14px center;
+            padding-right: 36px;
+            cursor: pointer;
+        }
+        select option { background: #222; }
+
+        .helper-text {
+            font-size: 0.82rem;
+            line-height: 1.4;
+            color: var(--text-muted);
+        }
+
+        .reaction-card,
+        .heart-card {
+            background: #121212;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1rem;
+        }
+
+        .reaction-status {
+            font-size: 0.88rem;
+            color: var(--text-muted);
+            margin-bottom: 0.75rem;
+            min-height: 1.3em;
+        }
+
+        .reaction-pad {
+            width: 100%;
+            border: 1px solid var(--border);
+            background: #202020;
+            color: var(--text-main);
+            border-radius: 10px;
+            padding: 14px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            cursor: pointer;
+            transition: transform 0.1s, border-color 0.2s, background 0.2s;
+        }
+        .reaction-pad:active { transform: scale(0.98); }
+        .reaction-pad.waiting { border-color: #666; background: #262626; }
+        .reaction-pad.ready { border-color: var(--success); background: rgba(34, 197, 94, 0.14); color: var(--success); }
+
+        .reaction-controls {
+            margin-top: 0.75rem;
+            display: flex;
+            gap: 0.6rem;
+            justify-content: center;
+        }
+        .reaction-controls .btn {
+            min-width: 150px;
+        }
+
+        .trial-pills {
+            margin-top: 0.9rem;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 0.5rem;
+        }
+        .trial-pill {
+            text-align: center;
+            background: #1f1f1f;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 8px;
+            font-size: 0.82rem;
+            color: var(--text-muted);
+        }
+        .trial-pill strong { color: #fff; }
+
+        .btn {
+            border: 1px solid var(--border);
+            background: var(--bg-input);
+            color: var(--text-main);
+            border-radius: 8px;
+            padding: 10px 12px;
+            font-weight: 700;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            cursor: pointer;
+        }
+        .btn:hover { border-color: #555; }
+        .btn:disabled { opacity: 0.45; cursor: not-allowed; }
+
+        .heart-status {
+            min-height: 1.25em;
+            margin-bottom: 0.7rem;
+            color: var(--text-muted);
+            font-size: 0.86rem;
+        }
+
+        .heart-runner {
+            height: 34px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            background: #191919;
+            padding: 6px;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            gap: 5px;
+            margin-bottom: 0.8rem;
+        }
+        .heart-runner span {
+            width: 18px;
+            height: 35%;
+            background: #444;
+            border-radius: 3px;
+            animation: beat 0.8s ease-in-out infinite;
+            animation-play-state: paused;
+        }
+        .heart-runner.running span {
+            animation-play-state: running;
+            background: rgba(255, 102, 0, 0.8);
+        }
+        .heart-runner span:nth-child(2) { animation-delay: 0.1s; }
+        .heart-runner span:nth-child(3) { animation-delay: 0.2s; }
+        .heart-runner span:nth-child(4) { animation-delay: 0.3s; }
+        .heart-runner span:nth-child(5) { animation-delay: 0.4s; }
+
+        @keyframes beat {
+            0%, 100% { transform: scaleY(0.5); opacity: 0.6; }
+            50% { transform: scaleY(1.35); opacity: 1; }
+        }
+
+        .heart-controls {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.6rem;
+            margin-bottom: 0.8rem;
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 14px;
+            background: var(--primary);
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            font-family: 'Barlow Condensed', sans-serif;
+            font-size: 1.2rem;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: opacity 0.2s, transform 0.1s;
+        }
+        .submit-btn:hover { opacity: 0.9; }
+        .submit-btn:active { transform: scale(0.98); }
+        .submit-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+        #statusMessage {
+            margin-top: 1rem;
+            text-align: center;
+            padding: 10px 14px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            display: none;
+        }
+        .status-success { background: var(--success-dim); color: var(--success); border: 1px solid var(--success); }
+        .status-error   { background: var(--error-dim);   color: var(--error);   border: 1px solid var(--error); }
+
+        @media (max-width: 760px) {
+            .page-header h1 { font-size: 2.25rem; }
+            .card { padding: 1.25rem; }
+            .form-row.cols-2,
+            .form-row.cols-3,
+            .heart-controls {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="page-header">
+    <div class="eyebrow">Data Science x Hockey</div>
+    <h1>Skater <span>Traits</span></h1>
+</div>
+
+<div class="card">
+    <div class="form-section">
+        <div class="section-label">Student</div>
+        <div class="form-row cols-2">
+            <div class="form-group">
+                <label for="nickname">Nickname</label>
+                <input type="text" id="nickname" name="nickname" placeholder="e.g. PS43" required>
+            </div>
+            <div class="form-group">
+                <label for="handedness">Handedness</label>
+                <select id="handedness" name="handedness" required>
+                    <option value="" disabled selected>Select handedness...</option>
+                    <option value="left">Left</option>
+                    <option value="right">Right</option>
+                    <option value="ambidextrous">Ambidextrous</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <div class="form-section">
+        <div class="section-label">Body Metrics</div>
+        <div class="form-row cols-2">
+            <div class="form-group">
+                <label for="height_cm">Height (cm)</label>
+                <input type="number" id="height_cm" name="height_cm" min="50" max="260" step="0.1" placeholder="e.g. 162.5" required>
+            </div>
+            <div class="form-group">
+                <label for="wingspan_cm">Wingspan (cm)</label>
+                <input type="number" id="wingspan_cm" name="wingspan_cm" min="50" max="300" step="0.1" placeholder="e.g. 168.0" required>
+            </div>
+        </div>
+
+        <div class="form-row cols-2" style="margin-top:1rem;">
+            <div class="form-group">
+                <label for="skate_size">Skate Size</label>
+                <input type="number" id="skate_size" name="skate_size" min="1" max="20" step="0.5" placeholder="e.g. 6.5" required>
+            </div>
+            <div class="form-group">
+                <label for="birth_month">Birth Month</label>
+                <select id="birth_month" name="birth_month" required>
+                    <option value="" disabled selected>Select month...</option>
+                    <option value="January">January</option>
+                    <option value="February">February</option>
+                    <option value="March">March</option>
+                    <option value="April">April</option>
+                    <option value="May">May</option>
+                    <option value="June">June</option>
+                    <option value="July">July</option>
+                    <option value="August">August</option>
+                    <option value="September">September</option>
+                    <option value="October">October</option>
+                    <option value="November">November</option>
+                    <option value="December">December</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <div class="form-section">
+        <div class="section-label">Resting Heart Rate Timer</div>
+        <div class="heart-card">
+            <div class="helper-text" style="margin-bottom:0.55rem;">
+                Sit still, find your pulse, then start the 15-second timer. No countdown is shown. Count beats silently until the timer ends.
+            </div>
+            <div id="heartStatus" class="heart-status">Timer is ready.</div>
+            <div class="heart-runner" id="heartRunner" aria-hidden="true">
+                <span></span><span></span><span></span><span></span><span></span>
+            </div>
+            <div class="heart-controls">
+                <button type="button" id="heartStartBtn" class="btn" onclick="startHeartTimer()">Start 15s Timer</button>
+                <button type="button" class="btn" onclick="resetHeartTools()">Reset Timer</button>
+            </div>
+            <div class="form-row cols-2">
+                <div class="form-group">
+                    <label for="beats_15s">Beats Counted in 15s</label>
+                    <input type="number" id="beats_15s" min="0" max="120" step="1" placeholder="e.g. 16">
+                </div>
+                <div class="form-group" style="align-self:flex-end;">
+                    <button type="button" class="btn" onclick="calculateHeartRateFromBeats()">Set BPM (x4)</button>
+                </div>
+            </div>
+
+            <div class="form-group" style="margin-top:1rem;">
+                <label for="resting_heart_rate">Resting Heart Rate (bpm)</label>
+                <input type="number" id="resting_heart_rate" name="resting_heart_rate" min="20" max="220" step="1" placeholder="e.g. 64" required>
+            </div>
+        </div>
+    </div>
+
+    <div class="form-section">
+        <div class="section-label">Reaction Time (3 Trials)</div>
+        <div class="reaction-card">
+            <div class="helper-text" style="margin-bottom:0.8rem;">
+                Press Start Trial, wait for the pad to turn green, then click as fast as possible. Complete all 3 trials.
+            </div>
+            <div id="reactionStatus" class="reaction-status">Ready for Trial 1 of 3.</div>
+            <button type="button" id="reactionPad" class="reaction-pad">Start Trial First</button>
+            <div class="reaction-controls">
+                <button type="button" id="reactionStartBtn" class="btn" onclick="startReactionTrial()">Start Trial 1</button>
+                <button type="button" class="btn" onclick="resetReactionTrials()">Reset Trials</button>
+            </div>
+            <div class="trial-pills">
+                <div class="trial-pill" id="trial1">Trial 1: <strong>--</strong></div>
+                <div class="trial-pill" id="trial2">Trial 2: <strong>--</strong></div>
+                <div class="trial-pill" id="trial3">Trial 3: <strong>--</strong></div>
+            </div>
+            <div class="form-group" style="margin-top:0.9rem;">
+                <label for="reaction_time_ms">Reaction Time Average (ms)</label>
+                <input type="number" id="reaction_time_ms" name="reaction_time_ms" step="1" readonly required>
+            </div>
+        </div>
+    </div>
+
+    <button type="button" id="submitBtn" class="submit-btn" onclick="handleSubmit()">Submit Traits</button>
+    <div id="statusMessage"></div>
+</div>
+
+<script>
+const PB_URL = 'https://api.datadunkers.ca/api/collections/data_skaters_traits/records';
+
+let reactionTrials = [];
+let reactionState = 'idle';
+let reactionTrialStartMs = 0;
+let reactionDelayTimeout = null;
+
+let heartTimerRunning = false;
+let heartTimerTimeout = null;
+
+window.onload = () => {
+    const savedNick = localStorage.getItem('traitsNickname');
+    if (savedNick) {
+        document.getElementById('nickname').value = savedNick;
+    }
+
+    document.getElementById('reactionPad').addEventListener('click', onReactionPadClick);
+    syncReactionUI();
+    syncHeartUI();
+};
+
+function showStatus(msg, type) {
+    const el = document.getElementById('statusMessage');
+    el.textContent = msg;
+    el.className = type === 'success' ? 'status-success' : 'status-error';
+    el.style.display = 'block';
+    setTimeout(() => { el.style.display = 'none'; }, 3500);
+}
+
+function syncReactionUI() {
+    const status = document.getElementById('reactionStatus');
+    const pad = document.getElementById('reactionPad');
+    const startBtn = document.getElementById('reactionStartBtn');
+
+    if (reactionTrials.length >= 3) {
+        reactionState = 'done';
+        status.textContent = 'All 3 trials completed. Average is ready to submit.';
+        pad.textContent = 'Trials Complete';
+        pad.className = 'reaction-pad';
+        startBtn.disabled = true;
+        startBtn.textContent = 'Done';
+        return;
+    }
+
+    const nextTrial = reactionTrials.length + 1;
+    startBtn.disabled = reactionState === 'waiting' || reactionState === 'ready';
+    startBtn.textContent = 'Start Trial ' + nextTrial;
+
+    if (reactionState === 'waiting') {
+        status.textContent = 'Trial ' + nextTrial + ': wait for green...';
+        pad.textContent = 'Wait for this to turn green...';
+        pad.className = 'reaction-pad waiting';
+    } else if (reactionState === 'ready') {
+        status.textContent = 'Trial ' + nextTrial + ': click now!';
+        pad.textContent = 'CLICK!';
+        pad.className = 'reaction-pad ready';
+    } else {
+        status.textContent = 'Ready for Trial ' + nextTrial + ' of 3.';
+        pad.textContent = 'Start Trial First';
+        pad.className = 'reaction-pad';
+    }
+}
+
+function updateTrialDisplay() {
+    for (let i = 0; i < 3; i++) {
+        const el = document.getElementById('trial' + (i + 1));
+        const val = reactionTrials[i];
+        if (val == null) {
+            el.innerHTML = 'Trial ' + (i + 1) + ': <strong>--</strong>';
+        } else {
+            el.innerHTML = 'Trial ' + (i + 1) + ': <strong>' + val + ' ms</strong>';
+        }
+    }
+}
+
+function setReactionAverage() {
+    const input = document.getElementById('reaction_time_ms');
+    if (reactionTrials.length < 3) {
+        input.value = '';
+        return;
+    }
+    const total = reactionTrials.reduce((sum, ms) => sum + ms, 0);
+    input.value = Math.round(total / reactionTrials.length);
+}
+
+function startReactionTrial() {
+    if (reactionState === 'waiting' || reactionState === 'ready') return;
+    if (reactionTrials.length >= 3) return;
+
+    reactionState = 'waiting';
+    syncReactionUI();
+
+    const delay = Math.floor(1200 + Math.random() * 2200);
+    reactionDelayTimeout = setTimeout(() => {
+        reactionState = 'ready';
+        reactionTrialStartMs = performance.now();
+        syncReactionUI();
+    }, delay);
+}
+
+function onReactionPadClick() {
+    if (reactionState === 'waiting') {
+        clearTimeout(reactionDelayTimeout);
+        reactionDelayTimeout = null;
+        reactionState = 'idle';
+        syncReactionUI();
+        showStatus('Too early. Trial reset.', 'error');
+        return;
+    }
+
+    if (reactionState !== 'ready') {
+        return;
+    }
+
+    const elapsed = Math.round(performance.now() - reactionTrialStartMs);
+    reactionTrials.push(elapsed);
+    reactionState = 'idle';
+    reactionDelayTimeout = null;
+
+    updateTrialDisplay();
+    setReactionAverage();
+    syncReactionUI();
+}
+
+function resetReactionTrials() {
+    if (reactionDelayTimeout) {
+        clearTimeout(reactionDelayTimeout);
+        reactionDelayTimeout = null;
+    }
+    reactionTrials = [];
+    reactionState = 'idle';
+    updateTrialDisplay();
+    setReactionAverage();
+    syncReactionUI();
+}
+
+function syncHeartUI() {
+    const status = document.getElementById('heartStatus');
+    const runner = document.getElementById('heartRunner');
+    const startBtn = document.getElementById('heartStartBtn');
+
+    if (heartTimerRunning) {
+        status.textContent = 'Timer running... keep counting your pulse.';
+        runner.classList.add('running');
+        startBtn.disabled = true;
+    } else {
+        if (status.textContent.indexOf('complete') === -1) {
+            status.textContent = 'Timer is ready.';
+        }
+        runner.classList.remove('running');
+        startBtn.disabled = false;
+    }
+}
+
+function startHeartTimer() {
+    if (heartTimerRunning) return;
+    heartTimerRunning = true;
+    syncHeartUI();
+
+    heartTimerTimeout = setTimeout(() => {
+        heartTimerRunning = false;
+        document.getElementById('heartStatus').textContent = 'Timer complete. Enter beats counted in 15 seconds.';
+        syncHeartUI();
+    }, 15000);
+}
+
+function resetHeartTools() {
+    if (heartTimerTimeout) {
+        clearTimeout(heartTimerTimeout);
+        heartTimerTimeout = null;
+    }
+    heartTimerRunning = false;
+    document.getElementById('beats_15s').value = '';
+    document.getElementById('heartStatus').textContent = 'Timer is ready.';
+    syncHeartUI();
+}
+
+function calculateHeartRateFromBeats() {
+    const beats = parseInt(document.getElementById('beats_15s').value, 10);
+    if (Number.isNaN(beats) || beats < 0) {
+        showStatus('Enter a valid 15-second beat count first.', 'error');
+        return;
+    }
+    document.getElementById('resting_heart_rate').value = beats * 4;
+}
+
+async function handleSubmit() {
+    if (heartTimerRunning) {
+        showStatus('Wait for the 15-second timer to finish before submitting.', 'error');
+        return;
+    }
+
+    const nickname = document.getElementById('nickname').value.trim();
+    const heightCm = parseFloat(document.getElementById('height_cm').value);
+    const wingspanCm = parseFloat(document.getElementById('wingspan_cm').value);
+    const reactionTimeMs = parseInt(document.getElementById('reaction_time_ms').value, 10);
+    const skateSize = parseFloat(document.getElementById('skate_size').value);
+    const handedness = document.getElementById('handedness').value;
+    const birthMonth = document.getElementById('birth_month').value;
+    const restingHeartRate = parseInt(document.getElementById('resting_heart_rate').value, 10);
+
+    if (!nickname || Number.isNaN(heightCm) || Number.isNaN(wingspanCm) || Number.isNaN(skateSize) || !handedness || !birthMonth || Number.isNaN(restingHeartRate)) {
+        showStatus('Please complete all required fields.', 'error');
+        return;
+    }
+
+    if (reactionTrials.length < 3 || Number.isNaN(reactionTimeMs)) {
+        showStatus('Please complete all 3 reaction-time trials.', 'error');
+        return;
+    }
+
+    const payload = {
+        nickname: nickname,
+        height_cm: heightCm,
+        wingspan_cm: wingspanCm,
+        reaction_time_ms: reactionTimeMs,
+        skate_size: skateSize,
+        handedness: handedness,
+        birth_month: birthMonth,
+        resting_heart_rate: restingHeartRate
+    };
+
+    const btn = document.getElementById('submitBtn');
+    btn.disabled = true;
+    btn.textContent = 'Submitting...';
+
+    localStorage.setItem('traitsNickname', nickname);
+
+    try {
+        const res = await fetch(PB_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+
+        if (!res.ok) {
+            throw new Error('Server error ' + res.status);
+        }
+
+        showStatus('Traits submitted successfully.', 'success');
+
+        document.getElementById('nickname').value = '';
+        document.getElementById('height_cm').value = '';
+        document.getElementById('wingspan_cm').value = '';
+        document.getElementById('skate_size').value = '';
+        document.getElementById('handedness').value = '';
+        document.getElementById('birth_month').value = '';
+        document.getElementById('resting_heart_rate').value = '';
+        document.getElementById('beats_15s').value = '';
+
+        resetReactionTrials();
+        resetHeartTools();
+    } catch (err) {
+        showStatus('Error: ' + err.message, 'error');
+    } finally {
+        btn.disabled = false;
+        btn.textContent = 'Submit Traits';
+    }
+}
+</script>
+
+</body>
+</html>
