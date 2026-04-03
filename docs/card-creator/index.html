@@ -317,8 +317,14 @@
         <input type="number" id="f-goals" value="12" min="0">
       </div>
       <div class="field">
-        <label>Assists</label>
-        <input type="number" id="f-assists" value="18" min="0">
+        <label>Hot Zone</label>
+        <select id="f-hot-zone">
+          <option>Top Left</option>
+          <option>Top Right</option>
+          <option>Bottom Left</option>
+          <option>Bottom Right</option>
+          <option>Five Hole</option>
+        </select>
       </div>
     </div>
     <div class="field-row">
@@ -327,8 +333,16 @@
         <input type="number" id="f-accuracy" value="74" min="0" max="100">
       </div>
       <div class="field">
-        <label>React. Time (ms)</label>
-        <input type="number" id="f-reaction" value="210" min="0">
+        <label>Archetype</label>
+        <select id="f-archetype">
+          <option>Sniper</option>
+          <option>Playmaker</option>
+          <option>Power Forward</option>
+          <option>Two-way Forward</option>
+          <option>Speed Winger</option>
+          <option>Defensive Defenseman</option>
+          <option>Offensive Defenseman</option>
+        </select>
       </div>
     </div>
 
@@ -620,9 +634,9 @@ function drawFrontOverlay(ctx, W, H, photoH, data) {
   // Quick stats row
   const statsY = plateY + 200;
   const stats = [
-    { label: 'G', value: data.goals },
-    { label: 'A', value: data.assists },
-    { label: 'PTS', value: parseInt(data.goals || 0) + parseInt(data.assists || 0) },
+    { label: 'ZONE', value: data.hotZone },
+    { label: 'GOALS', value: data.goals },
+    { label: 'TYPE', value: data.archetype },
   ];
   const sw = W / 3;
   stats.forEach((s, i) => {
@@ -639,13 +653,13 @@ function drawFrontOverlay(ctx, W, H, photoH, data) {
     }
     ctx.save();
     ctx.textAlign = 'center';
-    ctx.font = 'bold 52px "Barlow Condensed", sans-serif';
-    ctx.fillStyle = '#FFFFFF';
-    ctx.textBaseline = 'top';
-    ctx.fillText(s.value, cx, statsY);
     ctx.font = '600 20px "Barlow Condensed", sans-serif';
     ctx.fillStyle = '#5BB3E8';
-    ctx.fillText(s.label, cx, statsY + 56);
+    ctx.textBaseline = 'top';
+    ctx.fillText(s.label, cx, statsY + 8);
+    ctx.font = 'bold 24px "Barlow Condensed", sans-serif';
+    ctx.fillStyle = '#FFFFFF';
+    ctx.fillText(String(s.value), cx, statsY + 36, sw - 24);
     ctx.restore();
   });
 
@@ -761,10 +775,10 @@ function drawBack(ctx, W, H, data) {
 
   // ── Stats table ──────────────────────────────────────────────────────────────
   const statsData = [
-    ['HEIGHT', data.height + ' cm', 'REACTION TIME', data.reaction + ' ms'],
+    ['HEIGHT', data.height + ' cm', 'NUMBER', data.number],
     ['BIRTH MONTH', data.month, 'SHOOTS', data.hand],
-    ['GOALS', data.goals, 'ASSISTS', data.assists],
-    ['ACCURACY', data.accuracy + '%', 'POINTS', parseInt(data.goals||0)+parseInt(data.assists||0)],
+    ['GOALS', data.goals, 'HOT ZONE', data.hotZone],
+    ['ACCURACY', data.accuracy + '%', 'ARCHETYPE', data.archetype],
   ];
 
   const tableY = 265;
@@ -869,9 +883,9 @@ function generateCards() {
     hand:     val('f-hand') || 'Right',
     month:    val('f-month') || 'January',
     goals:    val('f-goals') || '0',
-    assists:  val('f-assists') || '0',
+    hotZone:  val('f-hot-zone') || 'Top Left',
     accuracy: val('f-accuracy') || '0',
-    reaction: val('f-reaction') || '0',
+    archetype: val('f-archetype') || 'Sniper',
     photo:    playerPhotoDataURL,
   };
 
