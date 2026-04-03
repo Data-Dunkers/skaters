@@ -363,6 +363,8 @@
 
 function createLogoImage(src) {
   const img = new Image();
+  // Keep canvas exportable when images are loaded from an HTTP(S) origin.
+  img.crossOrigin = 'anonymous';
   img.onload = () => generateCards();
   img.src = src;
   return img;
@@ -460,6 +462,8 @@ function drawFront(ctx, W, H, data) {
   const photoH = Math.floor(H * 0.68);
   if (data.photo) {
     const img = new Image();
+    // Data URLs remain same-origin; this also supports remote sources when allowed.
+    img.crossOrigin = 'anonymous';
     img.onload = function() {
       // draw cropped to top area
       ctx.save();
@@ -818,9 +822,7 @@ function drawBack(ctx, W, H, data) {
     ctx.restore();
   });
 
-  // ── Logos at bottom (centered, larger, keep aspect ratio) ──────────────────
-  //const logoLabels = ['DELL', 'PS43', 'LOTUS 8', 'MFNERC'];
-  //const logoImages = [logos.dell, logos.ps43, logos.lotus8, logos.mfnerc];
+  // ── Logos at bottom (centered, keep aspect ratio) ──────────────────
   const logoLabels = ['PS43', 'LOTUS 8', 'MFNERC', 'DELL'];
   const logoImages = [logos.ps43, logos.lotus8, logos.mfnerc, logos.dell];
   const slotW = 150;
@@ -886,7 +888,12 @@ function generateCards() {
 function downloadCard(side) {
   const canvas = document.getElementById(side + '-canvas');
   const a = document.createElement('a');
-  a.href = canvas.toDataURL('image/png');
+  try {
+    a.href = canvas.toDataURL('image/png');
+  } catch (err) {
+    handleCanvasExportError(err);
+    return;
+  }
   a.download = 'data-skaters-' + side + '.png';
   a.click();
 }
@@ -908,9 +915,25 @@ function downloadBoth() {
   ctx.drawImage(bc, W + gap, 0);
 
   const a = document.createElement('a');
-  a.href = combo.toDataURL('image/png');
+  try {
+    a.href = combo.toDataURL('image/png');
+  } catch (err) {
+    handleCanvasExportError(err);
+    return;
+  }
   a.download = 'data-skaters-card-both-sides.png';
   a.click();
+}
+
+function handleCanvasExportError(err) {
+  if (err && err.name === 'SecurityError') {
+    alert(
+      'Download failed because the canvas was tainted by an external asset. '
+      + 'Open this page from a local/server URL (http:// or https://) and ensure image assets are served from the same origin or CORS-enabled.'
+    );
+    return;
+  }
+  throw err;
 }
 
 // ─── INIT ──────────────────────────────────────────────────────────────────────
