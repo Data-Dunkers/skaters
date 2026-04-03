@@ -208,7 +208,7 @@
     margin-bottom: 8px;
   }
   canvas {
-    border-radius: 18px;
+    border-radius: 0;
     box-shadow: 0 20px 60px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.06);
     display: block;
   }
@@ -288,14 +288,15 @@
     </div>
     <div class="field-row">
       <div class="field">
-        <label>Height</label>
-        <input type="text" id="f-height" value="5'10&quot;" placeholder='5&apos;10"'>
+        <label>Height (cm)</label>
+        <input type="text" id="f-height" value="180" placeholder='180'>
       </div>
       <div class="field">
         <label>Handedness</label>
         <select id="f-hand">
           <option>Right</option>
           <option>Left</option>
+          <option>Ambidextrous</option>
         </select>
       </div>
     </div>
@@ -336,7 +337,7 @@
 
   <!-- PREVIEW -->
   <div class="preview-panel">
-    <div class="preview-label">Card Preview — 2.5 × 3.5 in</div>
+    <div class="preview-label"></div>
     <div class="canvas-row">
       <div class="canvas-wrap">
         <p>Front</p>
@@ -357,10 +358,37 @@
 </div>
 
 <script>
-// ─── LOGO PLACEHOLDERS ────────────────────────────────────────────────────────
-// These are placeholder logos as rounded-rect label badges.
-// Replace drawLogoPlaceholder calls with ctx.drawImage(logoImg, x, y, w, h)
-// once you have the real assets.
+// ─── LOGOS ────────────────────────────────────────────────────────────────────
+// Load image assets once and redraw when each image becomes available.
+
+function createLogoImage(src) {
+  const img = new Image();
+  img.onload = () => generateCards();
+  img.src = src;
+  return img;
+}
+
+const logos = {
+  dell: createLogoImage('dell-logo.png'),
+  ps43: createLogoImage('ps43-foundation-logo.png'),
+  lotus8: createLogoImage('lotus-8-esports-logo.png'),
+  mfnerc: createLogoImage('mfnerc-logo.png'),
+};
+
+function drawLogoImage(ctx, img, label, x, y, w, h, bg, fg) {
+  if (img && img.complete && img.naturalWidth > 0 && img.naturalHeight > 0) {
+    const iw = img.naturalWidth;
+    const ih = img.naturalHeight;
+    const scale = Math.min(w / iw, h / ih);
+    const dw = iw * scale;
+    const dh = ih * scale;
+    const dx = x + (w - dw) / 2;
+    const dy = y + (h - dh) / 2;
+    ctx.drawImage(img, dx, dy, dw, dh);
+    return;
+  }
+  drawLogoPlaceholder(ctx, label, x, y, w, h, bg, fg);
+}
 
 function drawLogoPlaceholder(ctx, label, x, y, w, h, bg, fg) {
   ctx.save();
@@ -435,7 +463,7 @@ function drawFront(ctx, W, H, data) {
     img.onload = function() {
       // draw cropped to top area
       ctx.save();
-      roundRect(ctx, 0, 0, W, H, 30);
+      roundRect(ctx, 0, 0, W, H, 0);
       ctx.clip();
 
       // cover-fit the photo
@@ -460,7 +488,7 @@ function drawFront(ctx, W, H, data) {
   } else {
     // Silhouette placeholder
     ctx.save();
-    roundRect(ctx, 0, 0, W, H, 30);
+    roundRect(ctx, 0, 0, W, H, 0);
     ctx.clip();
     const sGrad = ctx.createLinearGradient(0, 0, 0, photoH);
     sGrad.addColorStop(0, '#002244');
@@ -489,7 +517,7 @@ function drawFront(ctx, W, H, data) {
 function drawFrontOverlay(ctx, W, H, photoH, data) {
   // ── Diagonal accent stripe
   ctx.save();
-  roundRect(ctx, 0, 0, W, H, 30);
+  roundRect(ctx, 0, 0, W, H, 0);
   ctx.clip();
   ctx.fillStyle = 'rgba(0,118,206,0.18)';
   ctx.beginPath();
@@ -617,16 +645,9 @@ function drawFrontOverlay(ctx, W, H, photoH, data) {
     ctx.restore();
   });
 
-  // Bottom logo row
-  const logoY = H - 78;
-  drawLogoPlaceholder(ctx, 'DELL', 36, logoY, 120, 46, '#0076CE', '#FFFFFF');
-  drawLogoPlaceholder(ctx, 'PS43', 168, logoY, 90, 46, 'rgba(255,255,255,0.1)', '#FFFFFF');
-  drawLogoPlaceholder(ctx, 'LOTUS 8', 270, logoY, 110, 46, 'rgba(255,255,255,0.1)', '#FFFFFF');
-  drawLogoPlaceholder(ctx, 'MFNERC', 392, logoY, 120, 46, 'rgba(255,255,255,0.1)', '#FFFFFF');
-
   // Card border
   ctx.save();
-  roundRect(ctx, 2, 2, W - 4, H - 4, 29);
+  roundRect(ctx, 2, 2, W - 4, H - 4, 0);
   ctx.strokeStyle = 'rgba(0,118,206,0.5)';
   ctx.lineWidth = 4;
   ctx.stroke();
@@ -634,7 +655,7 @@ function drawFrontOverlay(ctx, W, H, photoH, data) {
 
   // Inner glow border
   ctx.save();
-  roundRect(ctx, 8, 8, W - 16, H - 16, 24);
+  roundRect(ctx, 8, 8, W - 16, H - 16, 0);
   ctx.strokeStyle = 'rgba(255,255,255,0.04)';
   ctx.lineWidth = 2;
   ctx.stroke();
@@ -680,11 +701,11 @@ function drawBack(ctx, W, H, data) {
 
   // Card border
   ctx.save();
-  roundRect(ctx, 2, 2, W - 4, H - 4, 29);
+  roundRect(ctx, 2, 2, W - 4, H - 4, 0);
   ctx.strokeStyle = 'rgba(0,118,206,0.5)';
   ctx.lineWidth = 4;
   ctx.stroke();
-  roundRect(ctx, 8, 8, W - 16, H - 16, 24);
+  roundRect(ctx, 8, 8, W - 16, H - 16, 0);
   ctx.strokeStyle = 'rgba(255,255,255,0.04)';
   ctx.lineWidth = 2;
   ctx.stroke();
@@ -694,7 +715,7 @@ function drawBack(ctx, W, H, data) {
   ctx.save();
   ctx.fillStyle = '#0076CE';
   ctx.fillRect(0, 0, W, 90);
-  roundRect(ctx, 0, 0, W, 90, 29);
+  roundRect(ctx, 0, 0, W, 90, 0);
   ctx.fillStyle = '#0076CE';
   ctx.fill();
   ctx.restore();
@@ -736,10 +757,10 @@ function drawBack(ctx, W, H, data) {
 
   // ── Stats table ──────────────────────────────────────────────────────────────
   const statsData = [
+    ['HEIGHT', data.height + ' cm', 'REACTION TIME', data.reaction + ' ms'],
+    ['BIRTH MONTH', data.month, 'SHOOTS', data.hand],
     ['GOALS', data.goals, 'ASSISTS', data.assists],
     ['ACCURACY', data.accuracy + '%', 'POINTS', parseInt(data.goals||0)+parseInt(data.assists||0)],
-    ['REACTION', data.reaction + ' ms', 'HEIGHT', data.height],
-    ['BIRTH MONTH', data.month, 'SHOOTS', data.hand],
   ];
 
   const tableY = 265;
@@ -797,24 +818,34 @@ function drawBack(ctx, W, H, data) {
     ctx.restore();
   });
 
-  // ── Logos at bottom ──────────────────────────────────────────────────────────
-  const logoY = H - 130;
-  // Dell blue separator
+  // ── Logos at bottom (centered, larger, keep aspect ratio) ──────────────────
+  //const logoLabels = ['DELL', 'PS43', 'LOTUS 8', 'MFNERC'];
+  //const logoImages = [logos.dell, logos.ps43, logos.lotus8, logos.mfnerc];
+  const logoLabels = ['PS43', 'LOTUS 8', 'MFNERC', 'DELL'];
+  const logoImages = [logos.ps43, logos.lotus8, logos.mfnerc, logos.dell];
+  const slotW = 150;
+  const slotH = 64;
+  const gap = 18;
+  const totalLogoW = slotW * logoImages.length + gap * (logoImages.length - 1);
+  const logosX = (W - totalLogoW) / 2;
+  const logosY = H - 108;
+
+  // Separator centered with the logo row
   ctx.fillStyle = '#0076CE';
-  ctx.fillRect(36, logoY - 14, W - 72, 3);
+  ctx.fillRect(logosX, logosY - 16, totalLogoW, 3);
 
   ctx.save();
   ctx.font = '600 16px "Barlow Condensed", sans-serif';
   ctx.fillStyle = 'rgba(255,255,255,0.3)';
-  ctx.textAlign = 'left';
+  ctx.textAlign = 'center';
   ctx.textBaseline = 'top';
-  ctx.fillText('POWERED BY', 36, logoY);
+  ctx.fillText('POWERED BY', W / 2, logosY - 38);
   ctx.restore();
 
-  drawLogoPlaceholder(ctx, 'DELL', 36, logoY + 22, 120, 46, '#0076CE', '#FFFFFF');
-  drawLogoPlaceholder(ctx, 'PS43', 168, logoY + 22, 90, 46, 'rgba(255,255,255,0.1)', '#FFFFFF');
-  drawLogoPlaceholder(ctx, 'LOTUS 8', 270, logoY + 22, 110, 46, 'rgba(255,255,255,0.1)', '#FFFFFF');
-  drawLogoPlaceholder(ctx, 'MFNERC', 392, logoY + 22, 120, 46, 'rgba(255,255,255,0.1)', '#FFFFFF');
+  logoImages.forEach((img, i) => {
+    const x = logosX + i * (slotW + gap);
+    drawLogoImage(ctx, img, logoLabels[i], x, logosY, slotW, slotH, 'rgba(255,255,255,0.1)', '#FFFFFF');
+  });
 
   // Website / tagline
   ctx.save();
