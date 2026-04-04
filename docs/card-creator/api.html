@@ -1,0 +1,770 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Data Skaters Card API</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,400;0,600;0,700;0,800;0,900;1,700&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #060f1e;
+    --panel: rgba(255, 255, 255, 0.06);
+    --line: rgba(255, 255, 255, 0.15);
+    --text: #ffffff;
+    --muted: rgba(255, 255, 255, 0.65);
+    --accent: #0076ce;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    min-height: 100vh;
+    background: radial-gradient(circle at 20% 20%, #103764 0%, var(--bg) 55%);
+    color: var(--text);
+    font-family: 'Barlow', sans-serif;
+    display: grid;
+    place-items: center;
+    padding: 20px;
+  }
+
+  .panel {
+    width: min(980px, 100%);
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 18px;
+  }
+
+  h1 {
+    margin: 0 0 8px;
+    font-family: 'Barlow Condensed', sans-serif;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    font-size: 36px;
+  }
+
+  .muted {
+    color: var(--muted);
+    margin: 0 0 12px;
+  }
+
+  .status {
+    border-left: 4px solid var(--accent);
+    background: rgba(0, 118, 206, 0.12);
+    padding: 10px 12px;
+    margin-bottom: 14px;
+    color: #d4ecff;
+  }
+
+  .status.error {
+    border-left-color: #ff5c5c;
+    background: rgba(255, 92, 92, 0.12);
+    color: #ffd3d3;
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 16px;
+  }
+
+  .canvas-wrap {
+    background: rgba(0, 0, 0, 0.35);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 10px;
+  }
+
+  .canvas-wrap p {
+    margin: 0 0 8px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-family: 'Barlow Condensed', sans-serif;
+  }
+
+  canvas {
+    width: 100%;
+    height: auto;
+    display: block;
+    background: #020812;
+  }
+
+  code {
+    background: rgba(0, 0, 0, 0.35);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: 0 5px;
+  }
+</style>
+</head>
+<body>
+  <div class="panel" id="fallback-panel" hidden>
+    <h1>Data Skaters Card API</h1>
+    <p class="muted">Provide URL parameters to render cards. When all required params are present, this page outputs only the image.</p>
+    <div id="status" class="status">Preparing...</div>
+    <p class="muted">Required params: <code>nickname</code>, <code>number</code>, <code>position</code>, <code>height</code>, <code>hand</code>, <code>month</code>, <code>goals</code>, <code>hot_zone</code>, <code>accuracy</code>, <code>archetype</code>. Optional: <code>name</code>, <code>side</code> (front/back/both).</p>
+    <p class="muted">Example: <a href="?nickname=PS43&amp;number=43&amp;position=Centre&amp;height=203&amp;hand=Right&amp;month=April&amp;goals=12&amp;hot_zone=Top%20Left&amp;accuracy=74&amp;archetype=Sniper&amp;side=both">Generate sample card</a></p>
+    <div class="grid">
+      <div class="canvas-wrap">
+        <p>Front</p>
+        <canvas id="front-canvas" width="750" height="1050"></canvas>
+      </div>
+      <div class="canvas-wrap">
+        <p>Back</p>
+        <canvas id="back-canvas" width="750" height="1050"></canvas>
+      </div>
+    </div>
+  </div>
+
+<script>
+const POCKETBASE_URL = 'https://api.datadunkers.ca';
+const COLLECTION_NAME = 'data_skaters_photos';
+
+function createLogoImage(src) {
+  const img = new Image();
+  img.crossOrigin = 'anonymous';
+  img.src = src;
+  return img;
+}
+
+const logos = {
+  dell: createLogoImage('dell-logo.png'),
+  ps43: createLogoImage('ps43-foundation-logo.png'),
+  lotus8: createLogoImage('lotus-8-esports-logo.png'),
+  mfnerc: createLogoImage('mfnerc-logo.png')
+};
+
+function drawLogoImage(ctx, img, label, x, y, w, h, bg, fg) {
+  if (img && img.complete && img.naturalWidth > 0 && img.naturalHeight > 0) {
+    const iw = img.naturalWidth;
+    const ih = img.naturalHeight;
+    const scale = Math.min(w / iw, h / ih);
+    const dw = iw * scale;
+    const dh = ih * scale;
+    const dx = x + (w - dw) / 2;
+    const dy = y + (h - dh) / 2;
+    ctx.drawImage(img, dx, dy, dw, dh);
+    return;
+  }
+  drawLogoPlaceholder(ctx, label, x, y, w, h, bg, fg);
+}
+
+function drawLogoPlaceholder(ctx, label, x, y, w, h, bg, fg) {
+  ctx.save();
+  roundRect(ctx, x, y, w, h, 6);
+  ctx.fillStyle = bg || 'rgba(255,255,255,0.12)';
+  ctx.fill();
+  ctx.font = `bold ${Math.floor(h * 0.38)}px "Barlow Condensed", sans-serif`;
+  ctx.fillStyle = fg || '#FFFFFF';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText(label, x + w / 2, y + h / 2);
+  ctx.restore();
+}
+
+function roundRect(ctx, x, y, w, h, r) {
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.lineTo(x + w - r, y);
+  ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+  ctx.lineTo(x + w, y + h - r);
+  ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+  ctx.lineTo(x + r, y + h);
+  ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+  ctx.lineTo(x, y + r);
+  ctx.quadraticCurveTo(x, y, x + r, y);
+  ctx.closePath();
+}
+
+function drawFront(ctx, W, H, data) {
+  ctx.clearRect(0, 0, W, H);
+
+  const bgGrad = ctx.createLinearGradient(0, 0, 0, H);
+  bgGrad.addColorStop(0, '#001B3A');
+  bgGrad.addColorStop(0.5, '#003B6F');
+  bgGrad.addColorStop(1, '#001020');
+  ctx.fillStyle = bgGrad;
+  ctx.fillRect(0, 0, W, H);
+
+  const photoH = Math.floor(H * 0.68);
+  if (data.photoImage && data.photoImage.naturalWidth > 0 && data.photoImage.naturalHeight > 0) {
+    const img = data.photoImage;
+    ctx.save();
+    roundRect(ctx, 0, 0, W, H, 0);
+    ctx.clip();
+
+    const iw = img.naturalWidth;
+    const ih = img.naturalHeight;
+    const scale = Math.max(W / iw, photoH / ih);
+    const dw = iw * scale;
+    const dh = ih * scale;
+    const dx = (W - dw) / 2;
+    const dy = 0;
+    ctx.drawImage(img, dx, dy, dw, dh);
+
+    const grad = ctx.createLinearGradient(0, photoH * 0.3, 0, photoH);
+    grad.addColorStop(0, 'rgba(0,27,58,0)');
+    grad.addColorStop(0.6, 'rgba(0,27,58,0.6)');
+    grad.addColorStop(1, 'rgba(0,27,58,0.98)');
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, W, photoH);
+
+    ctx.restore();
+    drawFrontOverlay(ctx, W, H, photoH, data);
+  } else {
+    ctx.save();
+    roundRect(ctx, 0, 0, W, H, 0);
+    ctx.clip();
+    const sGrad = ctx.createLinearGradient(0, 0, 0, photoH);
+    sGrad.addColorStop(0, '#002244');
+    sGrad.addColorStop(1, '#001B3A');
+    ctx.fillStyle = sGrad;
+    ctx.fillRect(0, 0, W, photoH);
+
+    ctx.fillStyle = 'rgba(255,255,255,0.06)';
+    ctx.beginPath();
+    ctx.arc(W / 2, photoH * 0.42, 110, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = 'rgba(255,255,255,0.04)';
+    ctx.beginPath();
+    ctx.ellipse(W / 2, photoH * 0.85, 160, 80, 0, 0, Math.PI * 2);
+    ctx.fill();
+
+    const grad = ctx.createLinearGradient(0, photoH * 0.5, 0, photoH);
+    grad.addColorStop(0, 'rgba(0,27,58,0)');
+    grad.addColorStop(1, 'rgba(0,27,58,0.97)');
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, W, photoH);
+    ctx.restore();
+    drawFrontOverlay(ctx, W, H, photoH, data);
+  }
+}
+
+function drawFrontOverlay(ctx, W, H, photoH, data) {
+  ctx.save();
+  roundRect(ctx, 0, 0, W, H, 0);
+  ctx.clip();
+  ctx.fillStyle = 'rgba(0,118,206,0.18)';
+  ctx.beginPath();
+  ctx.moveTo(0, photoH - 120);
+  ctx.lineTo(W, photoH - 200);
+  ctx.lineTo(W, photoH - 160);
+  ctx.lineTo(0, photoH - 80);
+  ctx.closePath();
+  ctx.fill();
+  ctx.restore();
+
+  ctx.save();
+  ctx.font = 'bold 22px "Barlow Condensed", sans-serif';
+  ctx.fillStyle = 'rgba(255,255,255,0.85)';
+  ctx.textAlign = 'left';
+  ctx.textBaseline = 'top';
+  ctx.fillText('DATA SKATERS', 36, 36);
+  ctx.fillStyle = '#0076CE';
+  ctx.fillRect(36, 64, 180, 3);
+  ctx.restore();
+
+  ctx.save();
+  ctx.font = 'italic 900 130px "Barlow Condensed", sans-serif';
+  ctx.fillStyle = 'rgba(255,255,255,0.08)';
+  ctx.textAlign = 'right';
+  ctx.textBaseline = 'top';
+  ctx.fillText('#' + (data.number || '00'), W - 30, 10);
+  ctx.font = 'italic 800 72px "Barlow Condensed", sans-serif';
+  ctx.fillStyle = 'rgba(255,255,255,0.9)';
+  ctx.fillText('#' + (data.number || '00'), W - 32, 28);
+  ctx.restore();
+
+  const plateY = photoH - 10;
+  const plateH = H - plateY;
+
+  ctx.save();
+  ctx.fillStyle = '#001428';
+  ctx.fillRect(0, plateY, W, plateH);
+  ctx.restore();
+
+  ctx.fillStyle = '#0076CE';
+  ctx.fillRect(0, plateY, W, 5);
+
+  ctx.save();
+  ctx.font = '600 24px "Barlow Condensed", sans-serif';
+  ctx.fillStyle = '#5BB3E8';
+  ctx.textAlign = 'left';
+  ctx.textBaseline = 'top';
+  ctx.fillText((data.position || 'PLAYER').toUpperCase(), 36, plateY + 22);
+  ctx.restore();
+
+  const nameParts = (data.name || 'Player Name').split(' ');
+  const firstName = nameParts.slice(0, -1).join(' ') || nameParts[0];
+  const lastName = nameParts.length > 1 ? nameParts[nameParts.length - 1] : '';
+
+  ctx.save();
+  ctx.textAlign = 'left';
+  ctx.textBaseline = 'top';
+
+  ctx.font = '700 56px "Barlow Condensed", sans-serif';
+  ctx.fillStyle = 'rgba(255,255,255,0.7)';
+  ctx.fillText(firstName.toUpperCase(), 34, plateY + 52);
+
+  ctx.font = 'italic 900 80px "Barlow Condensed", sans-serif';
+  ctx.fillStyle = '#FFFFFF';
+  ctx.fillText(lastName.toUpperCase(), 34, plateY + 102);
+  ctx.restore();
+
+  ctx.save();
+  ctx.font = 'bold 20px "Barlow Condensed", sans-serif';
+  ctx.textAlign = 'right';
+  ctx.textBaseline = 'top';
+  ctx.fillStyle = 'rgba(255,255,255,0.5)';
+  ctx.fillText(data.hand + ' HAND', W - 36, plateY + 28);
+  ctx.restore();
+
+  ctx.save();
+  ctx.font = '600 24px "Barlow Condensed", sans-serif';
+  ctx.textAlign = 'right';
+  ctx.textBaseline = 'top';
+  ctx.fillStyle = 'rgba(255,255,255,0.6)';
+  ctx.fillText(data.height, W - 36, plateY + 56);
+  ctx.restore();
+
+  const statsY = plateY + 200;
+  const stats = [
+    { label: 'ZONE', value: data.hotZone },
+    { label: 'GOALS', value: data.goals },
+    { label: 'TYPE', value: data.archetype }
+  ];
+  const sw = W / 3;
+
+  stats.forEach((s, i) => {
+    const cx = sw * i + sw / 2;
+    if (i > 0) {
+      ctx.save();
+      ctx.strokeStyle = 'rgba(255,255,255,0.1)';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(sw * i, statsY - 16);
+      ctx.lineTo(sw * i, statsY + 60);
+      ctx.stroke();
+      ctx.restore();
+    }
+
+    ctx.save();
+    ctx.textAlign = 'center';
+    ctx.font = '600 20px "Barlow Condensed", sans-serif';
+    ctx.fillStyle = '#5BB3E8';
+    ctx.textBaseline = 'top';
+    ctx.fillText(s.label, cx, statsY + 8);
+    ctx.font = 'bold 24px "Barlow Condensed", sans-serif';
+    ctx.fillStyle = '#FFFFFF';
+    ctx.fillText(String(s.value), cx, statsY + 36, sw - 24);
+    ctx.restore();
+  });
+
+  ctx.save();
+  roundRect(ctx, 2, 2, W - 4, H - 4, 0);
+  ctx.strokeStyle = 'rgba(0,118,206,0.5)';
+  ctx.lineWidth = 4;
+  ctx.stroke();
+  ctx.restore();
+
+  ctx.save();
+  roundRect(ctx, 8, 8, W - 16, H - 16, 0);
+  ctx.strokeStyle = 'rgba(255,255,255,0.04)';
+  ctx.lineWidth = 2;
+  ctx.stroke();
+  ctx.restore();
+}
+
+function drawBack(ctx, W, H, data) {
+  ctx.clearRect(0, 0, W, H);
+
+  const bgGrad = ctx.createLinearGradient(0, 0, W, H);
+  bgGrad.addColorStop(0, '#001428');
+  bgGrad.addColorStop(0.5, '#002244');
+  bgGrad.addColorStop(1, '#001020');
+  ctx.fillStyle = bgGrad;
+  ctx.fillRect(0, 0, W, H);
+
+  ctx.save();
+  ctx.strokeStyle = 'rgba(0,118,206,0.12)';
+  ctx.lineWidth = 3;
+  ctx.beginPath();
+  ctx.arc(W / 2, 280, 200, 0, Math.PI * 2);
+  ctx.stroke();
+  ctx.beginPath();
+  ctx.arc(W / 2, 280, 20, 0, Math.PI * 2);
+  ctx.stroke();
+  ctx.beginPath();
+  ctx.moveTo(60, 140);
+  ctx.lineTo(W - 60, 140);
+  ctx.stroke();
+  ctx.beginPath();
+  ctx.moveTo(60, 420);
+  ctx.lineTo(W - 60, 420);
+  ctx.stroke();
+  ctx.strokeStyle = 'rgba(220,30,30,0.15)';
+  ctx.beginPath();
+  ctx.moveTo(60, 280);
+  ctx.lineTo(W - 60, 280);
+  ctx.stroke();
+  ctx.restore();
+
+  ctx.save();
+  roundRect(ctx, 2, 2, W - 4, H - 4, 0);
+  ctx.strokeStyle = 'rgba(0,118,206,0.5)';
+  ctx.lineWidth = 4;
+  ctx.stroke();
+  roundRect(ctx, 8, 8, W - 16, H - 16, 0);
+  ctx.strokeStyle = 'rgba(255,255,255,0.04)';
+  ctx.lineWidth = 2;
+  ctx.stroke();
+  ctx.restore();
+
+  ctx.save();
+  ctx.fillStyle = '#0076CE';
+  ctx.fillRect(0, 0, W, 90);
+  roundRect(ctx, 0, 0, W, 90, 0);
+  ctx.fillStyle = '#0076CE';
+  ctx.fill();
+  ctx.restore();
+
+  ctx.fillStyle = '#0076CE';
+  ctx.fillRect(0, 60, W, 30);
+
+  ctx.save();
+  ctx.font = 'italic 900 52px "Barlow Condensed", sans-serif';
+  ctx.fillStyle = '#FFFFFF';
+  ctx.textAlign = 'left';
+  ctx.textBaseline = 'middle';
+  ctx.fillText('DATA SKATERS', 36, 46);
+  ctx.font = 'bold 36px "Barlow Condensed", sans-serif';
+  ctx.fillStyle = 'rgba(255,255,255,0.6)';
+  ctx.textAlign = 'right';
+  ctx.fillText('#' + (data.number || '00'), W - 36, 46);
+  ctx.restore();
+
+  const nameParts = (data.name || 'Player Name').split(' ');
+  const firstName = nameParts.slice(0, -1).join(' ') || nameParts[0];
+  const lastName = nameParts.length > 1 ? nameParts[nameParts.length - 1] : '';
+
+  ctx.save();
+  ctx.textAlign = 'left';
+  ctx.textBaseline = 'top';
+  ctx.font = '600 28px "Barlow Condensed", sans-serif';
+  ctx.fillStyle = 'rgba(255,255,255,0.5)';
+  ctx.fillText(firstName.toUpperCase(), 36, 108);
+  ctx.font = 'italic 800 52px "Barlow Condensed", sans-serif';
+  ctx.fillStyle = '#FFFFFF';
+  ctx.fillText(lastName.toUpperCase(), 36, 136);
+  ctx.font = '600 22px "Barlow Condensed", sans-serif';
+  ctx.fillStyle = '#5BB3E8';
+  ctx.fillText(data.position.toUpperCase(), 36, 196);
+  ctx.restore();
+
+  const statsData = [
+    ['HEIGHT', data.height + ' cm', 'NUMBER', data.number],
+    ['BIRTH MONTH', data.month, 'SHOOTS', data.hand],
+    ['GOALS', data.goals, 'HOT ZONE', data.hotZone],
+    ['ACCURACY', data.accuracy + '%', 'ARCHETYPE', data.archetype]
+  ];
+
+  const tableY = 265;
+  const rowH = 74;
+  const colW = W / 2;
+
+  statsData.forEach((row, ri) => {
+    const y = tableY + ri * rowH;
+
+    ctx.save();
+    ctx.fillStyle = ri % 2 === 0 ? 'rgba(0,118,206,0.1)' : 'rgba(255,255,255,0.04)';
+    ctx.fillRect(0, y, W, rowH);
+    ctx.restore();
+
+    ctx.save();
+    ctx.strokeStyle = 'rgba(255,255,255,0.06)';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(0, y + rowH);
+    ctx.lineTo(W, y + rowH);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(W / 2, y + 8);
+    ctx.lineTo(W / 2, y + rowH - 8);
+    ctx.stroke();
+    ctx.restore();
+
+    ctx.save();
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'top';
+    ctx.font = '600 18px "Barlow Condensed", sans-serif';
+    ctx.fillStyle = '#5BB3E8';
+    ctx.fillText(row[0], 36, y + 12);
+    ctx.font = 'bold 34px "Barlow Condensed", sans-serif';
+    ctx.fillStyle = '#FFFFFF';
+    ctx.fillText(String(row[1]), 36, y + 32);
+    ctx.restore();
+
+    ctx.save();
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'top';
+    ctx.font = '600 18px "Barlow Condensed", sans-serif';
+    ctx.fillStyle = '#5BB3E8';
+    ctx.fillText(row[2], colW + 30, y + 12);
+    ctx.font = 'bold 34px "Barlow Condensed", sans-serif';
+    ctx.fillStyle = '#FFFFFF';
+    ctx.fillText(String(row[3]), colW + 30, y + 32);
+    ctx.restore();
+  });
+
+  const logoLabels = ['PS43', 'LOTUS 8', 'MFNERC', 'DELL'];
+  const logoImages = [logos.ps43, logos.lotus8, logos.mfnerc, logos.dell];
+  const slotW = 150;
+  const slotH = 64;
+  const gap = 18;
+  const totalLogoW = slotW * logoImages.length + gap * (logoImages.length - 1);
+  const logosX = (W - totalLogoW) / 2;
+  const logosY = H - 108;
+
+  ctx.fillStyle = '#0076CE';
+  ctx.fillRect(logosX, logosY - 16, totalLogoW, 3);
+
+  ctx.save();
+  ctx.font = '600 16px "Barlow Condensed", sans-serif';
+  ctx.fillStyle = 'rgba(255,255,255,0.3)';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'top';
+  ctx.fillText('POWERED BY', W / 2, logosY - 38);
+  ctx.restore();
+
+  logoImages.forEach((img, i) => {
+    const x = logosX + i * (slotW + gap);
+    drawLogoImage(ctx, img, logoLabels[i], x, logosY, slotW, slotH, 'rgba(255,255,255,0.1)', '#FFFFFF');
+  });
+
+  ctx.save();
+  ctx.font = '600 18px "Barlow Condensed", sans-serif';
+  ctx.fillStyle = 'rgba(255,255,255,0.2)';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'bottom';
+  ctx.fillText('datadunkers.ca  ·  #dataskaters', W / 2, H - 22);
+  ctx.restore();
+}
+
+function parseParams() {
+  const p = new URLSearchParams(window.location.search);
+  const get = (name) => (p.get(name) || '').trim();
+
+  return {
+    nickname: get('nickname'),
+    name: get('name'),
+    number: get('number'),
+    position: get('position'),
+    height: get('height'),
+    hand: get('hand'),
+    month: get('month'),
+    goals: get('goals'),
+    hotZone: get('hot_zone') || get('hot-zone'),
+    accuracy: get('accuracy'),
+    archetype: get('archetype'),
+    side: (get('side') || 'both').toLowerCase()
+  };
+}
+
+function requiredParamList() {
+  return ['nickname', 'number', 'position', 'height', 'hand', 'month', 'goals', 'hotZone', 'accuracy', 'archetype'];
+}
+
+function getMissingParams(data) {
+  return requiredParamList().filter((k) => !data[k]);
+}
+
+async function fetchPlayerFromPocketBase(nickname) {
+  if (!nickname) {
+    return { realName: '', photoUrl: '' };
+  }
+
+  const filter = encodeURIComponent(`nickname="${nickname.replace(/"/g, '\\"')}"`);
+  const url = `${POCKETBASE_URL}/api/collections/${COLLECTION_NAME}/records?perPage=1&page=1&filter=${filter}&sort=-created`;
+
+  const response = await fetch(url);
+  if (!response.ok) {
+    const text = await response.text();
+    throw new Error(`PocketBase lookup failed: ${response.status} ${text || ''}`.trim());
+  }
+
+  const payload = await response.json();
+  const record = payload && payload.items && payload.items[0] ? payload.items[0] : null;
+  if (!record) {
+    return { realName: '', photoUrl: '' };
+  }
+
+  const photoField = record.photo;
+  const fileName = Array.isArray(photoField) ? photoField[0] : photoField;
+  const photoUrl = fileName
+    ? `${POCKETBASE_URL}/api/files/${COLLECTION_NAME}/${record.id}/${encodeURIComponent(fileName)}`
+    : '';
+
+  return {
+    realName: (record.real_name || '').trim(),
+    photoUrl
+  };
+}
+
+function loadImage(url) {
+  return new Promise((resolve) => {
+    if (!url) {
+      resolve(null);
+      return;
+    }
+
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    img.onload = () => resolve(img);
+    img.onerror = () => resolve(null);
+    img.src = url;
+  });
+}
+
+function waitForLogos(timeoutMs) {
+  const images = Object.values(logos);
+  const waiters = images.map((img) => new Promise((resolve) => {
+    if (img.complete) {
+      resolve();
+      return;
+    }
+
+    const done = () => resolve();
+    img.addEventListener('load', done, { once: true });
+    img.addEventListener('error', done, { once: true });
+  }));
+
+  return Promise.race([
+    Promise.all(waiters),
+    new Promise((resolve) => setTimeout(resolve, timeoutMs))
+  ]);
+}
+
+function drawToCanvases(data) {
+  const fc = document.getElementById('front-canvas');
+  const bc = document.getElementById('back-canvas');
+  const fCtx = fc.getContext('2d');
+  const bCtx = bc.getContext('2d');
+
+  drawFront(fCtx, fc.width, fc.height, data);
+  drawBack(bCtx, bc.width, bc.height, data);
+}
+
+function getOutputCanvas(side) {
+  const fc = document.getElementById('front-canvas');
+  const bc = document.getElementById('back-canvas');
+
+  if (side === 'front') {
+    return fc;
+  }
+  if (side === 'back') {
+    return bc;
+  }
+
+  const combo = document.createElement('canvas');
+  combo.width = fc.width * 2;
+  combo.height = fc.height;
+  const ctx = combo.getContext('2d');
+  ctx.fillStyle = '#060F1E';
+  ctx.fillRect(0, 0, combo.width, combo.height);
+  ctx.drawImage(fc, 0, 0);
+  ctx.drawImage(bc, fc.width, 0);
+  return combo;
+}
+
+function outputImageOnly(canvas) {
+  const panel = document.getElementById('fallback-panel');
+  panel.remove();
+
+  document.body.style.display = 'block';
+  document.body.style.padding = '0';
+  document.body.style.margin = '0';
+  document.body.style.background = '#000';
+
+  const img = document.createElement('img');
+  img.alt = 'Data Skaters card';
+  img.style.display = 'block';
+  img.style.width = '100%';
+  img.style.height = 'auto';
+  img.src = canvas.toDataURL('image/png');
+  document.body.appendChild(img);
+}
+
+function showFallbackPanel(status, isError) {
+  const panel = document.getElementById('fallback-panel');
+  const statusEl = document.getElementById('status');
+  panel.hidden = false;
+  statusEl.textContent = status;
+  statusEl.className = isError ? 'status error' : 'status';
+}
+
+async function run() {
+  const params = parseParams();
+  const missing = getMissingParams(params);
+  const completeRequest = missing.length === 0;
+
+  if (!completeRequest) {
+    showFallbackPanel(
+      `Missing required params: ${missing.join(', ')}. Rendering preview with defaults where needed.`,
+      true
+    );
+  }
+
+  let pbData;
+  try {
+    pbData = await fetchPlayerFromPocketBase(params.nickname);
+  } catch (error) {
+    pbData = { realName: '', photoUrl: '' };
+    showFallbackPanel(`Could not read PocketBase record: ${error.message}`, true);
+  }
+
+  const name = params.name || pbData.realName || params.nickname || 'Player Name';
+  const cardData = {
+    name,
+    number: params.number || '00',
+    position: params.position || 'Centre',
+    height: params.height || '180',
+    hand: params.hand || 'Right',
+    month: params.month || 'January',
+    goals: params.goals || '0',
+    hotZone: params.hotZone || 'Top Left',
+    accuracy: params.accuracy || '0',
+    archetype: params.archetype || 'Sniper',
+    photo: pbData.photoUrl || ''
+  };
+
+  if (!document.getElementById('fallback-panel').hidden) {
+    showFallbackPanel(
+      pbData.photoUrl
+        ? `Preview mode. Loaded photo for nickname "${params.nickname}" from PocketBase.`
+        : `Preview mode. No PocketBase photo found for nickname "${params.nickname || 'n/a'}".`,
+      !pbData.photoUrl
+    );
+  }
+
+  const photoImagePromise = loadImage(cardData.photo);
+
+  await waitForLogos(2500);
+  cardData.photoImage = await photoImagePromise;
+
+  drawToCanvases(cardData);
+
+  if (completeRequest) {
+    const side = ['front', 'back', 'both'].includes(params.side) ? params.side : 'both';
+    const canvas = getOutputCanvas(side);
+    outputImageOnly(canvas);
+  }
+}
+
+run().catch((error) => {
+  showFallbackPanel(`Unexpected error: ${error.message}`, true);
+});
+</script>
+</body>
+</html>
