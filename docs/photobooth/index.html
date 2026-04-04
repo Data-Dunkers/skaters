@@ -261,6 +261,10 @@
             accent-color: var(--primary);
         }
 
+        .picker-active {
+            cursor: crosshair;
+        }
+
         .status {
             margin-top: 0.9rem;
             border: 1px solid var(--border);
@@ -351,7 +355,7 @@
                     </div>
                 </div>
 
-                <button type="button" class="btn" id="sample-bg-btn" disabled>Sample Top-Left Color</button>
+                <button type="button" class="btn" id="pick-color-btn" disabled>Pick Color From Photo</button>
             </div>
         </div>
 
@@ -396,12 +400,13 @@
         const softnessInput = document.getElementById('softness');
         const toleranceValue = document.getElementById('tolerance-value');
         const softnessValue = document.getElementById('softness-value');
-        const sampleBgBtn = document.getElementById('sample-bg-btn');
+        const pickColorBtn = document.getElementById('pick-color-btn');
 
         let stream = null;
         let photoBlob = null;
         let selectedDeviceId = '';
         let originalImageData = null;
+        let isPickingColor = false;
 
         function setStatus(message, type) {
             statusEl.textContent = message;
@@ -418,14 +423,17 @@
                 retakeBtn.disabled = false;
                 uploadBtn.disabled = false;
                 captureBtn.disabled = true;
-                sampleBgBtn.disabled = false;
+                pickColorBtn.disabled = false;
             } else {
                 video.style.display = 'block';
                 canvas.style.display = 'none';
                 retakeBtn.disabled = true;
                 uploadBtn.disabled = true;
                 captureBtn.disabled = !stream;
-                sampleBgBtn.disabled = true;
+                pickColorBtn.disabled = true;
+                isPickingColor = false;
+                canvas.classList.remove('picker-active');
+                pickColorBtn.textContent = 'Pick Color From Photo';
             }
         }
 
@@ -503,18 +511,39 @@
             softnessValue.textContent = softnessInput.value;
         }
 
-        function sampleTopLeftColor() {
+        function setColorPickerMode(enabled) {
             if (!originalImageData) {
                 return;
             }
 
-            const sampleX = Math.min(30, Math.floor(originalImageData.width / 8));
-            const sampleY = Math.min(30, Math.floor(originalImageData.height / 8));
-            const idx = ((sampleY * originalImageData.width) + sampleX) * 4;
+            isPickingColor = enabled;
+            if (enabled) {
+                canvas.classList.add('picker-active');
+                pickColorBtn.textContent = 'Cancel Color Pick';
+                setStatus('Click on the captured image to pick background color.');
+            } else {
+                canvas.classList.remove('picker-active');
+                pickColorBtn.textContent = 'Pick Color From Photo';
+            }
+        }
+
+        function pickColorFromCanvas(event) {
+            if (!isPickingColor || !originalImageData) {
+                return;
+            }
+
+            const rect = canvas.getBoundingClientRect();
+            const x = Math.max(0, Math.min(canvas.width - 1,
+                Math.floor(((event.clientX - rect.left) / rect.width) * canvas.width)));
+            const y = Math.max(0, Math.min(canvas.height - 1,
+                Math.floor(((event.clientY - rect.top) / rect.height) * canvas.height)));
+
+            const idx = ((y * originalImageData.width) + x) * 4;
             const data = originalImageData.data;
             keyColorInput.value = rgbToHex(data[idx], data[idx + 1], data[idx + 2]);
+            setColorPickerMode(false);
             renderProcessedImage();
-            setStatus('Background color sampled from top-left area.');
+            setStatus('Background color updated from clicked pixel.');
         }
 
         function stopCurrentStream() {
@@ -707,6 +736,7 @@
         function retakePhoto() {
             photoBlob = null;
             originalImageData = null;
+            setColorPickerMode(false);
             setCaptureState(false);
             setStatus('Retake ready. Capture a new photo.');
         }
@@ -792,7 +822,14 @@
                 renderProcessedImage();
             }
         });
-        sampleBgBtn.addEventListener('click', sampleTopLeftColor);
+        pickColorBtn.addEventListener('click', () => {
+            if (!originalImageData) {
+                return;
+            }
+
+            setColorPickerMode(!isPickingColor);
+        });
+        canvas.addEventListener('click', pickColorFromCanvas);
         uploadForm.addEventListener('submit', uploadRecord);
 
         if (navigator.mediaDevices && navigator.mediaDevices.addEventListener) {
