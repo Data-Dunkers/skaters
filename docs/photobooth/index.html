@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Skaters Photobooth</title>
+    <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #FF6600;
+            --primary-dim: rgba(255, 102, 0, 0.15);
+            --bg-dark: #0076CE;
+            --bg-card: #181818;
+            --bg-input: #222222;
+            --text-main: #FFFFFF;
+            --text-muted: #888888;
+            --border: #2a2a2a;
+            --border-focus: #FF6600;
+            --success: #22C55E;
+            --success-dim: rgba(34, 197, 94, 0.15);
+            --error: #EF4444;
+            --error-dim: rgba(239, 68, 68, 0.15);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Barlow', sans-serif;
+            background-color: var(--bg-dark);
+            background-image:
+                radial-gradient(ellipse at 20% 0%, rgba(255,102,0,0.07) 0%, transparent 60%),
+                radial-gradient(ellipse at 80% 100%, rgba(255,102,0,0.04) 0%, transparent 60%);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 2rem 1rem 4rem;
+        }
+
+        .page-header {
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .page-header .eyebrow {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-size: 0.75rem;
+            font-weight: 600;
+            letter-spacing: 0.25em;
+            text-transform: uppercase;
+            color: var(--primary);
+            margin-bottom: 0.4rem;
+        }
+
+        .page-header h1 {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-size: 3rem;
+            font-weight: 800;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            line-height: 1;
+            color: var(--text-main);
+        }
+
+        .page-header h1 span { color: var(--primary); }
+
+        .page-header p {
+            margin-top: 0.55rem;
+            color: var(--text-muted);
+            font-size: 0.92rem;
+        }
+
+        .layout {
+            width: 100%;
+            max-width: 980px;
+            display: grid;
+            grid-template-columns: 1.1fr 0.9fr;
+            gap: 1.2rem;
+        }
+
+        .card {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 1.15rem;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+        }
+
+        .section-label {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-size: 0.75rem;
+            font-weight: 700;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: var(--primary);
+            margin-bottom: 0.8rem;
+            padding-bottom: 0.35rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .camera-wrap {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 4 / 3;
+            background: #101010;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        video,
+        canvas {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        canvas { display: none; }
+
+        .camera-hint {
+            margin-top: 0.7rem;
+            color: var(--text-muted);
+            font-size: 0.84rem;
+            line-height: 1.45;
+        }
+
+        .controls {
+            margin-top: 0.9rem;
+            display: flex;
+            gap: 0.7rem;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            border: 1px solid var(--border);
+            background: var(--bg-input);
+            color: var(--text-main);
+            border-radius: 8px;
+            padding: 10px 14px;
+            font-family: 'Barlow Condensed', sans-serif;
+            font-size: 0.9rem;
+            font-weight: 700;
+            letter-spacing: 0.09em;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: border-color 0.2s, background-color 0.2s, transform 0.08s;
+        }
+
+        .btn:hover { border-color: var(--border-focus); }
+        .btn:active { transform: scale(0.98); }
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        .btn-primary {
+            background: var(--primary);
+            color: #fff;
+            border-color: #b64900;
+        }
+
+        .btn-primary:hover {
+            background: #ff7c2e;
+            border-color: #d45b08;
+        }
+
+        .form-grid {
+            display: grid;
+            gap: 0.85rem;
+        }
+
+        .field {
+            display: flex;
+            flex-direction: column;
+            gap: 0.35rem;
+        }
+
+        label {
+            font-size: 0.78rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+        }
+
+        input[type="text"],
+        select {
+            width: 100%;
+            padding: 11px 13px;
+            background-color: var(--bg-input);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text-main);
+            font-size: 1rem;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        input[type="text"]:focus,
+        select:focus {
+            outline: none;
+            border-color: var(--border-focus);
+            box-shadow: 0 0 0 3px rgba(255,102,0,0.12);
+        }
+
+        select {
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23888' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 14px center;
+            padding-right: 36px;
+            cursor: pointer;
+        }
+
+        select option {
+            background: #222;
+            color: #fff;
+        }
+
+        .optional-note {
+            color: var(--text-muted);
+            font-size: 0.82rem;
+            margin-top: -0.15rem;
+        }
+
+        .status {
+            margin-top: 0.9rem;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 0.7rem 0.85rem;
+            font-size: 0.88rem;
+            color: var(--text-muted);
+            line-height: 1.45;
+            min-height: 2.65rem;
+        }
+
+        .status.success {
+            border-color: var(--success);
+            background: var(--success-dim);
+            color: #9ef0ba;
+        }
+
+        .status.error {
+            border-color: var(--error);
+            background: var(--error-dim);
+            color: #ffb0b0;
+        }
+
+        @media (max-width: 900px) {
+            .layout {
+                grid-template-columns: 1fr;
+                max-width: 640px;
+            }
+
+            .page-header h1 { font-size: 2.3rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="page-header">
+        <div class="eyebrow">Data Science x Hockey</div>
+        <h1>Data <span>Skaters</span></h1>
+        <p>Photobooth Capture for Player Registration</p>
+    </div>
+
+    <div class="layout">
+        <div class="card">
+            <div class="section-label">Camera</div>
+            <div class="camera-wrap">
+                <video id="video" autoplay playsinline muted></video>
+                <canvas id="snapshot" aria-label="Captured photo preview"></canvas>
+            </div>
+            <p class="camera-hint">
+                Allow camera access, frame the player, then capture. You can retake before uploading.
+            </p>
+            <div class="field" style="margin-top: 0.9rem;">
+                <label for="camera-select">Camera</label>
+                <select id="camera-select" disabled>
+                    <option value="">Default Camera</option>
+                </select>
+            </div>
+            <div class="controls">
+                <button type="button" class="btn" id="start-btn">Start Camera</button>
+                <button type="button" class="btn btn-primary" id="capture-btn" disabled>Capture</button>
+                <button type="button" class="btn" id="retake-btn" disabled>Retake</button>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="section-label">Upload Details</div>
+            <form id="upload-form" class="form-grid" novalidate>
+                <div class="field">
+                    <label for="nickname">Nickname</label>
+                    <input type="text" id="nickname" name="nickname" placeholder="PS43" required>
+                </div>
+
+                <div class="field">
+                    <label for="real-name">Real Name</label>
+                    <input type="text" id="real-name" name="real_name" placeholder="Optional">
+                    <div class="optional-note">Optional field</div>
+                </div>
+
+                <button type="submit" class="btn btn-primary" id="upload-btn" disabled>Upload Photo</button>
+            </form>
+            <div id="status" class="status">Start camera to begin.</div>
+        </div>
+    </div>
+
+    <script>
+        const POCKETBASE_URL = 'https://api.datadunkers.ca';
+        const COLLECTION_NAME = 'data_skaters_photos';
+
+        const video = document.getElementById('video');
+        const canvas = document.getElementById('snapshot');
+        const startBtn = document.getElementById('start-btn');
+        const captureBtn = document.getElementById('capture-btn');
+        const retakeBtn = document.getElementById('retake-btn');
+        const cameraSelect = document.getElementById('camera-select');
+        const uploadBtn = document.getElementById('upload-btn');
+        const uploadForm = document.getElementById('upload-form');
+        const nicknameInput = document.getElementById('nickname');
+        const realNameInput = document.getElementById('real-name');
+        const statusEl = document.getElementById('status');
+
+        let stream = null;
+        let photoBlob = null;
+        let selectedDeviceId = '';
+
+        function setStatus(message, type) {
+            statusEl.textContent = message;
+            statusEl.classList.remove('success', 'error');
+            if (type) {
+                statusEl.classList.add(type);
+            }
+        }
+
+        function setCaptureState(isCaptured) {
+            if (isCaptured) {
+                video.style.display = 'none';
+                canvas.style.display = 'block';
+                retakeBtn.disabled = false;
+                uploadBtn.disabled = false;
+                captureBtn.disabled = true;
+            } else {
+                video.style.display = 'block';
+                canvas.style.display = 'none';
+                retakeBtn.disabled = true;
+                uploadBtn.disabled = true;
+                captureBtn.disabled = !stream;
+            }
+        }
+
+        function stopCurrentStream() {
+            if (stream) {
+                stream.getTracks().forEach((track) => track.stop());
+                stream = null;
+                video.srcObject = null;
+            }
+        }
+
+        async function loadVideoDevices() {
+            if (!navigator.mediaDevices || !navigator.mediaDevices.enumerateDevices) {
+                return;
+            }
+
+            const devices = await navigator.mediaDevices.enumerateDevices();
+            const cameras = devices.filter((device) => device.kind === 'videoinput');
+            const currentValue = cameraSelect.value;
+
+            cameraSelect.innerHTML = '';
+
+            if (!cameras.length) {
+                const option = document.createElement('option');
+                option.value = '';
+                option.textContent = 'No camera detected';
+                cameraSelect.appendChild(option);
+                cameraSelect.disabled = true;
+                return;
+            }
+
+            cameras.forEach((camera, index) => {
+                const option = document.createElement('option');
+                option.value = camera.deviceId;
+                option.textContent = camera.label || `Camera ${index + 1}`;
+                cameraSelect.appendChild(option);
+            });
+
+            cameraSelect.disabled = false;
+            const availableIds = cameras.map((camera) => camera.deviceId);
+            const preferredId = selectedDeviceId || currentValue;
+            if (preferredId && availableIds.includes(preferredId)) {
+                cameraSelect.value = preferredId;
+            } else {
+                cameraSelect.selectedIndex = 0;
+                selectedDeviceId = cameraSelect.value;
+            }
+        }
+
+        async function startCamera(deviceId) {
+            stopCurrentStream();
+
+            try {
+                const videoConstraints = {
+                    width: { ideal: 1280 },
+                    height: { ideal: 960 }
+                };
+
+                if (deviceId) {
+                    videoConstraints.deviceId = { exact: deviceId };
+                } else {
+                    videoConstraints.facingMode = 'user';
+                }
+
+                stream = await navigator.mediaDevices.getUserMedia({
+                    video: videoConstraints,
+                    audio: false
+                });
+
+                video.srcObject = stream;
+                await video.play();
+
+                const [track] = stream.getVideoTracks();
+                const trackSettings = track ? track.getSettings() : {};
+                if (trackSettings.deviceId) {
+                    selectedDeviceId = trackSettings.deviceId;
+                }
+
+                await loadVideoDevices();
+                if (selectedDeviceId) {
+                    cameraSelect.value = selectedDeviceId;
+                }
+
+                captureBtn.disabled = false;
+                startBtn.disabled = true;
+                setStatus('Camera ready. Capture when the player is framed.');
+            } catch (error) {
+                captureBtn.disabled = true;
+                startBtn.disabled = false;
+                setStatus('Camera access failed. Please allow webcam permissions and try again.', 'error');
+            }
+        }
+
+        async function onCameraChange() {
+            const nextDeviceId = cameraSelect.value;
+            if (!nextDeviceId) {
+                return;
+            }
+
+            selectedDeviceId = nextDeviceId;
+            photoBlob = null;
+            setCaptureState(false);
+            await startCamera(nextDeviceId);
+        }
+
+        function capturePhoto() {
+            if (!stream) {
+                return;
+            }
+
+            const width = video.videoWidth;
+            const height = video.videoHeight;
+
+            if (!width || !height) {
+                setStatus('Camera is still warming up. Try again in a second.', 'error');
+                return;
+            }
+
+            canvas.width = width;
+            canvas.height = height;
+            const context = canvas.getContext('2d');
+            context.drawImage(video, 0, 0, width, height);
+
+            canvas.toBlob((blob) => {
+                if (!blob) {
+                    setStatus('Could not capture image. Please retake.', 'error');
+                    return;
+                }
+
+                photoBlob = blob;
+                setCaptureState(true);
+                setStatus('Photo captured. Fill details and upload.');
+            }, 'image/jpeg', 0.92);
+        }
+
+        function retakePhoto() {
+            photoBlob = null;
+            setCaptureState(false);
+            setStatus('Retake ready. Capture a new photo.');
+        }
+
+        async function uploadRecord(event) {
+            event.preventDefault();
+
+            const nickname = nicknameInput.value.trim();
+            const realName = realNameInput.value.trim();
+
+            if (!nickname) {
+                setStatus('Nickname is required.', 'error');
+                nicknameInput.focus();
+                return;
+            }
+
+            if (!photoBlob) {
+                setStatus('Capture a photo before uploading.', 'error');
+                return;
+            }
+
+            const fileName = `${nickname.replace(/[^a-zA-Z0-9_-]/g, '_')}_${Date.now()}.jpg`;
+            const photoFile = new File([photoBlob], fileName, { type: 'image/jpeg' });
+
+            const formData = new FormData();
+            formData.append('nickname', nickname);
+            formData.append('real_name', realName);
+            formData.append('photo', photoFile);
+
+            uploadBtn.disabled = true;
+            setStatus('Uploading to PocketBase...');
+
+            try {
+                const response = await fetch(`${POCKETBASE_URL}/api/collections/${COLLECTION_NAME}/records`, {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (!response.ok) {
+                    const errorBody = await response.text();
+                    throw new Error(errorBody || `Upload failed with status ${response.status}`);
+                }
+
+                const record = await response.json();
+                setStatus(`Upload complete. Record saved: ${record.id}`, 'success');
+                nicknameInput.value = '';
+                realNameInput.value = '';
+                photoBlob = null;
+                setCaptureState(false);
+            } catch (error) {
+                setStatus(`Upload failed. ${error.message}`, 'error');
+            } finally {
+                uploadBtn.disabled = !photoBlob;
+            }
+        }
+
+        startBtn.addEventListener('click', () => {
+            const deviceId = cameraSelect.value || selectedDeviceId;
+            startCamera(deviceId);
+        });
+        captureBtn.addEventListener('click', capturePhoto);
+        retakeBtn.addEventListener('click', retakePhoto);
+        cameraSelect.addEventListener('change', onCameraChange);
+        uploadForm.addEventListener('submit', uploadRecord);
+
+        if (navigator.mediaDevices && navigator.mediaDevices.addEventListener) {
+            navigator.mediaDevices.addEventListener('devicechange', () => {
+                loadVideoDevices().catch(() => {
+                    // Ignore transient device enumeration errors.
+                });
+            });
+        }
+
+        loadVideoDevices().catch(() => {
+            // Device labels are often unavailable until camera permission is granted.
+        });
+
+        window.addEventListener('beforeunload', () => {
+            stopCurrentStream();
+        });
+    </script>
+</body>
+</html>
