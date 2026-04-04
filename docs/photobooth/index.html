@@ -356,6 +356,38 @@
             }
         }
 
+        function getCameraFailureHelp(error) {
+            if (window.location.protocol === 'file:') {
+                return 'Camera access is blocked from local files in Edge. Serve this page on http://localhost or https.';
+            }
+
+            if (!window.isSecureContext) {
+                return 'Camera requires a secure context. Use https:// or http://localhost.';
+            }
+
+            if (!error || !error.name) {
+                return 'Please check browser camera permissions and try again.';
+            }
+
+            if (error.name === 'NotAllowedError' || error.name === 'SecurityError') {
+                return 'Camera permission was denied. Allow camera access in browser site settings.';
+            }
+
+            if (error.name === 'NotFoundError' || error.name === 'DevicesNotFoundError') {
+                return 'No webcam was found. Connect a camera and retry.';
+            }
+
+            if (error.name === 'NotReadableError' || error.name === 'TrackStartError') {
+                return 'Camera is busy in another app. Close Teams/Zoom/OBS and retry.';
+            }
+
+            if (error.name === 'OverconstrainedError' || error.name === 'ConstraintNotSatisfiedError') {
+                return 'Selected camera constraints were not supported. Try another camera.';
+            }
+
+            return `${error.name}: ${error.message || 'Unknown camera error.'}`;
+        }
+
         async function loadVideoDevices() {
             if (!navigator.mediaDevices || !navigator.mediaDevices.enumerateDevices) {
                 return;
@@ -395,24 +427,56 @@
         }
 
         async function startCamera(deviceId) {
+            if (window.location.protocol === 'file:') {
+                setStatus('Camera access is not supported from file:// in Edge. Run a local server and open http://localhost.', 'error');
+                return;
+            }
+
+            if (!window.isSecureContext) {
+                setStatus('Camera requires a secure context. Use https:// or http://localhost.', 'error');
+                return;
+            }
+
             stopCurrentStream();
 
             try {
-                const videoConstraints = {
-                    width: { ideal: 1280 },
-                    height: { ideal: 960 }
-                };
+                const attempts = [];
 
                 if (deviceId) {
-                    videoConstraints.deviceId = { exact: deviceId };
-                } else {
-                    videoConstraints.facingMode = 'user';
+                    attempts.push({
+                        video: {
+                            deviceId: { exact: deviceId },
+                            width: { ideal: 1280 },
+                            height: { ideal: 960 }
+                        },
+                        audio: false
+                    });
                 }
 
-                stream = await navigator.mediaDevices.getUserMedia({
-                    video: videoConstraints,
+                attempts.push({
+                    video: {
+                        facingMode: { ideal: 'user' },
+                        width: { ideal: 1280 },
+                        height: { ideal: 960 }
+                    },
                     audio: false
                 });
+
+                attempts.push({ video: true, audio: false });
+
+                let lastError = null;
+                for (const constraints of attempts) {
+                    try {
+                        stream = await navigator.mediaDevices.getUserMedia(constraints);
+                        break;
+                    } catch (error) {
+                        lastError = error;
+                    }
+                }
+
+                if (!stream) {
+                    throw lastError || new Error('Unable to open any camera stream.');
+                }
 
                 video.srcObject = stream;
                 await video.play();
@@ -434,7 +498,7 @@
             } catch (error) {
                 captureBtn.disabled = true;
                 startBtn.disabled = false;
-                setStatus('Camera access failed. Please allow webcam permissions and try again.', 'error');
+                setStatus(`Camera access failed. ${getCameraFailureHelp(error)}`, 'error');
             }
         }
 
@@ -558,6 +622,10 @@
         loadVideoDevices().catch(() => {
             // Device labels are often unavailable until camera permission is granted.
         });
+
+        if (window.location.protocol === 'file:') {
+            setStatus('Open this page via http://localhost (not file://) to use the webcam in Edge.', 'error');
+        }
 
         window.addEventListener('beforeunload', () => {
             stopCurrentStream();
