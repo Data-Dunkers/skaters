@@ -34,7 +34,7 @@ LAST_NAMES = [
 
 ACTIVITIES = [
     'Sniper', 'Playmaker', 'Power Forward', 'Two-way Forward',
-    'Speed Winger', 'Defensive Defenseman', 'Offensive Defenseman'
+    'Speed Winger', 'Defensive Defenseman', 'Offensive Defenseman', 'Virtual'
 ]
 
 MONTHS = [
@@ -54,33 +54,32 @@ def generate_students(count: int) -> List[Dict[str, Any]]:
     used_nicknames = set()
 
     for i in range(count):
-        # Generate unique nickname (2-3 letter code + number)
+        # Generate unique nickname (2 letter code + number)
+        first_name = random.choice(FIRST_NAMES)
+        last_name = random.choice(LAST_NAMES)
+        initials = first_name[:2].upper()
+
         while True:
-            letters = ''.join(random.choices('ABCDEFGHIJKLMNOPQRSTUVWXYZ', k=random.randint(2, 3)))
             number = random.randint(10, 99)
-            nickname = f'{letters}{number}'
+            nickname = f'{initials}{number}'
             if nickname not in used_nicknames:
                 used_nicknames.add(nickname)
                 break
 
-        first_name = random.choice(FIRST_NAMES)
-        last_name = random.choice(LAST_NAMES)
-
-        # Realistic middle-school heights: 140-180 cm, wingspan ~1-5% more than height
-        height = round(random.uniform(140, 180), 1)
+        # Realistic middle-school heights: 140-200 cm, wingspan ~1-5% more than height
+        min_height = 140
+        max_height = 200
+        height = round(random.uniform(min_height, max_height), 1)
         wingspan = round(height * random.uniform(1.00, 1.05), 1)
-        skate_size = round(random.uniform(3.0, 8.0), 1)
+        skate_size = round(4 + (height - min_height) * (12 - 4) / (max_height - min_height), 0) + random.choice([-0.5, 0, 0.5])
 
-        # Reaction times: 150-350ms (realistic range for middle school)
+        # Reaction times: 200-450ms (realistic range for middle school)
         reaction_times = [
-            random.randint(150, 350),
-            random.randint(150, 350),
-            random.randint(150, 350),
+            random.randint(200, 450),
+            random.randint(200, 450),
+            random.randint(200, 450),
         ]
         avg_reaction = sum(reaction_times) // len(reaction_times)
-
-        # Resting heart rate: 60-100 bpm (middle school range)
-        resting_hr = random.randint(60, 100)
 
         student = {
             'nickname': nickname,
@@ -90,9 +89,9 @@ def generate_students(count: int) -> List[Dict[str, Any]]:
             'wingspan_cm': wingspan,
             'skate_size': skate_size,
             'reaction_time_ms': avg_reaction,
-            'resting_heart_rate': resting_hr,
+            'resting_heart_rate': random.randint(60, 100),
             'handedness': random.choices(HANDEDNESS, weights=HANDEDNESS_WEIGHTS, k=1)[0],
-            'brith_month': random.choice(MONTHS),
+            'birth_month': random.choice(MONTHS),
             'group_number': (i // 10) + 1,  # 10 students per group
         }
         students.append(student)
@@ -146,10 +145,16 @@ def submit_activities(student: Dict[str, Any]) -> bool:
             }
 
             # Add activity-specific fields based on config
-            if activity in ['Sniper', 'Playmaker', 'Two-way Forward', 'Defensive Defenseman', 'Offensive Defenseman']:
+            if activity in ['Playmaker', 'Two-way Forward', 'Defensive Defenseman', 'Offensive Defenseman']:
                 payload['target_zone'] = random.choice(ZONES)
 
-            if activity in ['Sniper', 'Playmaker', 'Two-way Forward']:
+            if activity in ['Sniper', 'Offensive Defenseman']:
+                payload['target_zone'] = random.choice(['TL', 'TR'])
+
+            if activity in ['Power Forward', 'Defensive Defenseman']:
+                payload['target_zone'] = random.choice(['BL', 'BR', 'FH'])
+
+            if activity == 'Speed Winger':
                 payload['time_seconds'] = round(random.uniform(2.5, 12.0), 2)
 
             try:
@@ -162,7 +167,7 @@ def submit_activities(student: Dict[str, Any]) -> bool:
                 fail_count += 1
 
             # Small delay to avoid overwhelming the API
-            time.sleep(0.1)
+            #time.sleep(0.1)
 
     return fail_count == 0
 
@@ -213,15 +218,11 @@ def test():
 
 
 def main():
-    """Generate and submit data for 75 students."""
-    print("=" * 60)
-    print("DATA SKATERS - SYNTHETIC DATA SUBMISSION")
-    print("=" * 60)
-    print()
+    """Generate and submit data for 70 students."""
 
     # Generate students
-    print("Generating 75 fictional Manitoba middle-school students...")
-    students = generate_students(75)
+    print("Generating 70 fictional Manitoba middle-school students...")
+    students = generate_students(70)
     print(f"✓ Generated {len(students)} students")
     print()
 
@@ -235,7 +236,7 @@ def main():
     print()
 
     for idx, student in enumerate(students, 1):
-        print(f"[{idx:2d}/75] {student['nickname']} ({student['first_name']} {student['last_name']})")
+        print(f"[{idx:2d}/70] {student['nickname']} ({student['first_name']} {student['last_name']})")
 
         # Submit traits
         if submit_traits(student):
@@ -252,16 +253,14 @@ def main():
             activities_failed += 1
 
         # Small delay between students
-        time.sleep(0.1)
+        #time.sleep(0.1)
 
     # Summary
-    print()
     print("=" * 60)
     print("SUBMISSION SUMMARY")
     print("=" * 60)
     print(f"Traits:     {traits_success} successful, {traits_failed} failed")
     print(f"Activities: {activities_success} successful, {activities_failed} failed")
-    print()
     print("✓ Data submission complete!")
 
 
