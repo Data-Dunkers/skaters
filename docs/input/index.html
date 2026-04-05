@@ -454,16 +454,31 @@ const PB_URL = 'https://api.datadunkers.ca/api/collections/data_skaters_activiti
 
 // Which fields each activity needs
 // target_zone: true = show, false = hide
-// time_seconds: true = show, false = hide
 const ACTIVITY_CONFIG = {
-    'Sniper':                 { target_zone: true,  time_seconds: false, hint: 'Wrist shot · Top corners · Mid-distance' },
-    'Playmaker':              { target_zone: true,  time_seconds: false, hint: 'Wrist shot · All 5 holes · Same distance' },
-    'Power Forward':          { target_zone: false, time_seconds: false, hint: 'Close-range · Any low zone · Right at the net' },
-    'Two-way Forward':        { target_zone: true,  time_seconds: false, hint: '6 different distances/angles · 2 ft away' },
-    'Speed Winger':           { target_zone: false, time_seconds: false, hint: '6 quick shots · Timed within 30 sec · 2 ft away' },
-    'Defensive Defenseman':   { target_zone: true,  time_seconds: false, hint: 'Blue line · Bottom corners & five-hole only' },
-    'Offensive Defenseman':   { target_zone: true,  time_seconds: false, hint: 'Blue line · Top corners only · Not timed' },
-    'Virtual':                { target_zone: false, time_seconds: false, hint: 'Hockey esport' },
+    'Sniper':                 { target_zone: true,  hint: 'Wrist shot · Top corners · Mid-distance' },
+    'Playmaker':              { target_zone: true,  hint: 'Wrist shot · All 5 holes · Same distance' },
+    'Power Forward':          { target_zone: true,  hint: 'Close-range · Any low zone · Right at the net' },
+    'Two-way Forward':        { target_zone: true,  hint: '6 different distances/angles · 2 ft away' },
+    'Speed Winger':           { target_zone: false, hint: '6 quick shots · Timed within 30 sec · 2 ft away' },
+    'Defensive Defenseman':   { target_zone: true,  hint: 'Blue line · Bottom corners & five-hole only' },
+    'Offensive Defenseman':   { target_zone: true,  hint: 'Blue line · Top corners only · Not timed' },
+    'Virtual':                { target_zone: false, hint: 'Hockey esport' },
+};
+
+const ZONE_LABELS = {
+    TL: 'Top-Left (TL)',
+    TR: 'Top-Right (TR)',
+    BL: 'Bottom-Left (BL)',
+    BR: 'Bottom-Right (BR)',
+    FH: 'Five-Hole (FH)',
+};
+
+const ALL_ZONES = ['TL', 'TR', 'BL', 'BR', 'FH'];
+const ACTIVITY_ZONE_OPTIONS = {
+    'Sniper': ['TL', 'TR'],
+    'Offensive Defenseman': ['TL', 'TR'],
+    'Power Forward': ['BL', 'BR', 'FH'],
+    'Defensive Defenseman': ['BL', 'BR', 'FH'],
 };
 
 // ── STATE ───────────────────────────────────────────────────────
@@ -510,6 +525,7 @@ document.getElementById('activity').addEventListener('change', function () {
 
     toggleField('field_target_zone',   cfg.target_zone);
     toggleField('field_time_seconds',  cfg.time_seconds);
+    updateTargetZoneOptions(this.value);
 
     // Clear values for hidden fields
     if (!cfg.target_zone)  document.getElementById('target_zone').value  = '';
@@ -517,6 +533,25 @@ document.getElementById('activity').addEventListener('change', function () {
 
     setSpeedModeUI(this.value === 'Speed Winger');
 });
+
+function updateTargetZoneOptions(activity) {
+    const zoneSelect = document.getElementById('target_zone');
+    const currentValue = zoneSelect.value;
+    const allowedZones = ACTIVITY_ZONE_OPTIONS[activity] || ALL_ZONES;
+
+    zoneSelect.innerHTML = '<option value="" disabled selected>Select zone…</option>';
+
+    allowedZones.forEach(zone => {
+        const option = document.createElement('option');
+        option.value = zone;
+        option.textContent = ZONE_LABELS[zone] || zone;
+        zoneSelect.appendChild(option);
+    });
+
+    if (allowedZones.includes(currentValue)) {
+        zoneSelect.value = currentValue;
+    }
+}
 
 function toggleField(id, show) {
     const el = document.getElementById(id);
