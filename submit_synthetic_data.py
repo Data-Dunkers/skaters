@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Submit synthetic data for 75 fictional middle-school students from Manitoba
+Submit synthetic data for fictional middle-school students from Manitoba
 to both the Data Skaters Activities and Traits forms.
 """
 
@@ -12,7 +12,7 @@ from typing import Dict, List, Any
 
 # API endpoints
 ACTIVITIES_URL = 'https://api.datadunkers.ca/api/collections/data_skaters_activities/records'
-TRAITS_URL = 'https://api.datadunkers.ca/api/collections/data_skaters_traits/records'
+TRAITS_URL = 'https://api.datadunkers.ca/api/collections/data_skaters_demographics/records'
 
 # Manitoba-themed first and last names for authenticity
 FIRST_NAMES = [
@@ -57,7 +57,7 @@ def generate_students(count: int) -> List[Dict[str, Any]]:
         # Generate unique nickname (2 letter code + number)
         first_name = random.choice(FIRST_NAMES)
         last_name = random.choice(LAST_NAMES)
-        initials = first_name[:2].upper()
+        initials = first_name[0].upper() + last_name[0].upper()
 
         while True:
             number = random.randint(10, 99)
@@ -108,7 +108,7 @@ def submit_traits(student: Dict[str, Any]) -> bool:
         'reaction_time_ms': student['reaction_time_ms'],
         'skate_size': student['skate_size'],
         'handedness': student['handedness'],
-        'brith_month': student['brith_month'],
+        'birth_month': student['birth_month'],
         'resting_heart_rate': student['resting_heart_rate'],
     }
 
@@ -124,11 +124,8 @@ def submit_traits(student: Dict[str, Any]) -> bool:
         print(f"  ✗ Traits submission error: {e}")
         return False
 
-
 def submit_activities(student: Dict[str, Any]) -> bool:
     """Submit student activity data (6 shot attempts per activity) to the API."""
-    nickname = student['nickname']
-    group = student['group_number']
     success_count = 0
     fail_count = 0
 
@@ -137,8 +134,8 @@ def submit_activities(student: Dict[str, Any]) -> bool:
         # Each student completes all 6 attempts per activity
         for attempt_num in range(1, 7):
             payload = {
-                'group_number': group,
-                'nickname': nickname,
+                'group_number': student['group_number'],
+                'nickname': student['nickname'],
                 'activity': activity,
                 'attempt_number': attempt_num,
                 'success': random.choice([True, False]),
@@ -244,14 +241,14 @@ def main():
             traits_success += 1
         else:
             traits_failed += 1
-
+        
         # Submit activities
         if submit_activities(student):
             print(f"  ✓ Activities submitted")
             activities_success += 1
         else:
             activities_failed += 1
-
+        
         # Small delay between students
         #time.sleep(0.1)
 
