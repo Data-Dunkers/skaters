@@ -214,12 +214,10 @@ def test():
     print("=" * 60)
 
 
-def main():
-    """Generate and submit data for 70 students."""
+def main(n: int = 70):
+    """Generate and submit data for n students."""
 
-    # Generate students
-    print("Generating 70 fictional Manitoba middle-school students...")
-    students = generate_students(70)
+    students = generate_students(n)
     print(f"✓ Generated {len(students)} students")
     print()
 
@@ -233,7 +231,7 @@ def main():
     print()
 
     for idx, student in enumerate(students, 1):
-        print(f"[{idx:2d}/70] {student['nickname']} ({student['first_name']} {student['last_name']})")
+        print(f"[{idx:2d}/{n}] {student['nickname']} ({student['first_name']} {student['last_name']})")
 
         # Submit traits
         if submit_traits(student):
@@ -253,14 +251,9 @@ def main():
         #time.sleep(0.1)
 
     # Summary
-    print("=" * 60)
-    print("SUBMISSION SUMMARY")
-    print("=" * 60)
     print(f"Traits:     {traits_success} successful, {traits_failed} failed")
     print(f"Activities: {activities_success} successful, {activities_failed} failed")
-    print("✓ Data submission complete!")
-
 
 if __name__ == '__main__':
     #test()
-    main()
+    main(70)
