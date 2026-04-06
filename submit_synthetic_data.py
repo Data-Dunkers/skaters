@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 Submit synthetic data for fictional middle-school students from Manitoba
-to both the Data Skaters Activities and Traits forms.
+to both the Data Skaters Activities and Demographics forms.
 """
 
 import requests
@@ -12,7 +12,7 @@ from typing import Dict, List, Any
 
 # API endpoints
 ACTIVITIES_URL = 'https://api.datadunkers.ca/api/collections/data_skaters_activities/records'
-TRAITS_URL = 'https://api.datadunkers.ca/api/collections/data_skaters_demographics/records'
+DEMOGRAPHICS_URL = 'https://api.datadunkers.ca/api/collections/data_skaters_demographics/records'
 
 # Manitoba-themed first and last names for authenticity
 FIRST_NAMES = [
@@ -85,43 +85,44 @@ def generate_students(count: int) -> List[Dict[str, Any]]:
             'nickname': nickname,
             'first_name': first_name,
             'last_name': last_name,
+            'group_number': (i // 10) + 1,  # 10 students per group
             'height_cm': height,
             'wingspan_cm': wingspan,
             'skate_size': skate_size,
-            'reaction_time_ms': avg_reaction,
-            'resting_heart_rate': random.randint(60, 100),
             'handedness': random.choices(HANDEDNESS, weights=HANDEDNESS_WEIGHTS, k=1)[0],
             'birth_month': random.choice(MONTHS),
-            'group_number': (i // 10) + 1,  # 10 students per group
+            'reaction_time_ms': avg_reaction,
+            'resting_heart_rate': random.randint(60, 100),
         }
         students.append(student)
 
     return students
 
 
-def submit_traits(student: Dict[str, Any]) -> bool:
-    """Submit student traits data to the API."""
+def submit_demographics(student: Dict[str, Any]) -> bool:
+    """Submit student demographics data to the API."""
     payload = {
         'nickname': student['nickname'],
+        #'group_number': student['group_number'], # Group number is not needed in demographics, only in activities
         'height_cm': student['height_cm'],
         'wingspan_cm': student['wingspan_cm'],
-        'reaction_time_ms': student['reaction_time_ms'],
         'skate_size': student['skate_size'],
         'handedness': student['handedness'],
         'birth_month': student['birth_month'],
+        'reaction_time_ms': student['reaction_time_ms'],
         'resting_heart_rate': student['resting_heart_rate'],
     }
 
     try:
-        response = requests.post(TRAITS_URL, json=payload, timeout=10)
+        response = requests.post(DEMOGRAPHICS_URL, json=payload, timeout=10)
         if response.status_code in [200, 201]:
             return True
         else:
-            print(f"  ✗ Traits submission failed: {response.status_code}")
+            print(f"  ✗ Demographics submission failed: {response.status_code}")
             print(f"    Response: {response.text[:200]}")
             return False
     except Exception as e:
-        print(f"  ✗ Traits submission error: {e}")
+        print(f"  ✗ Demographics submission error: {e}")
         return False
 
 def submit_activities(student: Dict[str, Any]) -> bool:
@@ -168,52 +169,6 @@ def submit_activities(student: Dict[str, Any]) -> bool:
 
     return fail_count == 0
 
-
-def test():
-    """Test submission with a single student."""
-    print("=" * 60)
-    print("DATA SKATERS - TEST SUBMISSION (1 STUDENT)")
-    print("=" * 60)
-    print()
-
-    # Generate a single student
-    students = generate_students(1)
-    student = students[0]
-
-    print(f"Test Student: {student['nickname']} ({student['first_name']} {student['last_name']})")
-    print(f"  Height: {student['height_cm']} cm")
-    print(f"  Handedness: {student['handedness']}")
-    print(f"  Reaction Time: {student['reaction_time_ms']} ms")
-    print(f"  Resting HR: {student['resting_heart_rate']} bpm")
-    print()
-
-    traits_ok = False
-    activities_ok = False
-
-    print("Submitting traits...")
-    if submit_traits(student):
-        print("  ✓ Traits submitted successfully")
-        traits_ok = True
-    else:
-        print("  ✗ Traits submission failed")
-
-    print()
-    print("Submitting activities...")
-    if submit_activities(student):
-        print("  ✓ Activities submitted successfully")
-        activities_ok = True
-    else:
-        print("  ✗ Activities submission failed")
-
-    print()
-    print("=" * 60)
-    if traits_ok and activities_ok:
-        print("✓ TEST PASSED: All submissions successful")
-    else:
-        print("✗ TEST FAILED: Some submissions failed")
-    print("=" * 60)
-
-
 def main(n: int = 70):
     """Generate and submit data for n students."""
 
@@ -222,23 +177,23 @@ def main(n: int = 70):
     print()
 
     # Submit data
-    traits_success = 0
-    traits_failed = 0
+    demographics_success = 0
+    demographics_failed = 0
     activities_success = 0
     activities_failed = 0
 
-    print("Submitting traits and activity data...")
+    print("Submitting demographics and activity data...")
     print()
 
     for idx, student in enumerate(students, 1):
         print(f"[{idx:2d}/{n}] {student['nickname']} ({student['first_name']} {student['last_name']})")
 
-        # Submit traits
-        if submit_traits(student):
-            print(f"  ✓ Traits submitted")
-            traits_success += 1
+        # Submit demographics
+        if submit_demographics(student):
+            print(f"  ✓ Demographics submitted")
+            demographics_success += 1
         else:
-            traits_failed += 1
+            demographics_failed += 1
         
         # Submit activities
         if submit_activities(student):
@@ -251,9 +206,8 @@ def main(n: int = 70):
         #time.sleep(0.1)
 
     # Summary
-    print(f"Traits:     {traits_success} successful, {traits_failed} failed")
+    print(f"Demographics: {demographics_success} successful, {demographics_failed} failed")
     print(f"Activities: {activities_success} successful, {activities_failed} failed")
 
 if __name__ == '__main__':
-    #test()
     main(70)
