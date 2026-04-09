@@ -333,7 +333,7 @@
     <div class="page-header">
         <div class="eyebrow">Data Science x Hockey</div>
         <h1>Data <span>Skaters</span></h1>
-        <p>Photobooth Capture for Player Registration</p>
+        <p>Photobooth Capture for Player Cards</p>
     </div>
 
     <div class="layout">
@@ -344,7 +344,7 @@
                 <canvas id="snapshot" aria-label="Captured photo preview"></canvas>
             </div>
             <p class="camera-hint">
-                Allow camera access, frame the player, then capture. You can retake before uploading.
+                Allow camera access, frame the player, then capture.<br>You can retake before uploading.
             </p>
             <div class="field" style="margin-top: 0.9rem;">
                 <label for="camera-select">Camera</label>
@@ -395,7 +395,7 @@
             <form id="upload-form" class="form-grid" novalidate>
                 <div class="field">
                     <label for="nickname">Nickname</label>
-                    <input type="text" id="nickname" name="nickname" placeholder="PS43" required>
+                    <input type="text" id="nickname" name="nickname" placeholder="PS43" required oninput="this.value=this.value.toUpperCase().replace(/\s/g,'')">
                 </div>
 
                 <div class="field">
