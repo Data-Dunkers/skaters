@@ -354,14 +354,13 @@
             <label for="activity">Activity</label>
             <select id="activity" name="activity" required>
                 <option value="" disabled selected>Select your activity…</option>
-                <option value="Sniper">Sniper</option>
-                <option value="Playmaker">Playmaker</option>
-                <option value="Power Forward">Power Forward</option>
-                <option value="Two-way Forward">Two-way Forward</option>
-                <option value="Speed Winger">Speed Winger</option>
-                <option value="Defensive Defenseman">Defensive Defenseman</option>
-                <option value="Offensive Defenseman">Offensive Defenseman</option>
-                <option value="Virtual">Virtual</option>
+                <option value="Power Forward">1. Power Forward</option>
+                <option value="Playmaker">2. Playmaker</option>
+                <option value="Two-way Forward">3. Two-way Forward</option>
+                <option value="Speed Winger">4. Speed Winger</option>
+                <option value="Defensive Defenseman">5. Defensive Defenseman</option>
+                <option value="Offensive Defenseman">6. Offensive Defenseman</option>
+                <option value="Sniper">7. Sniper</option>
             </select>
             <div class="activity-hint" id="activityHint"></div>
         </div>
@@ -455,14 +454,13 @@ const PB_URL = 'https://api.datadunkers.ca/api/collections/data_skaters_activiti
 // Which fields each activity needs
 // target_zone: true = show, false = hide
 const ACTIVITY_CONFIG = {
-    'Sniper':                 { target_zone: true,  hint: 'Wrist shot · Top corners · Mid-distance' },
-    'Playmaker':              { target_zone: true,  hint: 'Wrist shot · All 5 holes · Same distance' },
-    'Power Forward':          { target_zone: true,  hint: 'Close-range · Any low zone · Right at the net' },
-    'Two-way Forward':        { target_zone: true,  hint: '6 different distances/angles · 2 ft away' },
-    'Speed Winger':           { target_zone: false, hint: '6 quick shots · Timed within 30 sec · 2 ft away' },
-    'Defensive Defenseman':   { target_zone: true,  hint: 'Blue line · Bottom corners & five-hole only' },
-    'Offensive Defenseman':   { target_zone: true,  hint: 'Blue line · Top corners only · Not timed' },
-    'Virtual':                { target_zone: false, hint: 'Hockey esport' },
+    'Power Forward':          { target_zone: true,  hint: 'Any low zone - 2 feet away' },
+    'Playmaker':              { target_zone: true,  hint: 'All 5 holes - 2 feet away' },
+    'Two-way Forward':        { target_zone: true,  hint: '6 different angles - 2 feet away' },
+    'Speed Winger':           { target_zone: false, hint: '6 quick shots within 30 seconds - 2 ft away' },
+    'Defensive Defenseman':   { target_zone: true,  hint: 'Bottom corners & five-hole only - 5 feet away' },
+    'Offensive Defenseman':   { target_zone: true,  hint: 'Top corners only - 5 feet away' },
+    'Sniper':                 { target_zone: true,  hint: 'Top corners - 7 feet away' },
 };
 
 const ZONE_LABELS = {
