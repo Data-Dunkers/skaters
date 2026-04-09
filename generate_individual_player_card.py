@@ -7,7 +7,7 @@ Dependencies:
 - requests
 
 Example:
-python generate_player_card.py --nickname PS43 --number 43 --position Centre --height 203 --hand Right --month April --goals 12 --hot-zone TL --accuracy 74 --archetype Sniper --side both --output ps43-card.png
+python generate_individual_player_card.py --nickname PS43 --number 43 --position Centre --height 203 --hand Right --month April --goals 12 --hot-zone TL --accuracy 74 --archetype Sniper --side both --output ps43-card.png
 """
 
 from __future__ import annotations
