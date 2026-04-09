@@ -322,6 +322,34 @@
         .badge-miss { background: var(--error-dim);   color: var(--error); }
         .badge-na   { background: #2a2a2a; color: #666; }
         #emptyState { color: var(--text-muted); font-size: 0.85rem; text-align: center; padding: 1.5rem 0; }
+
+        .home-link-wrap {
+            margin-top: 1rem;
+        }
+        .home-link {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 10px 16px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            background: var(--bg-card);
+            color: var(--text-main);
+            font-family: 'Barlow Condensed', sans-serif;
+            font-size: 0.95rem;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            text-decoration: none;
+            transition: border-color 0.2s, color 0.2s, transform 0.1s;
+        }
+        .home-link:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+        .home-link:active {
+            transform: scale(0.98);
+        }
     </style>
 </head>
 <body>
@@ -446,6 +474,8 @@
         <tbody id="statsBody"></tbody>
     </table>
 </div>
+
+<div class="home-link-wrap"><a class="home-link" href="../index.html">Home</a></div>
 
 <script>
 // ── CONFIG ──────────────────────────────────────────────────────

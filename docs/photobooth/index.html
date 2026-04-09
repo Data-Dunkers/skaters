@@ -288,6 +288,37 @@
             color: #ffb0b0;
         }
 
+        .home-link-wrap {
+            margin-top: 1rem;
+        }
+
+        .home-link {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 10px 16px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            background: var(--bg-card);
+            color: var(--text-main);
+            font-family: 'Barlow Condensed', sans-serif;
+            font-size: 0.9rem;
+            font-weight: 700;
+            letter-spacing: 0.09em;
+            text-transform: uppercase;
+            text-decoration: none;
+            transition: border-color 0.2s, color 0.2s, transform 0.08s;
+        }
+
+        .home-link:hover {
+            border-color: var(--border-focus);
+            color: var(--primary);
+        }
+
+        .home-link:active {
+            transform: scale(0.98);
+        }
+
         @media (max-width: 900px) {
             .layout {
                 grid-template-columns: 1fr;
@@ -378,6 +409,8 @@
             <div id="status" class="status">Start camera to begin.</div>
         </div>
     </div>
+
+    <div class="home-link-wrap"><a class="home-link" href="../index.html">Home</a></div>
 
     <script>
         const POCKETBASE_URL = 'https://api.datadunkers.ca';

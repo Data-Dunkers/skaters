@@ -309,6 +309,34 @@
         .status-success { background: var(--success-dim); color: var(--success); border: 1px solid var(--success); }
         .status-error   { background: var(--error-dim);   color: var(--error);   border: 1px solid var(--error); }
 
+        .home-link-wrap {
+            margin-top: 1rem;
+        }
+        .home-link {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 10px 16px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            background: var(--bg-card);
+            color: var(--text-main);
+            font-family: 'Barlow Condensed', sans-serif;
+            font-size: 0.95rem;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            text-decoration: none;
+            transition: border-color 0.2s, color 0.2s, transform 0.1s;
+        }
+        .home-link:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+        .home-link:active {
+            transform: scale(0.98);
+        }
+
         @media (max-width: 760px) {
             .page-header h1 { font-size: 2.25rem; }
             .card { padding: 1.25rem; }
@@ -444,7 +472,7 @@
     <button type="button" id="submitBtn" class="submit-btn" onclick="handleSubmit()">Submit Traits</button>
     <div id="statusMessage"></div>
 </div>
-
+<div class="home-link-wrap"><a class="home-link" href="../index.html">Home</a></div>
 <script>
 const PB_URL = 'https://api.datadunkers.ca/api/collections/data_skaters_traits/records';
 

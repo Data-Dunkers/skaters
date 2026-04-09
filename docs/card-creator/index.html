@@ -233,6 +233,34 @@
   }
   .btn-dl:hover { background: rgba(0,118,206,0.3); border-color: var(--dell-blue); }
 
+  .home-link-wrap {
+    text-align: center;
+    margin-top: 8px;
+  }
+  .home-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 16px;
+    border: 1px solid rgba(255,255,255,0.16);
+    border-radius: 8px;
+    background: rgba(255,255,255,0.05);
+    color: var(--white);
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    text-decoration: none;
+    transition: border-color 0.2s, background 0.2s, color 0.2s, transform 0.1s;
+  }
+  .home-link:hover {
+    border-color: var(--dell-blue);
+    background: rgba(0,118,206,0.25);
+    color: var(--ice);
+  }
+  .home-link:active { transform: scale(0.98); }
+
   @media (max-width: 800px) {
     .app-wrap { flex-direction: column; }
     .form-panel { position: static; flex: none; width: 100%; }
@@ -246,6 +274,8 @@
   <h1>Data <span>Skaters</span></h1>
   <div style="font-size:13px;color:rgba(255,255,255,0.4);margin-top:8px;font-family:'Barlow Condensed',sans-serif;letter-spacing:1px;">Player Card Creator</div>
 </header>
+
+<div class="home-link-wrap"><a class="home-link" href="../index.html">Home</a></div>
 
 <div class="app-wrap">
 
