@@ -7,7 +7,7 @@ Assumptions:
 - Photos are in photos/ and named NICKNAME.JPG (case-insensitive extension lookup).
 
 Example:
-python generate_individual_player_card_from_traits.py --nickname DH21 --side both
+python generate_individual_player_card_from_traits.py --nickname DH21
 """
 
 from __future__ import annotations
@@ -21,8 +21,11 @@ from typing import Dict, Optional, Sequence, Tuple
 from PIL import Image, ImageDraw, ImageFont
 
 
-CARD_WIDTH = 750
-CARD_HEIGHT = 1050
+CARD_WIDTH_IN = 2.5
+CARD_HEIGHT_IN = 3.5
+CARD_DPI = 300
+CARD_WIDTH = int(CARD_WIDTH_IN * CARD_DPI)
+CARD_HEIGHT = int(CARD_HEIGHT_IN * CARD_DPI)
 Color = Tuple[int, int, int, int]
 
 
@@ -297,7 +300,7 @@ def draw_back(player: PlayerTraits, logos: Dict[str, Optional[Image.Image]], fon
     draw.text((36, 20), "DATA SKATERS", font=fonts.get("heavy", 52), fill=(255, 255, 255, 255))
 
     draw.text((36, 112), player.nickname.upper(), font=fonts.get("heavy", 64), fill=(20, 36, 52, 255))
-    draw.text((36, 186), "PLAYER TRAITS", font=fonts.get("bold", 24), fill=(33, 92, 145, 255))
+    draw.text((56, 186), "PLAYER TRAITS", font=fonts.get("bold", 24), fill=(33, 92, 145, 255))
 
     stats_rows = [
         ("HEIGHT (CM)", player.height_cm, "WINGSPAN (CM)", player.wingspan_cm),
@@ -321,12 +324,22 @@ def draw_back(player: PlayerTraits, logos: Dict[str, Optional[Image.Image]], fon
         if ri < len(stats_rows) - 1:
             draw.line((table_x + 10, y + row_h, table_x + table_w - 10, y + row_h), fill=(196, 38, 38, 210), width=2)
 
-        draw.text((table_x + 12, y + 6), row[0], font=fonts.get("bold", 19), fill=(33, 92, 145, 255))
-        draw.text((table_x + 12, y + 32), str(row[1]), font=fonts.get("heavy", 44), fill=(20, 36, 52, 255))
+        draw.text((table_x + 32, y + 6), row[0], font=fonts.get("bold", 19), fill=(33, 92, 145, 255))
+        draw.text((table_x + 32, y + 32), str(row[1]), font=fonts.get("heavy", 44), fill=(20, 36, 52, 255))
 
         right_col_x = table_x + col_w + 12
         draw.text((right_col_x, y + 6), row[2], font=fonts.get("bold", 19), fill=(33, 92, 145, 255))
-        draw.text((right_col_x, y + 32), str(row[3]), font=fonts.get("heavy", 44), fill=(20, 36, 52, 255))
+        right_value = str(row[3])
+        if row[2] == "ARCHETYPE" and right_value.strip().lower() == "defensive defenceman":
+            draw.multiline_text(
+                (right_col_x, y + 26),
+                "DEFENSIVE\nDEFENCEMAN",
+                font=fonts.get("heavy", 26),
+                fill=(20, 36, 52, 255),
+                spacing=0,
+            )
+        else:
+            draw.text((right_col_x, y + 32), right_value, font=fonts.get("heavy", 44), fill=(20, 36, 52, 255))
 
     draw.line((table_x + col_w, table_y + 10, table_x + col_w, table_y + table_h - 10), fill=(196, 38, 38, 210), width=2)
 
@@ -354,8 +367,8 @@ def draw_back(player: PlayerTraits, logos: Dict[str, Optional[Image.Image]], fon
 
 def combine_front_back(front: Image.Image, back: Image.Image) -> Image.Image:
     combo = Image.new("RGBA", (CARD_WIDTH * 2, CARD_HEIGHT), (6, 15, 30, 255))
-    combo.alpha_composite(front, (0, 0))
-    combo.alpha_composite(back, (CARD_WIDTH, 0))
+    combo.alpha_composite(back, (0, 0))
+    combo.alpha_composite(front, (CARD_WIDTH, 0))
     return combo
 
 
@@ -364,13 +377,9 @@ def generate_player_card_from_traits(
     traits_csv: Path,
     photos_dir: Path,
     logos_dir: Path,
-    side: str = "both",
     output_path: Optional[Path] = None,
     fonts_dir: Optional[Path] = None,
-) -> Path:
-    side_norm = side.strip().lower()
-    if side_norm not in {"front", "back", "both"}:
-        raise ValueError("side must be one of: front, back, both")
+) -> Dict[str, Path]:
 
     players = load_traits_by_nickname(traits_csv)
     player = players.get(nickname.upper())
@@ -385,19 +394,25 @@ def generate_player_card_from_traits(
     front = draw_front(player, photo, fonts)
     back = draw_back(player, logos, fonts)
 
-    if side_norm == "front":
-        out_img = front
-    elif side_norm == "back":
-        out_img = back
-    else:
-        out_img = combine_front_back(front, back)
+    combined = combine_front_back(front, back)
 
     if output_path is None:
         output_path = Path(f"{nickname.lower()}-traits-card.png")
+    elif not output_path.suffix:
+        output_path = output_path.with_suffix(".png")
+
+    front_path = output_path.with_name(f"{output_path.stem}-front{output_path.suffix}")
+    back_path = output_path.with_name(f"{output_path.stem}-back{output_path.suffix}")
 
     output_path.parent.mkdir(parents=True, exist_ok=True)
-    out_img.convert("RGB").save(output_path, format="PNG")
-    return output_path
+    combined.convert("RGB").save(output_path, format="PNG", dpi=(CARD_DPI, CARD_DPI))
+    front.convert("RGB").save(front_path, format="PNG", dpi=(CARD_DPI, CARD_DPI))
+    back.convert("RGB").save(back_path, format="PNG", dpi=(CARD_DPI, CARD_DPI))
+    return {
+        "combined": output_path,
+        "front": front_path,
+        "back": back_path,
+    }
 
 
 def _build_parser() -> argparse.ArgumentParser:
@@ -407,7 +422,6 @@ def _build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--photos-dir", default="photos")
     parser.add_argument("--logos-dir", default="docs/card-creator")
     parser.add_argument("--fonts-dir", default=None)
-    parser.add_argument("--side", default="both", choices=["front", "back", "both"])
     parser.add_argument("--output", default=None)
     return parser
 
@@ -415,16 +429,15 @@ def _build_parser() -> argparse.ArgumentParser:
 def main() -> None:
     args = _build_parser().parse_args()
 
-    output = generate_player_card_from_traits(
+    outputs = generate_player_card_from_traits(
         nickname=args.nickname,
         traits_csv=Path(args.traits_csv),
         photos_dir=Path(args.photos_dir),
         logos_dir=Path(args.logos_dir),
-        side=args.side,
         output_path=Path(args.output) if args.output else None,
         fonts_dir=Path(args.fonts_dir) if args.fonts_dir else None,
     )
-    print(f"Card generated: {output}")
+    print(f"Cards generated: {outputs['combined']}, {outputs['front']}, {outputs['back']}")
 
 
 if __name__ == "__main__":
