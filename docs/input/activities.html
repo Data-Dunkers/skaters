@@ -1,0 +1,865 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Skaters Form</title>
+    <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary: #FF6600;
+            --primary-dim: rgba(255, 102, 0, 0.15);
+            --bg-dark: #0076CE;
+            --bg-card: #181818;
+            --bg-input: #222222;
+            --text-main: #FFFFFF;
+            --text-muted: #888888;
+            --border: #2a2a2a;
+            --border-focus: #FF6600;
+            --success: #22C55E;
+            --success-dim: rgba(34, 197, 94, 0.15);
+            --error: #EF4444;
+            --error-dim: rgba(239, 68, 68, 0.15);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Barlow', sans-serif;
+            background-color: var(--bg-dark);
+            background-image:
+                radial-gradient(ellipse at 20% 0%, rgba(255,102,0,0.07) 0%, transparent 60%),
+                radial-gradient(ellipse at 80% 100%, rgba(255,102,0,0.04) 0%, transparent 60%);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 2rem 1rem 4rem;
+        }
+
+        /* ── HEADER ── */
+        .page-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        .page-header .eyebrow {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-size: 0.75rem;
+            font-weight: 600;
+            letter-spacing: 0.25em;
+            text-transform: uppercase;
+            color: var(--primary);
+            margin-bottom: 0.4rem;
+        }
+        .page-header h1 {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-size: 3rem;
+            font-weight: 800;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            line-height: 1;
+            color: var(--text-main);
+        }
+        .page-header h1 span { color: var(--primary); }
+        .page-header p {
+            margin-top: 0.5rem;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        /* ── CARD ── */
+        .card {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 2rem;
+            width: 100%;
+            max-width: 480px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+        }
+
+        /* ── SECTION LABELS ── */
+        .section-label {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-size: 0.7rem;
+            font-weight: 700;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: var(--primary);
+            margin-bottom: 1rem;
+            padding-bottom: 0.4rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        /* ── FORM GROUPS ── */
+        .form-section { margin-bottom: 1.75rem; }
+
+        .form-row {
+            display: grid;
+            gap: 1rem;
+        }
+        .form-row.cols-2 { grid-template-columns: 1fr 1fr; }
+
+        .form-group { display: flex; flex-direction: column; gap: 0.4rem; }
+
+        label {
+            font-size: 0.78rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+        }
+
+        input[type="text"],
+        input[type="number"],
+        select {
+            width: 100%;
+            padding: 11px 14px;
+            background-color: var(--bg-input);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text-main);
+            font-size: 1rem;
+            font-family: 'Barlow', sans-serif;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            appearance: none;
+        }
+        #nickname.nickname-reminder {
+            background-color: rgba(255, 102, 0, 0.2);
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(255, 102, 0, 0.14);
+        }
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--border-focus);
+            box-shadow: 0 0 0 3px rgba(255,102,0,0.12);
+        }
+        select {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23888' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 14px center;
+            padding-right: 36px;
+            cursor: pointer;
+        }
+        select option { background: #222; }
+
+        /* ── SUCCESS / BOOL BUTTONS ── */
+        .bool-group { display: flex; gap: 0.75rem; }
+        .bool-btn {
+            flex: 1;
+            padding: 11px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            background: var(--bg-input);
+            color: var(--text-muted);
+            font-family: 'Barlow Condensed', sans-serif;
+            font-size: 1rem;
+            font-weight: 700;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+        .bool-btn:hover { border-color: #555; color: #fff; }
+        .bool-btn:disabled {
+            opacity: 0.45;
+            cursor: not-allowed;
+            border-color: #3a3a3a;
+            color: #777;
+        }
+        .bool-btn.active-yes {
+            background: var(--success-dim);
+            border-color: var(--success);
+            color: var(--success);
+        }
+        .bool-btn.active-no {
+            background: var(--error-dim);
+            border-color: var(--error);
+            color: var(--error);
+        }
+        input#success_hidden { display: none; }
+
+        /* ── FIELD VISIBILITY ── */
+        .conditional-field {
+            transition: opacity 0.2s, transform 0.2s;
+        }
+        .conditional-field.hidden {
+            display: none;
+        }
+
+        /* ── ACTIVITY BADGE ── */
+        .activity-hint {
+            margin-top: 0.5rem;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            font-style: italic;
+            min-height: 1.2em;
+        }
+
+        /* ── ATTEMPT COUNTER ── */
+        .attempt-tracker {
+            display: flex;
+            gap: 0.4rem;
+            margin-top: 0.25rem;
+        }
+        .attempt-dot {
+            width: 10px; height: 10px;
+            border-radius: 50%;
+            background: var(--border);
+            border: 1px solid #444;
+            transition: background 0.2s;
+        }
+        .attempt-dot.filled { background: var(--primary); border-color: var(--primary); }
+
+        /* ── SPEED TIMER ── */
+        .speed-timer-display {
+            width: 100%;
+            padding: 10px 12px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            background: #121212;
+            color: var(--primary);
+            font-family: 'Barlow Condensed', sans-serif;
+            font-size: 1.15rem;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            text-align: center;
+            margin-bottom: 0.6rem;
+        }
+        .timer-btn-row { display: flex; gap: 0.75rem; }
+        .timer-btn-row .bool-btn { flex: 1; }
+        .timer-running {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(255,102,0,0.12);
+        }
+
+        /* ── SUBMIT ── */
+        .submit-btn {
+            width: 100%;
+            padding: 14px;
+            background: var(--primary);
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            font-family: 'Barlow Condensed', sans-serif;
+            font-size: 1.2rem;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: opacity 0.2s, transform 0.1s;
+        }
+        .submit-btn:hover { opacity: 0.9; }
+        .submit-btn:active { transform: scale(0.98); }
+        .submit-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+        /* ── STATUS ── */
+        #statusMessage {
+            margin-top: 1rem;
+            text-align: center;
+            padding: 10px 14px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            display: none;
+        }
+        .status-success { background: var(--success-dim); color: var(--success); border: 1px solid var(--success); }
+        .status-error   { background: var(--error-dim);   color: var(--error);   border: 1px solid var(--error);   }
+
+        /* ── HISTORY TABLE ── */
+        .history-card {
+            width: 100%;
+            max-width: 600px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 1.75rem 2rem;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+        }
+        .history-header {
+            display: flex;
+            align-items: baseline;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+        }
+        .history-header h2 {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-size: 1.3rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--primary);
+        }
+        #statsFor { font-size: 0.82rem; color: var(--text-muted); }
+
+        table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
+        th {
+            text-align: left;
+            color: var(--primary);
+            font-family: 'Barlow Condensed', sans-serif;
+            font-weight: 700;
+            font-size: 0.75rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            border-bottom: 1px solid var(--border);
+            padding: 8px 10px;
+        }
+        td { padding: 9px 10px; border-bottom: 1px solid var(--border); color: var(--text-main); vertical-align: middle; }
+        tr:last-child td { border-bottom: none; }
+        tr:hover td { background: var(--primary-dim); }
+        .badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 99px;
+            font-size: 0.72rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        .badge-hit  { background: var(--success-dim); color: var(--success); }
+        .badge-miss { background: var(--error-dim);   color: var(--error); }
+        .badge-na   { background: #2a2a2a; color: #666; }
+        #emptyState { color: var(--text-muted); font-size: 0.85rem; text-align: center; padding: 1.5rem 0; }
+
+        .home-link-wrap {
+            margin-top: 1rem;
+        }
+        .home-link {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 10px 16px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            background: var(--bg-card);
+            color: var(--text-main);
+            font-family: 'Barlow Condensed', sans-serif;
+            font-size: 0.95rem;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            text-decoration: none;
+            transition: border-color 0.2s, color 0.2s, transform 0.1s;
+        }
+        .home-link:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+        .home-link:active {
+            transform: scale(0.98);
+        }
+    </style>
+</head>
+<body>
+
+<div class="page-header">
+    <div class="eyebrow">Data Science × Hockey</div>
+    <h1>Data <span>Skaters</span></h1>
+</div>
+
+<!-- ── FORM CARD ── -->
+<div class="card" style="margin-bottom: 1.5rem;">
+
+    <div class="form-section">
+        <div class="section-label">Who are you?</div>
+        <div class="form-row cols-2">
+            <div class="form-group">
+                <label for="group_number">Group #</label>
+                <input type="number" id="group_number" name="group_number" placeholder="e.g. 3" min="1" required>
+            </div>
+            <div class="form-group">
+                <label for="nickname">Nickname</label>
+                <input type="text" id="nickname" name="nickname" placeholder="e.g. PS43" required oninput="this.value=this.value.toUpperCase().replace(/\s/g,'')">
+            </div>
+        </div>
+    </div>
+
+    <div class="form-section">
+        <div class="section-label">Activity</div>
+        <div class="form-group">
+            <label for="activity">Activity</label>
+            <select id="activity" name="activity" required>
+                <option value="" disabled selected>Select your activity…</option>
+                <option value="Power Forward">1. Power Forward</option>
+                <option value="Playmaker">2. Playmaker</option>
+                <option value="Two-way Forward">3. Two-way Forward</option>
+                <option value="Speed Winger">4. Speed Winger</option>
+                <option value="Defensive Defenseman">5. Defensive Defenseman</option>
+                <option value="Offensive Defenseman">6. Offensive Defenseman</option>
+                <option value="Sniper">7. Sniper</option>
+            </select>
+            <div class="activity-hint" id="activityHint"></div>
+        </div>
+    </div>
+
+    <div class="form-section">
+        <div class="section-label">Shot Data</div>
+
+        <div class="form-group conditional-field" id="field_attempt_number" style="margin-bottom:1rem;">
+            <label for="attempt_number">Attempt #</label>
+            <input type="number" id="attempt_number" name="attempt_number" min="1" max="6" placeholder="1 – 6" required>
+            <div class="attempt-tracker" id="attemptDots">
+                <div class="attempt-dot" data-dot="1"></div>
+                <div class="attempt-dot" data-dot="2"></div>
+                <div class="attempt-dot" data-dot="3"></div>
+                <div class="attempt-dot" data-dot="4"></div>
+                <div class="attempt-dot" data-dot="5"></div>
+                <div class="attempt-dot" data-dot="6"></div>
+            </div>
+        </div>
+
+        <div class="form-group conditional-field hidden" id="field_speed_timer" style="margin-bottom:1rem;">
+            <label>Speed Winger Timer</label>
+            <div class="speed-timer-display" id="speedTimerDisplay">0.00s / 30.00s</div>
+            <div class="timer-btn-row">
+                <button type="button" class="bool-btn" onclick="startSpeedTimer()">Start</button>
+                <button type="button" class="bool-btn" onclick="resetSpeedTimer()">Reset</button>
+            </div>
+        </div>
+
+        <!-- target_zone: shown for all except Speed Winger, Power Forward -->
+        <div class="form-group conditional-field hidden" id="field_target_zone" style="margin-bottom:1rem;">
+            <label for="target_zone">Target Zone</label>
+            <select id="target_zone" name="target_zone">
+                <option value="" disabled selected>Select zone…</option>
+                <option value="TL">Top-Left (TL)</option>
+                <option value="TR">Top-Right (TR)</option>
+                <option value="BL">Bottom-Left (BL)</option>
+                <option value="BR">Bottom-Right (BR)</option>
+                <option value="FH">Five-Hole (FH)</option>
+            </select>
+        </div>
+
+        <!-- success: always shown -->
+        <div class="form-group" style="margin-bottom:1rem;">
+            <label>Result</label>
+            <div class="bool-group">
+                <button type="button" class="bool-btn" id="btn_yes" onclick="handleResultClick(true)">✓ Hit</button>
+                <button type="button" class="bool-btn" id="btn_no"  onclick="handleResultClick(false)">✗ Miss</button>
+            </div>
+            <input type="hidden" id="success_hidden" name="success">
+        </div>
+
+        <!-- time_seconds: shown only for Distance and Speed Winger -->
+        <div class="form-group conditional-field hidden" id="field_time_seconds">
+            <label for="time_seconds">Time (seconds)</label>
+            <input type="number" id="time_seconds" name="time_seconds" step="0.01" placeholder="e.g. 4.72">
+        </div>
+    </div>
+
+    <button type="button" class="submit-btn" id="submitBtn" onclick="handleSubmit()">Log Shot</button>
+    <div id="statusMessage"></div>
+</div>
+
+<!-- ── HISTORY CARD ── -->
+<div class="history-card">
+    <div class="history-header">
+        <h2>Shot History</h2>
+        <span id="statsFor">—</span>
+    </div>
+    <div id="emptyState">No shots logged yet.</div>
+    <table id="statsTable" style="display:none;">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Activity</th>
+                <th>Attempt</th>
+                <th>Zone</th>
+                <th>Result</th>
+                <th>Time (s)</th>
+            </tr>
+        </thead>
+        <tbody id="statsBody"></tbody>
+    </table>
+</div>
+
+<div class="home-link-wrap"><a class="home-link" href="../index.html">Home</a></div>
+
+<script>
+// ── CONFIG ──────────────────────────────────────────────────────
+const PB_URL = 'https://api.datadunkers.ca/api/collections/data_skaters_activities/records';
+
+// Which fields each activity needs
+// target_zone: true = show, false = hide
+const ACTIVITY_CONFIG = {
+    'Power Forward':          { target_zone: true,  hint: 'Bottom corners & five-hole - 2 feet away' },
+    'Playmaker':              { target_zone: true,  hint: 'All 5 areas - 2 feet away' },
+    'Two-way Forward':        { target_zone: true,  hint: '3 different angles - 2 feet away' },
+    'Speed Winger':           { target_zone: false, hint: '6 quick shots within 30 seconds - 2 ft away' },
+    'Defensive Defenseman':   { target_zone: true,  hint: 'Bottom corners & five-hole - 5 feet away' },
+    'Offensive Defenseman':   { target_zone: true,  hint: 'Top corners - 5 feet away' },
+    'Sniper':                 { target_zone: true,  hint: 'Any area - 10 feet away' },
+};
+
+const ZONE_LABELS = {
+    TL: 'Top-Left (TL)',
+    TR: 'Top-Right (TR)',
+    BL: 'Bottom-Left (BL)',
+    BR: 'Bottom-Right (BR)',
+    FH: 'Five-Hole (FH)',
+};
+
+const ALL_ZONES = ['TL', 'TR', 'BL', 'BR', 'FH'];
+const ACTIVITY_ZONE_OPTIONS = {
+    'Sniper': ['TL', 'TR'],
+    'Offensive Defenseman': ['TL', 'TR'],
+    'Power Forward': ['BL', 'BR', 'FH'],
+    'Defensive Defenseman': ['BL', 'BR', 'FH'],
+};
+
+// ── STATE ───────────────────────────────────────────────────────
+let successValue = null; // true | false | null
+let nicknameReminderActive = false;
+let lastReminderNickname = null;
+let speedTimerRunning = false;
+let speedTimerStartMs = 0;
+let speedTimerElapsedMs = 0;
+let speedTimerIntervalId = null;
+let speedWingerCompleted = false;
+const SPEED_TIMER_LIMIT_MS = 30000;
+
+// ── ON LOAD ─────────────────────────────────────────────────────
+window.onload = () => {
+    const savedNick  = localStorage.getItem('lastNickname');
+    const savedGroup = localStorage.getItem('lastGroup');
+    if (savedNick)  document.getElementById('nickname').value = savedNick;
+    if (savedGroup) document.getElementById('group_number').value = savedGroup;
+    if (savedNick)  updateStats(savedNick);
+
+    // Wire attempt dots
+    document.getElementById('attempt_number').addEventListener('input', updateDots);
+
+    // Clear reminder if nickname is edited.
+    document.getElementById('nickname').addEventListener('input', () => {
+        resetAttemptToOne();
+        resetSpeedTimer();
+        setNicknameReminder(false);
+        lastReminderNickname = null;
+    });
+
+    renderSpeedTimer();
+    setSpeedModeUI(false);
+};
+
+// ── ACTIVITY SELECTION ──────────────────────────────────────────
+document.getElementById('activity').addEventListener('change', function () {
+    const cfg  = ACTIVITY_CONFIG[this.value] || {};
+    const hint = document.getElementById('activityHint');
+
+    resetAttemptToOne();
+    hint.textContent = cfg.hint || '';
+
+    toggleField('field_target_zone',   cfg.target_zone);
+    toggleField('field_time_seconds',  cfg.time_seconds);
+    updateTargetZoneOptions(this.value);
+
+    // Clear values for hidden fields
+    if (!cfg.target_zone)  document.getElementById('target_zone').value  = '';
+    if (!cfg.time_seconds) document.getElementById('time_seconds').value = '';
+
+    setSpeedModeUI(this.value === 'Speed Winger');
+});
+
+function updateTargetZoneOptions(activity) {
+    const zoneSelect = document.getElementById('target_zone');
+    const currentValue = zoneSelect.value;
+    const allowedZones = ACTIVITY_ZONE_OPTIONS[activity] || ALL_ZONES;
+
+    zoneSelect.innerHTML = '<option value="" disabled selected>Select zone…</option>';
+
+    allowedZones.forEach(zone => {
+        const option = document.createElement('option');
+        option.value = zone;
+        option.textContent = ZONE_LABELS[zone] || zone;
+        zoneSelect.appendChild(option);
+    });
+
+    if (allowedZones.includes(currentValue)) {
+        zoneSelect.value = currentValue;
+    }
+}
+
+function toggleField(id, show) {
+    const el = document.getElementById(id);
+    if (show) el.classList.remove('hidden');
+    else      el.classList.add('hidden');
+}
+
+// ── SUCCESS BUTTONS ─────────────────────────────────────────────
+function setSuccess(val) {
+    successValue = val;
+    document.getElementById('success_hidden').value = val;
+    document.getElementById('btn_yes').className = 'bool-btn' + (val === true  ? ' active-yes' : '');
+    document.getElementById('btn_no').className  = 'bool-btn' + (val === false ? ' active-no'  : '');
+}
+
+function handleResultClick(val) {
+    if (document.getElementById('activity').value === 'Speed Winger') {
+        handleSpeedWingerShot(val);
+        return;
+    }
+    setSuccess(val);
+}
+
+// ── ATTEMPT DOTS ─────────────────────────────────────────────────
+function updateDots() {
+    const val = parseInt(document.getElementById('attempt_number').value, 10);
+    const isSpeedWinger = document.getElementById('activity').value === 'Speed Winger';
+    const nicknameHighlighted = document.getElementById('nickname').classList.contains('nickname-reminder');
+    const filledCount = Number.isNaN(val)
+        ? 0
+        : (nicknameHighlighted ? val : (isSpeedWinger ? (speedWingerCompleted ? 6 : Math.max(val - 1, 0)) : val));
+    document.querySelectorAll('.attempt-dot').forEach(dot => {
+        dot.classList.toggle('filled', parseInt(dot.dataset.dot, 10) <= filledCount);
+    });
+}
+
+function resetAttemptToOne() {
+    speedWingerCompleted = false;
+    document.getElementById('attempt_number').value = 1;
+    updateDots();
+}
+
+function setNicknameReminder(active) {
+    nicknameReminderActive = active;
+    document.getElementById('nickname').classList.toggle('nickname-reminder', active);
+}
+
+function setSpeedModeUI(isSpeedWinger) {
+    toggleField('field_attempt_number', true);
+    toggleField('field_speed_timer', isSpeedWinger);
+    document.getElementById('submitBtn').style.display = isSpeedWinger ? 'none' : 'block';
+    document.getElementById('attempt_number').style.display = isSpeedWinger ? 'none' : 'block';
+    document.querySelector('label[for="attempt_number"]').style.display = isSpeedWinger ? 'none' : 'block';
+
+    if (isSpeedWinger && !speedTimerRunning) {
+        setSuccess(null);
+    }
+
+    if (!isSpeedWinger) {
+        resetSpeedTimer();
+    }
+
+    updateResultButtonsState();
+}
+
+function renderSpeedTimer() {
+    const display = document.getElementById('speedTimerDisplay');
+    const seconds = (speedTimerElapsedMs / 1000).toFixed(2);
+    display.textContent = `${seconds}s / 30.00s`;
+    display.classList.toggle('timer-running', speedTimerRunning);
+}
+
+function tickSpeedTimer() {
+    const now = performance.now();
+    speedTimerElapsedMs = Math.min(now - speedTimerStartMs, SPEED_TIMER_LIMIT_MS);
+    renderSpeedTimer();
+    if (speedTimerElapsedMs >= SPEED_TIMER_LIMIT_MS) {
+        stopSpeedTimer();
+    }
+}
+
+function stopSpeedTimer() {
+    speedTimerRunning = false;
+    if (speedTimerIntervalId !== null) {
+        clearInterval(speedTimerIntervalId);
+        speedTimerIntervalId = null;
+    }
+    renderSpeedTimer();
+    updateResultButtonsState();
+}
+
+function startSpeedTimer() {
+    if (document.getElementById('activity').value !== 'Speed Winger') return;
+    if (speedTimerRunning) return;
+    if (speedTimerElapsedMs >= SPEED_TIMER_LIMIT_MS) {
+        speedTimerElapsedMs = 0;
+    }
+    speedTimerRunning = true;
+    speedTimerStartMs = performance.now() - speedTimerElapsedMs;
+    speedTimerIntervalId = setInterval(tickSpeedTimer, 30);
+    tickSpeedTimer();
+    updateResultButtonsState();
+}
+
+function resetSpeedTimer() {
+    stopSpeedTimer();
+    speedTimerElapsedMs = 0;
+    resetAttemptToOne();
+    renderSpeedTimer();
+    updateResultButtonsState();
+}
+
+function updateResultButtonsState() {
+    const isSpeedWinger = document.getElementById('activity').value === 'Speed Winger';
+    const shouldDisable = isSpeedWinger && !speedTimerRunning;
+    document.getElementById('btn_yes').disabled = shouldDisable;
+    document.getElementById('btn_no').disabled = shouldDisable;
+}
+
+async function handleSpeedWingerShot(val) {
+    if (!speedTimerRunning) {
+        showStatus('Start the 30-second timer before logging Speed Winger shots.', 'error');
+        return;
+    }
+
+    const attempt = parseInt(document.getElementById('attempt_number').value, 10);
+    if (attempt > 6) {
+        showStatus('All 6 Speed Winger attempts are already logged.', 'error');
+        return;
+    }
+
+    const timeSeconds = Number((speedTimerElapsedMs / 1000).toFixed(2));
+    await handleSubmit({
+        forcedSuccess: val,
+        forcedTimeSeconds: timeSeconds,
+    });
+}
+
+// ── SUBMIT ───────────────────────────────────────────────────────
+async function handleSubmit(options = {}) {
+    // Basic validation
+    const group    = document.getElementById('group_number').value.trim();
+    const nick     = document.getElementById('nickname').value.trim();
+    const activity = document.getElementById('activity').value;
+    const attempt  = document.getElementById('attempt_number').value;
+    const successToSend = options.forcedSuccess !== undefined ? options.forcedSuccess : successValue;
+    let timeToSend = null;
+
+    if (options.forcedTimeSeconds !== undefined) {
+        timeToSend = options.forcedTimeSeconds;
+    } else if ((ACTIVITY_CONFIG[activity] || {}).time_seconds) {
+        const parsed = parseFloat(document.getElementById('time_seconds').value);
+        timeToSend = Number.isNaN(parsed) ? null : parsed;
+    }
+
+    if (!group || !nick || !activity || !attempt) {
+        showStatus('Please fill in all required fields.', 'error'); return;
+    }
+    if (successToSend === null) {
+        showStatus('Please mark the shot as Hit or Miss.', 'error'); return;
+    }
+
+    if (activity === 'Speed Winger' && options.forcedTimeSeconds === undefined) {
+        showStatus('Use Start + Hit/Miss buttons to log Speed Winger shots.', 'error'); return;
+    }
+
+    const cfg = ACTIVITY_CONFIG[activity] || {};
+
+    const btn = document.getElementById('submitBtn');
+    btn.disabled = true;
+    btn.textContent = 'Logging…';
+
+    // Build payload — use null for unused optional fields (PocketBase accepts null)
+    const payload = {
+        group_number:   parseInt(group, 10),
+        nickname:       nick,
+        activity:       activity,
+        attempt_number: parseInt(attempt, 10),
+        success:        successToSend,
+        target_zone:    cfg.target_zone  ? (document.getElementById('target_zone').value  || null) : null,
+        time_seconds:   timeToSend,
+    };
+
+    localStorage.setItem('lastNickname', nick);
+    localStorage.setItem('lastGroup', group);
+
+    try {
+        const res = await fetch(PB_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload),
+        });
+        if (!res.ok) throw new Error(`Server error ${res.status}`);
+
+        showStatus('Shot logged! ✓', 'success');
+
+        // Reset shot-specific fields; keep group/nick/activity for fast repeat entry
+        const nextAttempt = Math.min(parseInt(attempt, 10) + 1, 6);
+        document.getElementById('attempt_number').value = nextAttempt;
+        updateDots();
+        setSuccess(null);          // clear hit/miss
+        document.getElementById('time_seconds').value = '';
+
+        if (activity === 'Speed Winger' && parseInt(attempt, 10) >= 6) {
+            speedWingerCompleted = true;
+            updateDots();
+            stopSpeedTimer();
+            showStatus('Speed Winger run complete: 6 shots logged.', 'success');
+        }
+
+        // Reminder flow:
+        // 1) attempt #6 turns reminder on (once per nickname)
+        // 2) if reminder is already on, next successful shot turns it off
+        const attemptNum = parseInt(attempt, 10);
+        if (nicknameReminderActive) {
+            setNicknameReminder(false);
+        } else if (attemptNum === 6 && nick !== lastReminderNickname) {
+            setNicknameReminder(true);
+            lastReminderNickname = nick;
+        }
+
+        updateStats(nick);
+
+    } catch (err) {
+        showStatus(`Error: ${err.message}`, 'error');
+    } finally {
+        btn.disabled = false;
+        btn.textContent = 'Log Shot';
+    }
+}
+
+// ── STATUS MESSAGE ───────────────────────────────────────────────
+function showStatus(msg, type) {
+    const el = document.getElementById('statusMessage');
+    el.textContent = msg;
+    el.className = type === 'success' ? 'status-success' : 'status-error';
+    el.style.display = 'block';
+    setTimeout(() => el.style.display = 'none', 3000);
+}
+
+// ── HISTORY TABLE ────────────────────────────────────────────────
+async function updateStats(nick) {
+    document.getElementById('statsFor').textContent = nick;
+    try {
+        const res  = await fetch(`${PB_URL}?filter=(nickname='${nick}')&sort=-created&perPage=50`);
+        const data = await res.json();
+        const tbody = document.getElementById('statsBody');
+        const table = document.getElementById('statsTable');
+        const empty = document.getElementById('emptyState');
+
+        tbody.innerHTML = '';
+
+        if (!data.items || data.items.length === 0) {
+            table.style.display = 'none';
+            empty.style.display = 'block';
+            return;
+        }
+
+        table.style.display = 'table';
+        empty.style.display = 'none';
+
+        data.items.forEach((r, i) => {
+            const resultBadge = r.success === true
+                ? '<span class="badge badge-hit">Hit</span>'
+                : '<span class="badge badge-miss">Miss</span>';
+            const zone = r.target_zone  ? r.target_zone  : '<span class="badge badge-na">—</span>';
+            const time = r.time_seconds != null ? r.time_seconds.toFixed(2) + 's' : '<span class="badge badge-na">—</span>';
+            tbody.innerHTML += `<tr>
+                <td style="color:var(--text-muted);font-size:0.8rem;">${i+1}</td>
+                <td>${r.activity}</td>
+                <td style="text-align:center;">${r.attempt_number}</td>
+                <td>${zone}</td>
+                <td>${resultBadge}</td>
+                <td>${time}</td>
+            </tr>`;
+        });
+    } catch (err) {
+        console.error('Stats fetch failed:', err);
+    }
+}
+</script>
+</body>
+</html>
