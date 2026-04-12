@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Skaters - Data Science</title>
+    <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #FF6600;
+            --primary-dim: rgba(255, 102, 0, 0.15);
+            --bg-dark: #0076CE;
+            --bg-card: #181818;
+            --bg-input: #222222;
+            --text-main: #FFFFFF;
+            --text-muted: #888888;
+            --border: #2a2a2a;
+            --border-focus: #FF6600;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Barlow', sans-serif;
+            background-color: var(--bg-dark);
+            background-image:
+                radial-gradient(ellipse at 20% 0%, rgba(255,102,0,0.07) 0%, transparent 60%),
+                radial-gradient(ellipse at 80% 100%, rgba(255,102,0,0.04) 0%, transparent 60%);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 2rem 1rem 3rem;
+        }
+
+        .page-header {
+            text-align: center;
+            margin-bottom: 1.4rem;
+        }
+
+        .page-header .eyebrow {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-size: 0.75rem;
+            font-weight: 600;
+            letter-spacing: 0.25em;
+            text-transform: uppercase;
+            color: var(--primary);
+            margin-bottom: 0.4rem;
+        }
+
+        .page-header h1 {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-size: 3rem;
+            font-weight: 800;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            line-height: 1;
+            color: var(--text-main);
+        }
+
+        .page-header h1 span { color: var(--primary); }
+
+        .card {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 2rem;
+            width: 100%;
+            max-width: 1000px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+            margin-bottom: 2rem;
+        }
+
+        .section-label {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-size: 1.2rem;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--primary);
+            margin-bottom: 0.9rem;
+            padding-bottom: 0.4rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        #progress-container {
+            text-align: center;
+            margin: 2rem 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        progress {
+            width: 100%;
+            max-width: 400px;
+            height: 12px;
+            border-radius: 6px;
+            appearance: none;
+            -webkit-appearance: none;
+        }
+
+        progress::-webkit-progress-bar {
+            background-color: var(--bg-input);
+            border-radius: 6px;
+        }
+
+        progress::-webkit-progress-value {
+            background-color: var(--primary);
+            border-radius: 6px;
+            transition: width 0.2s ease;
+        }
+
+        .status-text {
+            color: var(--text-muted);
+            font-size: 0.96rem;
+            font-weight: 500;
+        }
+
+        .table-container {
+            overflow-x: auto;
+            margin-bottom: 2rem;
+            display: none;
+            background-color: var(--bg-input);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+        }
+
+        th, td {
+            text-align: left;
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid var(--border);
+            white-space: nowrap;
+        }
+
+        th {
+            font-family: 'Barlow Condensed', sans-serif;
+            color: var(--primary);
+            text-transform: uppercase;
+            font-size: 1rem;
+            letter-spacing: 0.05em;
+            background-color: rgba(0, 0, 0, 0.2);
+            position: sticky;
+            top: 0;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        tr:hover td {
+            background-color: rgba(255, 255, 255, 0.05);
+        }
+
+        select {
+            background-color: var(--bg-input);
+            color: var(--text-main);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 0.5rem 1rem;
+            font-family: 'Barlow', sans-serif;
+            font-size: 1rem;
+            outline: none;
+            cursor: pointer;
+        }
+        select:focus {
+            border-color: var(--border-focus);
+        }
+        .filter-container {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            margin-bottom: 1rem;
+            gap: 1rem;
+        }
+
+        @media (max-width: 760px) {
+            .page-header h1 { font-size: 2.25rem; }
+            .card { padding: 1.25rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="page-header">
+        <a href="../index.html" style="color: var(--text-muted); text-decoration: none; font-size: 0.9rem; margin-bottom: 1rem; display: inline-block;">&larr; Back to Home</a>
+        <div class="eyebrow">Data Skaters</div>
+        <h1>Data <span>Science</span></h1>
+    </div>
+
+    <div class="card">
+        <div id="progress-container">
+            <h2 class="section-label" style="border: none;">Downloading Data...</h2>
+            <progress id="data-progress" value="0" max="100"></progress>
+            <div id="status-text" class="status-text">Connecting to api.datadunkers.ca...</div>
+        </div>
+
+        <div id="tables-container">
+            <div id="filter-container" class="filter-container" style="display: none;">
+                <label for="date-select" class="status-text">Filter by Date:</label>
+                <select id="date-select">
+                    <option value="All Dates">All Dates</option>
+                </select>
+            </div>
+
+            <!-- Traits table will be injected here -->
+            <div class="section-label" id="traits-label" style="display: none;">Traits Data</div>
+            <div class="table-container" id="traits-container">
+                <table id="traits-table">
+                    <thead>
+                        <!-- Headings injected by JS -->
+                    </thead>
+                    <tbody>
+                        <!-- Data injected by JS -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Shots table will be injected here -->
+            <div class="section-label" id="shots-label" style="display: none;">Shots Data</div>
+            <div class="table-container" id="shots-container">
+                <table id="shots-table">
+                    <thead>
+                        <!-- Headings injected by JS -->
+                    </thead>
+                    <tbody>
+                        <!-- Data injected by JS -->
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- Photos/Names table will be injected here -->
+            <div class="section-label" id="photos-label" style="display: none;">Names Data</div>
+            <div class="table-container" id="photos-container">
+                <table id="photos-table">
+                    <thead>
+                        <!-- Headings injected by JS -->
+                    </thead>
+                    <tbody>
+                        <!-- Data injected by JS -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const BASE_URL = "https://api.datadunkers.ca";
+        let globalTraits = [];
+        let globalPhotos = [];
+        let globalShots = [];
+        const COLLECTIONS = [
+            { id: "data_skaters_traits", name: "Traits" },
+            { id: "data_skaters_photos", name: "Photos" },
+            { id: "data_skaters_shots", name: "Shots" }
+        ];
+
+        async function fetchAllRecords(collectionId, updateStatus) {
+            let records = [];
+            let page = 1;
+            const perPage = 500;
+            
+            while (true) {
+                updateStatus(`Fetching ${collectionId} (page ${page})...`);
+                const response = await fetch(`${BASE_URL}/api/collections/${collectionId}/records?page=${page}&perPage=${perPage}`);
+                if (!response.ok) {
+                    throw new Error(`Failed to fetch ${collectionId}`);
+                }
+                const data = await response.json();
+                
+                const items = data.items || [];
+                if (items.length === 0) {
+                    break;
+                }
+                records.push(...items);
+                
+                if (page >= data.totalPages) {
+                    break;
+                }
+                page++;
+            }
+            return records;
+        }
+
+        function buildTable(tableId, records, columns) {
+            const container = document.getElementById(`${tableId}-container`);
+            const label = document.getElementById(`${tableId}-label`);
+            const table = document.getElementById(`${tableId}-table`);
+            
+            const thead = table.querySelector('thead');
+            const tbody = table.querySelector('tbody');
+            
+            // clear existing
+            thead.innerHTML = '';
+            tbody.innerHTML = '';
+
+            if (records.length === 0) return;
+
+            // head
+            const trHead = document.createElement('tr');
+            columns.forEach(col => {
+                const th = document.createElement('th');
+                th.textContent = col.label;
+                trHead.appendChild(th);
+            });
+            thead.appendChild(trHead);
+
+            // body
+            records.forEach(rec => {
+                const tr = document.createElement('tr');
+                columns.forEach(col => {
+                    const td = document.createElement('td');
+                    let val = rec[col.key];
+                    td.textContent = (val !== null && val !== undefined) ? val : "";
+                    tr.appendChild(td);
+                });
+                tbody.appendChild(tr);
+            });
+
+            container.style.display = "block";
+            label.style.display = "block";
+        }
+
+        function renderAllTables(dateFilter = "All Dates") {
+            const filterFn = rec => {
+                if (dateFilter === "All Dates") return true;
+                if (!rec.created) return true;
+                return rec.created.split(" ")[0] === dateFilter;
+            };
+
+            const fTraits = globalTraits.filter(filterFn);
+            const fPhotos = globalPhotos.filter(filterFn);
+            const fShots = globalShots.filter(filterFn);
+
+            // Hide/Show containers if empty
+            if (fTraits.length === 0 && fPhotos.length === 0 && fShots.length === 0) {
+                document.getElementById('traits-container').style.display = 'none';
+                document.getElementById('traits-label').style.display = 'none';
+                document.getElementById('photos-container').style.display = 'none';
+                document.getElementById('photos-label').style.display = 'none';
+                document.getElementById('shots-container').style.display = 'none';
+                document.getElementById('shots-label').style.display = 'none';
+            }
+
+            if (fTraits.length > 0) {
+                buildTable('traits', fTraits, [
+                    {key: 'nickname', label: 'Nickname'},
+                    {key: 'height_cm', label: 'Height (cm)'},
+                    {key: 'wingspan_cm', label: 'Wingspan (cm)'},
+                    {key: 'skate_size', label: 'Skate Size'},
+                    {key: 'handedness', label: 'Handedness'},
+                    {key: 'birth_month', label: 'Birth Month'},
+                    {key: 'reaction_time_ms', label: 'Reaction (ms)'},
+                    {key: 'resting_heart_rate', label: 'BPM'}
+                ]);
+            } else {
+                document.getElementById('traits-container').style.display = 'none';
+                document.getElementById('traits-label').style.display = 'none';
+            }
+
+            if (fPhotos.length > 0) {
+                buildTable('photos', fPhotos, [
+                    {key: 'nickname', label: 'Nickname'},
+                    {key: 'real_name', label: 'Real Name'}
+                ]);
+            } else {
+                document.getElementById('photos-container').style.display = 'none';
+                document.getElementById('photos-label').style.display = 'none';
+            }
+
+            if (fShots.length > 0) {
+                buildTable('shots', fShots, [
+                    {key: 'nickname', label: 'Nickname'},
+                    {key: 'group', label: 'Group'},
+                    {key: 'distance', label: 'Distance'},
+                    {key: 'shots_made', label: 'Shots Made'}
+                ]);
+            } else {
+                document.getElementById('shots-container').style.display = 'none';
+                document.getElementById('shots-label').style.display = 'none';
+            }
+        }
+
+        function setupDateFilter() {
+            const allRecords = [...globalTraits, ...globalPhotos, ...globalShots];
+            const dates = new Set();
+            allRecords.forEach(rec => {
+                if (rec.created) {
+                    dates.add(rec.created.split(" ")[0]);
+                }
+            });
+            
+            const sortedDates = Array.from(dates).sort().reverse();
+            const select = document.getElementById("date-select");
+            
+            sortedDates.forEach(date => {
+                const option = document.createElement("option");
+                option.value = date;
+                option.textContent = date;
+                select.appendChild(option);
+            });
+            
+            document.getElementById("filter-container").style.display = "flex";
+            
+            select.addEventListener("change", (e) => {
+                renderAllTables(e.target.value);
+            });
+        }
+
+        async function downloadAll() {
+            const statusText = document.getElementById("status-text");
+            const progressBar = document.getElementById("data-progress");
+            const progressContainer = document.getElementById("progress-container");
+
+            let currentProgress = 0;
+            const progressPerCollection = 100 / COLLECTIONS.length;
+
+            try {
+                // Fetch Traits
+                globalTraits = await fetchAllRecords(COLLECTIONS[0].id, (status) => {
+                    statusText.textContent = status;
+                });
+                currentProgress += progressPerCollection;
+                progressBar.value = currentProgress;
+
+                // Fetch Photos/Names
+                globalPhotos = await fetchAllRecords(COLLECTIONS[1].id, (status) => {
+                    statusText.textContent = status;
+                });
+                currentProgress += progressPerCollection;
+                progressBar.value = currentProgress;
+
+                // Fetch Shots
+                globalShots = await fetchAllRecords(COLLECTIONS[2].id, (status) => {
+                    statusText.textContent = status;
+                });
+                currentProgress += progressPerCollection;
+                progressBar.value = currentProgress;
+
+                // Done
+                statusText.textContent = "Data successfully loaded!";
+                setTimeout(() => {
+                    progressContainer.style.display = 'none';
+                    setupDateFilter();
+                    renderAllTables("All Dates");
+                }, 500);
+
+            } catch (error) {
+                console.error(error);
+                statusText.textContent = "Error downloading data. Check console.";
+                statusText.style.color = "red";
+            }
+        }
+
+        // Start automatically
+        window.addEventListener("DOMContentLoaded", downloadAll);
+    </script>
+</body>
+</html>
