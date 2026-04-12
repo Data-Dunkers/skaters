@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Download skater traits, names, and photos from api.datadunkers.ca."""
+"""Download skater traits, names, photos, and shots from api.datadunkers.ca."""
 
 from __future__ import annotations
 
@@ -13,9 +13,10 @@ import requests
 BASE_URL = "https://api.datadunkers.ca"
 TRAITS_COLLECTION = "data_skaters_traits"
 PHOTOS_COLLECTION = "data_skaters_photos"
+SHOTS_COLLECTION = "data_skaters_shots"
 
 
-def fetch_all_records(collection: str, per_page: int = 200) -> list[dict[str, Any]]:
+def fetch_all_records(collection: str, per_page: int = 500) -> list[dict[str, Any]]:
     records: list[dict[str, Any]] = []
     page = 1
 
@@ -71,6 +72,26 @@ def write_traits_csv(records: list[dict[str, Any]], output_path: Path) -> None:
                 }
             )
 
+def write_shots_csv(records: list[dict[str, Any]], output_path: Path) -> None:
+    fieldnames = [
+        "nickname",
+        "group",
+        "distance",
+        "shots_made",
+    ]
+
+    with output_path.open("w", newline="", encoding="utf-8") as f:
+        writer = csv.DictWriter(f, fieldnames=fieldnames)
+        writer.writeheader()
+        for record in records:
+            writer.writerow(
+                {
+                    "nickname": record.get("nickname", ""),
+                    "group": record.get("group", ""),
+                    "distance": record.get("distance", ""),
+                    "shots_made": record.get("shots_made", ""),
+                }
+            )
 
 def extract_photo_filename(photo_field: Any) -> str:
     if isinstance(photo_field, list):
@@ -117,9 +138,11 @@ def write_names_and_download_photos(records: list[dict[str, Any]], names_csv: Pa
 def main() -> None:
     traits = fetch_all_records(TRAITS_COLLECTION)
     photos = fetch_all_records(PHOTOS_COLLECTION)
+    shots = fetch_all_records(SHOTS_COLLECTION)
 
     write_traits_csv(traits, Path("traits.csv"))
     downloaded_count = write_names_and_download_photos(photos, Path("names.csv"), Path("."))
+    write_shots_csv(shots, Path("shots.csv"))
 
     print(f"Saved traits.csv ({len(traits)} rows)")
     print(f"Saved names.csv ({len(photos)} rows)")
