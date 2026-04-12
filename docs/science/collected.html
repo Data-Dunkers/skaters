@@ -210,36 +210,9 @@
                 </select>
             </div>
 
-            <!-- Traits table will be injected here -->
-            <div class="section-label" id="traits-label" style="display: none;">Traits Data</div>
-            <div class="table-container" id="traits-container">
-                <table id="traits-table">
-                    <thead>
-                        <!-- Headings injected by JS -->
-                    </thead>
-                    <tbody>
-                        <!-- Data injected by JS -->
-                    </tbody>
-                </table>
-            </div>
-
-            <!-- Shots table will be injected here -->
-            <div class="section-label" id="shots-label" style="display: none;">Shots Data</div>
-            <div class="table-container" id="shots-container">
-                <table id="shots-table">
-                    <thead>
-                        <!-- Headings injected by JS -->
-                    </thead>
-                    <tbody>
-                        <!-- Data injected by JS -->
-                    </tbody>
-                </table>
-            </div>
-            
-            <!-- Photos/Names table will be injected here -->
-            <div class="section-label" id="photos-label" style="display: none;">Names Data</div>
-            <div class="table-container" id="photos-container">
-                <table id="photos-table">
+            <div class="section-label" id="submission-label" style="display: none;">Data Submissions</div>
+            <div class="table-container" id="submission-container" style="display: none;">
+                <table id="submission-table">
                     <thead>
                         <!-- Headings injected by JS -->
                     </thead>
@@ -289,45 +262,6 @@
             return records;
         }
 
-        function buildTable(tableId, records, columns) {
-            const container = document.getElementById(`${tableId}-container`);
-            const label = document.getElementById(`${tableId}-label`);
-            const table = document.getElementById(`${tableId}-table`);
-            
-            const thead = table.querySelector('thead');
-            const tbody = table.querySelector('tbody');
-            
-            // clear existing
-            thead.innerHTML = '';
-            tbody.innerHTML = '';
-
-            if (records.length === 0) return;
-
-            // head
-            const trHead = document.createElement('tr');
-            columns.forEach(col => {
-                const th = document.createElement('th');
-                th.textContent = col.label;
-                trHead.appendChild(th);
-            });
-            thead.appendChild(trHead);
-
-            // body
-            records.forEach(rec => {
-                const tr = document.createElement('tr');
-                columns.forEach(col => {
-                    const td = document.createElement('td');
-                    let val = rec[col.key];
-                    td.textContent = (val !== null && val !== undefined) ? val : "";
-                    tr.appendChild(td);
-                });
-                tbody.appendChild(tr);
-            });
-
-            container.style.display = "block";
-            label.style.display = "block";
-        }
-
         function renderAllTables(dateFilter = "All Dates") {
             const filterFn = rec => {
                 if (dateFilter === "All Dates") return true;
@@ -339,53 +273,90 @@
             const fPhotos = globalPhotos.filter(filterFn);
             const fShots = globalShots.filter(filterFn);
 
-            // Hide/Show containers if empty
+            const submissionContainer = document.getElementById('submission-container');
+            const submissionLabel = document.getElementById('submission-label');
+            const table = document.getElementById('submission-table');
+            const thead = table.querySelector('thead');
+            const tbody = table.querySelector('tbody');
+
+            thead.innerHTML = '';
+            tbody.innerHTML = '';
+
             if (fTraits.length === 0 && fPhotos.length === 0 && fShots.length === 0) {
-                document.getElementById('traits-container').style.display = 'none';
-                document.getElementById('traits-label').style.display = 'none';
-                document.getElementById('photos-container').style.display = 'none';
-                document.getElementById('photos-label').style.display = 'none';
-                document.getElementById('shots-container').style.display = 'none';
-                document.getElementById('shots-label').style.display = 'none';
+                submissionContainer.style.display = 'none';
+                submissionLabel.style.display = 'none';
+                return;
             }
 
-            if (fTraits.length > 0) {
-                buildTable('traits', fTraits, [
-                    {key: 'nickname', label: 'Nickname'},
-                    {key: 'height_cm', label: 'Height (cm)'},
-                    {key: 'wingspan_cm', label: 'Wingspan (cm)'},
-                    {key: 'skate_size', label: 'Skate Size'},
-                    {key: 'handedness', label: 'Handedness'},
-                    {key: 'birth_month', label: 'Birth Month'},
-                    {key: 'reaction_time_ms', label: 'Reaction (ms)'},
-                    {key: 'resting_heart_rate', label: 'BPM'}
-                ]);
-            } else {
-                document.getElementById('traits-container').style.display = 'none';
-                document.getElementById('traits-label').style.display = 'none';
-            }
+            // Get all unique distances
+            const distances = new Set();
+            globalShots.forEach(s => {
+                if(s.distance) distances.add(String(s.distance).trim());
+            });
+            const sortedDistances = Array.from(distances).sort((a,b) => {
+                const numA = parseFloat(a);
+                const numB = parseFloat(b);
+                if(!isNaN(numA) && !isNaN(numB)) return numA - numB;
+                return a.localeCompare(b);
+            });
 
-            if (fPhotos.length > 0) {
-                buildTable('photos', fPhotos, [
-                    {key: 'nickname', label: 'Nickname'},
-                    {key: 'real_name', label: 'Real Name'}
-                ]);
-            } else {
-                document.getElementById('photos-container').style.display = 'none';
-                document.getElementById('photos-label').style.display = 'none';
-            }
+            // Columns layout: Nickname | Traits | Photo | [Distance 1] | [Distance 2] | ...
+            const trHead = document.createElement('tr');
+            trHead.innerHTML = `
+                <th>Nickname</th>
+                <th style="text-align:center;">Traits</th>
+                <th style="text-align:center;">Photo</th>
+            `;
+            sortedDistances.forEach(d => {
+                const th = document.createElement('th');
+                th.style.textAlign = 'center';
+                th.textContent = `Distance: ${d}`;
+                trHead.appendChild(th);
+            });
+            thead.appendChild(trHead);
 
-            if (fShots.length > 0) {
-                buildTable('shots', fShots, [
-                    {key: 'nickname', label: 'Nickname'},
-                    {key: 'group', label: 'Group'},
-                    {key: 'distance', label: 'Distance'},
-                    {key: 'shots_made', label: 'Shots Made'}
-                ]);
-            } else {
-                document.getElementById('shots-container').style.display = 'none';
-                document.getElementById('shots-label').style.display = 'none';
-            }
+            // Get all unique nicknames from filtered data
+            const nicknames = new Set();
+            fTraits.forEach(t => { if(t.nickname) nicknames.add(t.nickname.trim()); });
+            fPhotos.forEach(p => { if(p.nickname) nicknames.add(p.nickname.trim()); });
+            fShots.forEach(s => { if(s.nickname) nicknames.add(s.nickname.trim()); });
+
+            const sortedNicknames = Array.from(nicknames).sort((a, b) => a.localeCompare(b, undefined, {sensitivity: 'base'}));
+
+            // Populate rows
+            sortedNicknames.forEach(nick => {
+                const tr = document.createElement('tr');
+                
+                const tdNick = document.createElement('td');
+                tdNick.textContent = nick;
+                tdNick.style.fontWeight = '600';
+                tr.appendChild(tdNick);
+
+                const hasTraits = fTraits.some(t => t.nickname && t.nickname.trim().toLowerCase() === nick.toLowerCase());
+                const tdTraits = document.createElement('td');
+                tdTraits.style.textAlign = 'center';
+                tdTraits.innerHTML = hasTraits ? '<span style="color: #4ade80;">✔</span>' : '<span style="color: #f87171;">✘</span>';
+                tr.appendChild(tdTraits);
+
+                const hasPhoto = fPhotos.some(p => p.nickname && p.nickname.trim().toLowerCase() === nick.toLowerCase());
+                const tdPhoto = document.createElement('td');
+                tdPhoto.style.textAlign = 'center';
+                tdPhoto.innerHTML = hasPhoto ? '<span style="color: #4ade80;">✔</span>' : '<span style="color: #f87171;">✘</span>';
+                tr.appendChild(tdPhoto);
+
+                sortedDistances.forEach(d => {
+                    const hasShot = fShots.some(s => s.nickname && s.nickname.trim().toLowerCase() === nick.toLowerCase() && String(s.distance).trim() === d);
+                    const tdShot = document.createElement('td');
+                    tdShot.style.textAlign = 'center';
+                    tdShot.innerHTML = hasShot ? '<span style="color: #4ade80;">✔</span>' : '<span style="color: #f87171;">✘</span>';
+                    tr.appendChild(tdShot);
+                });
+
+                tbody.appendChild(tr);
+            });
+
+            submissionContainer.style.display = 'block';
+            submissionLabel.style.display = 'block';
         }
 
         function setupDateFilter() {
