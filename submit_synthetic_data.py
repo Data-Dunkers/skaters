@@ -1,20 +1,13 @@
 #!/usr/bin/env python3
-"""
-Submit synthetic data for fictional middle-school students from Manitoba
-to both the Data Skaters Activities and Demographics forms.
-"""
 
 import requests
 import random
-import time
-import sys
 from typing import Dict, List, Any
 
-# API endpoints
-ACTIVITIES_URL = 'https://api.datadunkers.ca/api/collections/data_skaters_activities/records'
-DEMOGRAPHICS_URL = 'https://api.datadunkers.ca/api/collections/data_skaters_demographics/records'
+SHOTS_URL = 'https://api.datadunkers.ca/api/collections/data_skaters_shots/records'
+TRAITS_URL = 'https://api.datadunkers.ca/api/collections/data_skaters_traits/records'
 
-# Manitoba-themed first and last names for authenticity
+# Manitoba-themed first and last names
 FIRST_NAMES = [
     'Alex', 'Bailey', 'Casey', 'Dakota', 'Elliott', 'Finley', 'Grayson', 'Harper',
     'Indigo', 'Jordan', 'Kai', 'Logan', 'Morgan', 'Noelle', 'Owen', 'Parker',
@@ -30,11 +23,6 @@ LAST_NAMES = [
     'Goldstein', 'Harris', 'Iverson', 'Jackson', 'Kowalski', 'Larson',
     'Malone', 'Nelson', 'O\'Brien', 'Peterson', 'Ramirez', 'Schmidt',
     'Thompson', 'Underwood', 'Valenzuela', 'Westbrook', 'Yamamoto', 'Zhang',
-]
-
-ACTIVITIES = [
-    'Sniper', 'Playmaker', 'Power Forward', 'Two-way Forward',
-    'Speed Winger', 'Defensive Defenseman', 'Offensive Defenseman', 'Virtual'
 ]
 
 MONTHS = [
@@ -85,7 +73,7 @@ def generate_students(count: int) -> List[Dict[str, Any]]:
             'nickname': nickname,
             'first_name': first_name,
             'last_name': last_name,
-            'group_number': (i // 10) + 1,  # 10 students per group
+            'group': (i // 10) + 1,  # 10 students per group
             'height_cm': height,
             'wingspan_cm': wingspan,
             'skate_size': skate_size,
@@ -103,7 +91,7 @@ def submit_demographics(student: Dict[str, Any]) -> bool:
     """Submit student demographics data to the API."""
     payload = {
         'nickname': student['nickname'],
-        #'group_number': student['group_number'], # Group number is not needed in demographics, only in activities
+        #'group': student['group'], # Group number is not needed in demographics, only in shots
         'height_cm': student['height_cm'],
         'wingspan_cm': student['wingspan_cm'],
         'skate_size': student['skate_size'],
@@ -114,7 +102,7 @@ def submit_demographics(student: Dict[str, Any]) -> bool:
     }
 
     try:
-        response = requests.post(DEMOGRAPHICS_URL, json=payload, timeout=10)
+        response = requests.post(TRAITS_URL, json=payload, timeout=10)
         if response.status_code in [200, 201]:
             return True
         else:
@@ -125,89 +113,58 @@ def submit_demographics(student: Dict[str, Any]) -> bool:
         print(f"  ✗ Demographics submission error: {e}")
         return False
 
-def submit_activities(student: Dict[str, Any]) -> bool:
-    """Submit student activity data (6 shot attempts per activity) to the API."""
+def submit_shots(student: Dict[str, Any]) -> bool:
+    """Submit student activity data (6 shot attempts per distance)"""
     success_count = 0
     fail_count = 0
 
-    # Submit data for all activities
-    for activity in ACTIVITIES:
-        # Each student completes all 6 attempts per activity
-        for attempt_num in range(1, 7):
-            payload = {
-                'group_number': student['group_number'],
-                'nickname': student['nickname'],
-                'activity': activity,
-                'attempt_number': attempt_num,
-                'success': random.choice([True, False]),
-            }
+    for distance in [2, 5, 7, 10]:
+        # Each student attempts 6 shots per distance
+        shots_made = random.randint(0, 6)
+        payload = {
+            'nickname': student['nickname'],
+            'group': student['group'],
+            'distance': distance,
+            'shots_made': shots_made,
+        }
 
-            # Add activity-specific fields based on config
-            if activity in ['Playmaker', 'Two-way Forward', 'Defensive Defenseman', 'Offensive Defenseman']:
-                payload['target_zone'] = random.choice(ZONES)
-
-            if activity in ['Sniper', 'Offensive Defenseman']:
-                payload['target_zone'] = random.choice(['TL', 'TR'])
-
-            if activity in ['Power Forward', 'Defensive Defenseman']:
-                payload['target_zone'] = random.choice(['BL', 'BR', 'FH'])
-
-            if activity == 'Speed Winger':
-                payload['time_seconds'] = round(random.uniform(2.5, 12.0), 2)
-
-            try:
-                response = requests.post(ACTIVITIES_URL, json=payload, timeout=10)
-                if response.status_code in [200, 201]:
-                    success_count += 1
-                else:
-                    fail_count += 1
-            except Exception as e:
+        try:
+            response = requests.post(SHOTS_URL, json=payload, timeout=10)
+            if response.status_code in [200, 201]:
+                success_count += 1
+            else:
                 fail_count += 1
-
-            # Small delay to avoid overwhelming the API
-            #time.sleep(0.1)
+        except Exception as e:
+            fail_count += 1
 
     return fail_count == 0
 
-def main(n: int = 70):
-    """Generate and submit data for n students."""
+def generate(n: int = 70):
 
     students = generate_students(n)
     print(f"✓ Generated {len(students)} students")
-    print()
 
-    # Submit data
     demographics_success = 0
     demographics_failed = 0
     activities_success = 0
     activities_failed = 0
 
-    print("Submitting demographics and activity data...")
-    print()
-
     for idx, student in enumerate(students, 1):
         print(f"[{idx:2d}/{n}] {student['nickname']} ({student['first_name']} {student['last_name']})")
 
-        # Submit demographics
         if submit_demographics(student):
             print(f"  ✓ Demographics submitted")
             demographics_success += 1
         else:
             demographics_failed += 1
         
-        # Submit activities
-        if submit_activities(student):
-            print(f"  ✓ Activities submitted")
+        if submit_shots(student):
+            print(f"  ✓ Shots submitted")
             activities_success += 1
         else:
             activities_failed += 1
         
-        # Small delay between students
-        #time.sleep(0.1)
-
-    # Summary
     print(f"Demographics: {demographics_success} successful, {demographics_failed} failed")
     print(f"Activities: {activities_success} successful, {activities_failed} failed")
 
-if __name__ == '__main__':
-    main(70)
+generate(70)
