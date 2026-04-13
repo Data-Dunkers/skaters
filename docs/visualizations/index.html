@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Skaters - Data Science</title>
+    <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+    
+    <!-- Plotly & Prism.js -->
+    <script src="https://cdn.plot.ly/plotly-2.30.0.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+
+    <style>
+        :root {
+            --primary: #FF6600;
+            --primary-dim: rgba(255, 102, 0, 0.15);
+            --bg-dark: #0076CE;
+            --bg-card: #181818;
+            --bg-input: #222222;
+            --text-main: #FFFFFF;
+            --text-muted: #888888;
+            --border: #2a2a2a;
+            --border-focus: #FF6600;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Barlow', sans-serif;
+            background-color: var(--bg-dark);
+            background-image:
+                radial-gradient(ellipse at 20% 0%, rgba(255,102,0,0.07) 0%, transparent 60%),
+                radial-gradient(ellipse at 80% 100%, rgba(255,102,0,0.04) 0%, transparent 60%);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 2rem 1rem 3rem;
+        }
+
+        .page-header {
+            text-align: center;
+            margin-bottom: 1.4rem;
+        }
+
+        .page-header .eyebrow {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-size: 0.75rem;
+            font-weight: 600;
+            letter-spacing: 0.25em;
+            text-transform: uppercase;
+            color: var(--primary);
+            margin-bottom: 0.4rem;
+        }
+
+        .page-header h1 {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-size: 3rem;
+            font-weight: 800;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            line-height: 1;
+            color: var(--text-main);
+        }
+
+        .page-header h1 span { color: var(--primary); }
+
+        .card {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 2rem;
+            width: 100%;
+            max-width: 1000px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+            margin-bottom: 2rem;
+        }
+
+        .section-label {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-size: 1.2rem;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--primary);
+            margin-bottom: 0.9rem;
+            padding-bottom: 0.4rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        #progress-container {
+            text-align: center;
+            margin: 2rem 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        progress {
+            width: 100%;
+            max-width: 400px;
+            height: 12px;
+            border-radius: 6px;
+            appearance: none;
+            -webkit-appearance: none;
+        }
+
+        progress::-webkit-progress-bar {
+            background-color: var(--bg-input);
+            border-radius: 6px;
+        }
+
+        progress::-webkit-progress-value {
+            background-color: var(--primary);
+            border-radius: 6px;
+            transition: width 0.2s ease;
+        }
+
+        .status-text {
+            color: var(--text-muted);
+            font-size: 0.96rem;
+            font-weight: 500;
+        }
+
+        select {
+            background-color: var(--bg-input);
+            color: var(--text-main);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 0.5rem 1rem;
+            font-family: 'Barlow', sans-serif;
+            font-size: 0.9rem;
+            outline: none;
+            cursor: pointer;
+        }
+        select:focus {
+            border-color: var(--border-focus);
+        }
+        
+        .chart-box {
+            background-color: rgba(0,0,0,0.2);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            width: 100%;
+        }
+        .control-panel {
+            display: flex;
+            gap: 1.5rem;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+            align-items: flex-end;
+        }
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.4rem;
+        }
+        .control-group label {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            font-family: 'Barlow Condensed', sans-serif;
+            letter-spacing: 0.05em;
+        }
+
+        pre[class*="language-"] {
+            border-radius: 8px !important;
+            margin: 1rem 0 1.5rem !important;
+            background: #111 !important;
+            border: 1px solid var(--border);
+            font-size: 0.95rem;
+        }
+
+        @media (max-width: 760px) {
+            .page-header h1 { font-size: 2.25rem; }
+            .card { padding: 1.25rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="page-header">
+        <a href="../index.html" style="color: var(--text-muted); text-decoration: none; font-size: 0.9rem; margin-bottom: 1rem; display: inline-block;">&larr; Back to Home</a>
+        <div class="eyebrow">Data Skaters</div>
+        <h1>Data <span>Science</span></h1>
+    </div>
+
+    <div class="card">
+        <div id="progress-container">
+            <h2 class="section-label" style="border: none;">Downloading Data...</h2>
+            <progress id="data-progress" value="0" max="100"></progress>
+            <div id="status-text" class="status-text">Connecting to api.datadunkers.ca...</div>
+        </div>
+
+        <div id="visualizations-container" style="display:none; width: 100%;">
+            
+            <div class="chart-box">
+                <div class="section-label">Bar Chart</div>
+                <div class="control-panel" id="bar-controls"></div>
+                <pre><code class="language-python" id="bar-code"></code></pre>
+                <div id="bar-plot" style="width:100%; height:450px;"></div>
+            </div>
+
+            <div class="chart-box">
+                <div class="section-label">Scatter Plot</div>
+                <div class="control-panel" id="scatter-controls"></div>
+                <pre><code class="language-python" id="scatter-code"></code></pre>
+                <div id="scatter-plot" style="width:100%; height:450px;"></div>
+            </div>
+
+            <div class="chart-box">
+                <div class="section-label">Pie Chart</div>
+                <div class="control-panel" id="pie-controls"></div>
+                <pre><code class="language-python" id="pie-code"></code></pre>
+                <div id="pie-plot" style="width:100%; height:450px;"></div>
+            </div>
+
+            <div class="chart-box">
+                <div class="section-label">Correlation Matrix</div>
+                <div class="control-panel" id="corr-controls" style="margin-bottom:0.5rem; display:none;"></div>
+                <pre><code class="language-python" id="corr-code"></code></pre>
+                <div id="corr-plot" style="width:100%; height:800px;"></div>
+            </div>
+            
+        </div>
+    </div>
+
+    <script>
+        const BASE_URL = "https://api.datadunkers.ca";
+        let globalTraits = [];
+        let globalShots = [];
+        const COLLECTIONS = [
+            { id: "data_skaters_traits", name: "Traits" },
+            { id: "data_skaters_shots", name: "Shots" }
+        ];
+
+        let df = []; // unified pandas-like dataframe array
+        let columnDefs = []; // configurations for selectors
+
+        const PLOTLY_LAYOUT_TEMPLATE = {
+            paper_bgcolor: 'rgba(0,0,0,0)',
+            plot_bgcolor: 'rgba(0,0,0,0)',
+            font: { color: '#ffffff', family: 'Barlow' },
+            xaxis: { gridcolor: '#2a2a2a', zerolinecolor: '#444444' },
+            yaxis: { gridcolor: '#2a2a2a', zerolinecolor: '#444444' },
+            margin: { t: 50, r: 20, l: 50, b: 50 }
+        };
+
+        async function fetchAllRecords(collectionId, updateStatus) {
+            let records = [];
+            let page = 1;
+            const perPage = 500;
+            while (true) {
+                updateStatus(`Fetching ${collectionId} (page ${page})...`);
+                const response = await fetch(`${BASE_URL}/api/collections/${collectionId}/records?page=${page}&perPage=${perPage}`);
+                if (!response.ok) throw new Error(`Failed to fetch ${collectionId}`);
+                const data = await response.json();
+                
+                const items = data.items || [];
+                if (items.length === 0) break;
+                records.push(...items);
+                
+                if (page >= data.totalPages) break;
+                page++;
+            }
+            return records;
+        }
+
+        function createSelect(id, options, defaultVal) {
+            const select = document.createElement('select');
+            select.id = id;
+            options.forEach(opt => {
+                const option = document.createElement('option');
+                option.value = opt.value;
+                option.textContent = opt.label;
+                if(opt.value === defaultVal) option.selected = true;
+                select.appendChild(option);
+            });
+            return select;
+        }
+
+        function buildControl(panelId, id, label, options, defaultVal, onChange) {
+            const panel = document.getElementById(panelId);
+            const group = document.createElement('div');
+            group.className = 'control-group';
+            
+            const lbl = document.createElement('label');
+            lbl.textContent = label;
+            
+            const sel = createSelect(id, options, defaultVal);
+            sel.addEventListener('change', onChange);
+
+            group.appendChild(lbl);
+            group.appendChild(sel);
+            panel.appendChild(group);
+            return sel;
+        }
+
+        function updateCodeAndHighlight(blockId, codeStr) {
+            const block = document.getElementById(blockId);
+            block.textContent = codeStr;
+            Prism.highlightElement(block);
+        }
+
+        // ---------- Math Helpers ----------
+        function pearsonCorrelation(x, y) {
+            let sumX = 0, sumY = 0, sumXY = 0, sumX2 = 0, sumY2 = 0;
+            let n = 0;
+            for (let i = 0; i < x.length; i++) {
+                if (typeof x[i] === 'number' && typeof y[i] === 'number' && !isNaN(x[i]) && !isNaN(y[i])) {
+                    sumX += x[i];
+                    sumY += y[i];
+                    sumXY += x[i] * y[i];
+                    sumX2 += x[i] * x[i];
+                    sumY2 += y[i] * y[i];
+                    n++;
+                }
+            }
+            if (n === 0) return 0;
+            const numerator = (n * sumXY) - (sumX * sumY);
+            const denominator = Math.sqrt((n * sumX2 - sumX * sumX) * (n * sumY2 - sumY * sumY));
+            if (denominator === 0) return 0;
+            return numerator / denominator;
+        }
+
+        // ---------- Graphing Functions ----------
+
+        function drawBar() {
+            const xCol = document.getElementById('bar-x').value;
+            const yCol = document.getElementById('bar-y').value;
+            const colorCol = document.getElementById('bar-color').value;
+
+            const xLabel = columnDefs.find(c => c.key === xCol)?.label || xCol;
+            const yLabel = columnDefs.find(c => c.key === yCol)?.label || yCol;
+            
+            const trace = {
+                x: df.map(row => row[xCol]),
+                y: df.map(row => row[yCol]),
+                type: 'bar',
+                marker: { color: '#FF6600' }
+            };
+            
+            let data = [trace];
+            if (colorCol !== 'None') {
+                const grouped = {};
+                df.forEach(row => {
+                    const c = row[colorCol] || 'Unknown';
+                    if(!grouped[c]) grouped[c] = {x:[], y:[], type:'bar', name: c};
+                    grouped[c].x.push(row[xCol]);
+                    grouped[c].y.push(row[yCol]);
+                });
+                data = Object.values(grouped);
+            }
+
+            const layout = { ...PLOTLY_LAYOUT_TEMPLATE, title: {text: `${yLabel} vs ${xLabel}`, x: 0}, xaxis: { ...PLOTLY_LAYOUT_TEMPLATE.xaxis, title: xLabel }, yaxis: { ...PLOTLY_LAYOUT_TEMPLATE.yaxis, title: yLabel } };
+            Plotly.newPlot('bar-plot', data, layout);
+
+            let code = `import plotly.express as px\npx.bar(df, x='${xCol}', y='${yCol}', title='${yLabel} vs ${xLabel}'`;
+            if (colorCol !== 'None') code += `, color='${colorCol}'`;
+            code += `)`;
+            updateCodeAndHighlight('bar-code', code);
+        }
+
+        function drawScatter() {
+            const xCol = document.getElementById('scatter-x').value;
+            const yCol = document.getElementById('scatter-y').value;
+            const colorCol = document.getElementById('scatter-color').value;
+            const hoverCol = document.getElementById('scatter-hover').value;
+
+            const xLabel = columnDefs.find(c => c.key === xCol)?.label || xCol;
+            const yLabel = columnDefs.find(c => c.key === yCol)?.label || yCol;
+
+            let data = [];
+            if (colorCol === 'None') {
+                data = [{
+                    x: df.map(row => row[xCol]),
+                    y: df.map(row => row[yCol]),
+                    text: df.map(row => row[hoverCol]),
+                    mode: 'markers',
+                    type: 'scatter',
+                    marker: { size: 10, color: '#FF6600', line: {color: '#111', width:1} }
+                }];
+            } else {
+                const grouped = {};
+                df.forEach(row => {
+                    const c = row[colorCol] || 'Unknown';
+                    if(!grouped[c]) grouped[c] = {x:[], y:[], text:[], mode:'markers', type:'scatter', name: c, marker:{size:10, line:{color:'#111',width:1}}};
+                    grouped[c].x.push(row[xCol]);
+                    grouped[c].y.push(row[yCol]);
+                    grouped[c].text.push(row[hoverCol]);
+                });
+                data = Object.values(grouped);
+            }
+
+            const layout = { ...PLOTLY_LAYOUT_TEMPLATE, title: {text: `${yLabel} vs ${xLabel}`, x: 0}, xaxis: { ...PLOTLY_LAYOUT_TEMPLATE.xaxis, title: xLabel }, yaxis: { ...PLOTLY_LAYOUT_TEMPLATE.yaxis, title: yLabel } };
+            Plotly.newPlot('scatter-plot', data, layout);
+
+            let code = `import plotly.express as px\npx.scatter(df, x='${xCol}', y='${yCol}', title='${yLabel} vs ${xLabel}'`;
+            if (colorCol !== 'None') code += `, color='${colorCol}'`;
+            if (hoverCol !== 'None') code += `, hover_name='${hoverCol}'`;
+            code += `)`;
+            updateCodeAndHighlight('scatter-code', code);
+        }
+
+        function drawPie() {
+            const namesCol = document.getElementById('pie-names').value;
+            const valuesCol = document.getElementById('pie-values').value;
+
+            const counts = {};
+            df.forEach(row => {
+                const n = row[namesCol] || 'Unknown';
+                if (!counts[n]) counts[n] = 0;
+                
+                if (valuesCol === 'Count') {
+                    counts[n] += 1;
+                } else {
+                    counts[n] += (parseFloat(row[valuesCol]) || 0);
+                }
+            });
+
+            const data = [{
+                values: Object.values(counts),
+                labels: Object.keys(counts),
+                type: 'pie',
+                hole: 0.3,
+                marker: {
+                    colors: ['#FF6600', '#0076CE', '#4ade80', '#f87171', '#c084fc', '#facc15', '#93c5fd', '#fde047']
+                }
+            }];
+
+            const namesLabel = columnDefs.find(c => c.key === namesCol)?.label || namesCol;
+            const valuesLabel = valuesCol === 'Count' ? 'Count' : (columnDefs.find(c => c.key === valuesCol)?.label || valuesCol);
+            const pieTitle = valuesCol === 'Count' ? `${namesLabel}` : `${valuesLabel} by ${namesLabel}`;
+
+            const layout = { ...PLOTLY_LAYOUT_TEMPLATE, title: {text: pieTitle, x: 0}, margin: {t:50,r:20,l:20,b:30} };
+            Plotly.newPlot('pie-plot', data, layout);
+
+            let code = `import plotly.express as px\n`;
+            if (valuesCol === 'Count') {
+                code += `px.pie(df, names='${namesCol}', title='${namesLabel}')\n`;
+            } else {
+                code += `px.pie(df, names='${namesCol}', values='${valuesCol}', title='${valuesLabel} by ${namesLabel}')\n`;
+            }
+            updateCodeAndHighlight('pie-code', code);
+        }
+
+        function drawCorrelationMatrix() {
+            const numColsDefs = columnDefs.filter(c => !c.categorical);
+            const numKeys = numColsDefs.map(c => c.key);
+            const numLabels = numColsDefs.map(c => c.label);
+
+            const z = [];
+            const text = [];
+            for (let y = numKeys.length - 1; y >= 0; y--) { 
+                const rowZ = [];
+                const rowText = [];
+                for (let x = 0; x < numKeys.length; x++) {
+                    const xVals = df.map(row => row[numKeys[x]]);
+                    const yVals = df.map(row => row[numKeys[y]]);
+                    const corr = pearsonCorrelation(xVals, yVals);
+                    rowZ.push(corr);
+                    rowText.push(corr.toFixed(2));
+                }
+                z.push(rowZ);
+                text.push(rowText);
+            }
+
+            const yLabelsReversed = [...numLabels].reverse();
+
+            const trace = {
+                z: z,
+                x: numLabels,
+                y: yLabelsReversed,
+                type: 'heatmap',
+                text: text,
+                texttemplate: "%{text}",
+                colorscale: [
+                    [0.0, '#FF6600'],
+                    [0.5, '#222222'],
+                    [1.0, '#0076CE']
+                ],
+                zmin: -1,
+                zmax: 1,
+                showscale: true
+            };
+
+            const layout = { 
+                ...PLOTLY_LAYOUT_TEMPLATE, 
+                title: {text: 'Correlation Matrix', x: 0},
+                xaxis: { ...PLOTLY_LAYOUT_TEMPLATE.xaxis, tickangle: -45, automargin: true },
+                yaxis: { ...PLOTLY_LAYOUT_TEMPLATE.yaxis, automargin: true },
+                margin: { ...PLOTLY_LAYOUT_TEMPLATE.margin, b: 150, l: 150 }
+            };
+
+            Plotly.newPlot('corr-plot', [trace], layout);
+
+            const code = `import plotly.express as px\npx.imshow(df.corr(numeric_only=True), title='Correlation Matrix', text_auto='.2f')`;
+            updateCodeAndHighlight('corr-code', code);
+        }
+
+        // ---------- Setup and Initialization ----------
+
+        function setupUI() {
+            const colsList = columnDefs.map(c => ({value: c.key, label: c.label}));
+            
+            const catCols = columnDefs.filter(c => c.categorical).map(c => ({value: c.key, label: c.label}));
+            const numCols = columnDefs.filter(c => !c.categorical).map(c => ({value: c.key, label: c.label}));
+            
+            const colorOpts = [{value: 'None', label: 'None'}].concat(catCols);
+            const valueOpts = [{value: 'Count', label: 'Count'}].concat(numCols);
+            const hoverOpts = [{value: 'nickname', label: 'Nickname'}].concat(colsList.filter(c=>c.value !== 'nickname'));
+
+            // Bar controls
+            buildControl('bar-controls', 'bar-x', 'X Axis', catCols.concat(colsList), 'group', drawBar);
+            buildControl('bar-controls', 'bar-y', 'Y Axis', numCols, 'Overall Shot Percentage', drawBar);
+            buildControl('bar-controls', 'bar-color', 'Color', colorOpts, 'None', drawBar);
+
+            // Scatter controls
+            buildControl('scatter-controls', 'scatter-x', 'X Axis', numCols, 'height_cm', drawScatter);
+            buildControl('scatter-controls', 'scatter-y', 'Y Axis', numCols, 'wingspan_cm', drawScatter);
+            buildControl('scatter-controls', 'scatter-color', 'Color', colorOpts, 'group', drawScatter);
+            buildControl('scatter-controls', 'scatter-hover', 'Hover Text', hoverOpts, 'nickname', drawScatter);
+
+            // Pie controls
+            const pieNameOpts = colsList.filter(c => !c.value.includes('Shot Percentage'));
+            const pieValueOpts = valueOpts.filter(c => !c.value.includes('Shot Percentage'));
+            buildControl('pie-controls', 'pie-names', 'Category (Names)', pieNameOpts, 'group', drawPie);
+            buildControl('pie-controls', 'pie-values', 'Values', pieValueOpts, 'Count', drawPie);
+
+            document.getElementById('visualizations-container').style.display = 'block';
+            drawBar();
+            drawScatter();
+            drawPie();
+            drawCorrelationMatrix();
+        }
+
+        async function init() {
+            const statusText = document.getElementById("status-text");
+            const progressBar = document.getElementById("data-progress");
+            const progressContainer = document.getElementById("progress-container");
+
+            try {
+                globalTraits = await fetchAllRecords(COLLECTIONS[0].id, (status) => {
+                    statusText.textContent = status;
+                });
+                progressBar.value = 50;
+
+                globalShots = await fetchAllRecords(COLLECTIONS[1].id, (status) => {
+                    statusText.textContent = status;
+                });
+                progressBar.value = 100;
+
+                statusText.textContent = "Processing dataframe...";
+
+                const players = {};
+                globalTraits.forEach(t => {
+                    const nick = t.nickname ? t.nickname.trim() : 'Unknown';
+                    players[nick] = { ...t, nickname: nick };
+                    ['height_cm', 'wingspan_cm', 'skate_size', 'reaction_time_ms', 'resting_heart_rate'].forEach(numKey => {
+                        if (players[nick][numKey]) {
+                            players[nick][numKey] = parseFloat(players[nick][numKey]) || null;
+                        }
+                    });
+                });
+
+                const distances = new Set();
+                globalShots.forEach(s => {
+                    if(s.distance) distances.add(parseInt(s.distance) || s.distance);
+                });
+                const sortedDistances = Array.from(distances).sort((a,b)=>a-b);
+
+                Object.values(players).forEach(p => {
+                    sortedDistances.forEach(d => { 
+                        p[`Shot Percentage at ${d} feet`] = null;
+                        p[`Shots Made at ${d} feet`] = null;
+                    });
+                    p['Overall Shot Percentage'] = null;
+                    p['_made'] = 0;
+                    p['_att'] = 0;
+                });
+
+                globalShots.forEach(s => {
+                    const nick = s.nickname ? s.nickname.trim() : 'Unknown';
+                    if(!players[nick]) players[nick] = { nickname: nick, _made: 0, _att: 0 };
+                    
+                    const dist = parseInt(s.distance) || s.distance;
+                    const made = parseInt(s.shots_made) || 0;
+                    
+                    players[nick][`Shot Percentage at ${dist} feet`] = (made / 6) * 100;
+                    players[nick][`Shots Made at ${dist} feet`] = made;
+                    players[nick]._made += made;
+                    players[nick]._att += 6;
+
+                    if(s.group && !players[nick].group) players[nick].group = s.group;
+                });
+
+                Object.values(players).forEach(p => {
+                    if (p._att > 0) {
+                        p['Overall Shot Percentage'] = (p._made / p._att) * 100;
+                    }
+                });
+
+                df = Object.values(players);
+
+                columnDefs = [
+                    {key: 'nickname', label: 'Nickname', categorical: true},
+                    {key: 'group', label: 'Group', categorical: true},
+                    {key: 'handedness', label: 'Handedness', categorical: true},
+                    {key: 'birth_month', label: 'Birth Month', categorical: true},
+                    {key: 'height_cm', label: 'Height (cm)', categorical: false},
+                    {key: 'wingspan_cm', label: 'Wingspan (cm)', categorical: false},
+                    {key: 'skate_size', label: 'Skate Size', categorical: false},
+                    {key: 'reaction_time_ms', label: 'Reaction (ms)', categorical: false},
+                    {key: 'resting_heart_rate', label: 'Resting HR', categorical: false},
+                    {key: 'Overall Shot Percentage', label: 'Shot % (Overall)', categorical: false}
+                ];
+                sortedDistances.forEach(d => {
+                    columnDefs.push({ key: `Shot Percentage at ${d} feet`, label: `Shot % at ${d} feet`, categorical: false});
+                    columnDefs.push({ key: `Shots Made at ${d} feet`, label: `Shots Made at ${d} feet`, categorical: true});
+                });
+
+                statusText.textContent = "Data loaded successfully!";
+                setTimeout(() => { progressContainer.style.display = 'none'; setupUI(); }, 500);
+
+            } catch (err) {
+                console.error(err);
+                statusText.textContent = "Error downloading data. Check console.";
+                statusText.style.color = "red";
+            }
+        }
+
+        window.addEventListener("DOMContentLoaded", init);
+    </script>
+</body>
+</html>
