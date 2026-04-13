@@ -300,10 +300,11 @@
                 return a.localeCompare(b);
             });
 
-            // Columns layout: Nickname | Traits | Photo | [Distance 1] | [Distance 2] | ...
+            // Columns layout: Nickname | Group | Traits | Photo | [Distance 1] | [Distance 2] | ...
             const trHead = document.createElement('tr');
             trHead.innerHTML = `
                 <th>Nickname</th>
+                <th style="text-align:center;">Group</th>
                 <th style="text-align:center;">Traits</th>
                 <th style="text-align:center;">Photo</th>
             `;
@@ -332,6 +333,18 @@
                 tdNick.style.fontWeight = '600';
                 tr.appendChild(tdNick);
 
+                let group = "-";
+                const allUserRecords = [...fTraits, ...fPhotos, ...fShots].filter(r => r.nickname && r.nickname.trim().toLowerCase() === nick.toLowerCase());
+                const recWithGroup = allUserRecords.find(r => r.group !== undefined && r.group !== null);
+                if (recWithGroup) {
+                    group = recWithGroup.group;
+                }
+
+                const tdGroup = document.createElement('td');
+                tdGroup.style.textAlign = 'center';
+                tdGroup.textContent = group;
+                tr.appendChild(tdGroup);
+
                 const hasTraits = fTraits.some(t => t.nickname && t.nickname.trim().toLowerCase() === nick.toLowerCase());
                 const tdTraits = document.createElement('td');
                 tdTraits.style.textAlign = 'center';
@@ -357,8 +370,61 @@
 
             submissionContainer.style.display = 'block';
             submissionLabel.style.display = 'block';
+
+            makeTableSortable(table);
         }
 
+        function makeTableSortable(table) {
+            const headers = table.querySelectorAll('th');
+            const tbody = table.querySelector('tbody');
+            
+            headers.forEach((header, index) => {
+                header.style.cursor = 'pointer';
+                header.style.userSelect = 'none';
+                header.title = "Click to sort";
+                
+                header.addEventListener('click', () => {
+                    const isAscending = header.classList.contains('sort-asc');
+                    const rows = Array.from(tbody.querySelectorAll('tr'));
+                    
+                    // Clear all sort classes and indicators
+                    headers.forEach(h => {
+                        h.classList.remove('sort-asc', 'sort-desc');
+                        h.textContent = h.textContent.replace(' ▲', '').replace(' ▼', '');
+                    });
+                    
+                    let sortMultiplier = 1;
+                    if (isAscending) {
+                        header.classList.add('sort-desc');
+                        header.textContent += ' ▼';
+                        sortMultiplier = -1;
+                    } else {
+                        header.classList.add('sort-asc');
+                        header.textContent += ' ▲';
+                        sortMultiplier = 1;
+                    }
+                    
+                    rows.sort((a, b) => {
+                        const aText = a.children[index].textContent.trim();
+                        const bText = b.children[index].textContent.trim();
+                        
+                        const aNum = parseFloat(aText);
+                        const bNum = parseFloat(bText);
+                        
+                        let comparison = 0;
+                        if (aText !== "" && bText !== "" && !isNaN(aNum) && !isNaN(bNum)) {
+                            comparison = aNum - bNum;
+                        } else {
+                            comparison = aText.localeCompare(bText);
+                        }
+                        
+                        return comparison * sortMultiplier;
+                    });
+                    
+                    tbody.append(...rows);
+                });
+            });
+        }
         function setupDateFilter() {
             const allRecords = [...globalTraits, ...globalPhotos, ...globalShots];
             const dates = new Set();
