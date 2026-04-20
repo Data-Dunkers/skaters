@@ -193,6 +193,29 @@
             font-size: 0.9rem;
         }
 
+        .change-key-btn {
+            margin-top: 2rem;
+            padding: 10px 20px;
+            background: transparent;
+            color: var(--text-muted);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-family: 'Barlow Condensed', sans-serif;
+            font-size: 1rem;
+            font-weight: 600;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all 0.2s;
+            width: 100%;
+        }
+
+        .change-key-btn:hover {
+            color: var(--text-main);
+            border-color: var(--text-muted);
+            background: rgba(255,255,255,0.05);
+        }
+
         @media (max-width: 760px) {
             .page-header h1 { font-size: 2.25rem; }
             .card { padding: 1.25rem; }
@@ -254,6 +277,8 @@
                 <div class="link-desc">Analyze the collected data using JupyterLite.</div>
             </a>
         </div>
+
+        <button class="change-key-btn" onclick="clearEventKey()">Change Event Key</button>
     </div>
 
     <script>
