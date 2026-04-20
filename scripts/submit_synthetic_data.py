@@ -99,6 +99,7 @@ def submit_demographics(student: Dict[str, Any]) -> bool:
         'birth_month': student['birth_month'],
         'reaction_time_ms': student['reaction_time_ms'],
         'resting_heart_rate': student['resting_heart_rate'],
+        'event_key': 'demo',
     }
 
     try:
@@ -126,6 +127,7 @@ def submit_shots(student: Dict[str, Any]) -> bool:
             'group': student['group'],
             'distance': distance,
             'shots_made': shots_made,
+            'event_key': 'demo',
         }
 
         try:

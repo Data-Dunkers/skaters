@@ -20,6 +20,68 @@
 
         * { box-sizing: border-box; margin: 0; padding: 0; }
 
+        .demo-banner {
+            display: none;
+            background-color: var(--primary);
+            color: #fff;
+            padding: 0.5rem 1rem;
+            text-align: center;
+            font-weight: 700;
+            width: 100%;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        .demo-banner button {
+            margin-left: 10px;
+            padding: 4px 10px;
+            border: 1px solid rgba(255,255,255,0.4);
+            border-radius: 4px;
+            background: transparent;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            text-transform: uppercase;
+            font-size: 0.75rem;
+        }
+        .demo-banner button:hover {
+            background: rgba(255,255,255,0.2);
+        }
+
+        .key-input {
+            width: 100%;
+            padding: 11px 14px;
+            background-color: var(--bg-input);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text-main);
+            font-size: 1rem;
+            font-family: 'Barlow', sans-serif;
+            margin-bottom: 1rem;
+        }
+        .key-input:focus {
+            outline: none;
+            border-color: var(--border-focus);
+            box-shadow: 0 0 0 3px rgba(255,102,0,0.12);
+        }
+        .key-submit {
+            width: 100%;
+            padding: 14px;
+            background: var(--primary);
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            font-family: 'Barlow Condensed', sans-serif;
+            font-size: 1.2rem;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: opacity 0.2s, transform 0.1s;
+        }
+        .key-submit:hover { opacity: 0.9; }
+        .key-submit:active { transform: scale(0.98); }
+
         body {
             font-family: 'Barlow', sans-serif;
             background-color: var(--bg-dark);
@@ -138,12 +200,25 @@
     </style>
 </head>
 <body>
+    <div id="demoBanner" class="demo-banner">
+        Demo Mode Active <button onclick="clearEventKey()">Enter A Key</button>
+    </div>
+
     <div class="page-header">
         <div class="eyebrow">Data Science x Hockey</div>
         <h1>Data <span>Skaters</span></h1>
     </div>
 
-    <div class="card">
+    <div class="card" id="keyEntryCard" style="display: none;">
+        <div class="section-label">Access Restricted</div>
+        <p class="intro">
+            Enter your key, or use "demo" to see a demonstration.
+        </p>
+        <input type="text" id="eventKeyInput" class="key-input" placeholder="Enter your key">
+        <button class="key-submit" onclick="saveEventKey()">Enter</button>
+    </div>
+
+    <div class="card" id="mainCard" style="display: none;">
         <div class="section-label">Data Skaters Data Forms</div>
         <p class="intro">
             Welcome to Data Skaters. Use the links below to access the data entry forms for recording player traits and shot data.
@@ -180,5 +255,50 @@
             </a>
         </div>
     </div>
+
+    <script>
+        function checkKey() {
+            const key = localStorage.getItem('event_key');
+            const mainCard = document.getElementById('mainCard');
+            const keyEntryCard = document.getElementById('keyEntryCard');
+            const demoBanner = document.getElementById('demoBanner');
+
+            if (!key) {
+                mainCard.style.display = 'none';
+                keyEntryCard.style.display = 'block';
+                demoBanner.style.display = 'none';
+            } else {
+                mainCard.style.display = 'block';
+                keyEntryCard.style.display = 'none';
+                if (key.toLowerCase() === 'demo') {
+                    demoBanner.style.display = 'block';
+                } else {
+                    demoBanner.style.display = 'none';
+                }
+            }
+        }
+
+        function saveEventKey() {
+            const input = document.getElementById('eventKeyInput').value.trim();
+            if (input) {
+                localStorage.setItem('event_key', input);
+                checkKey();
+            }
+        }
+
+        function clearEventKey() {
+            localStorage.removeItem('event_key');
+            document.getElementById('eventKeyInput').value = '';
+            checkKey();
+        }
+
+        document.getElementById('eventKeyInput').addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') {
+                saveEventKey();
+            }
+        });
+
+        window.onload = checkKey;
+    </script>
 </body>
 </html>

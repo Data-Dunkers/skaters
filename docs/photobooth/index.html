@@ -435,6 +435,11 @@
         const softnessValue = document.getElementById('softness-value');
         const pickColorBtn = document.getElementById('pick-color-btn');
 
+        const eventKey = localStorage.getItem('event_key');
+        if (!eventKey) {
+            window.location.href = '../index.html';
+        }
+
         let stream = null;
         let photoBlob = null;
         let selectedDeviceId = '';
@@ -798,6 +803,7 @@
             formData.append('nickname', nickname);
             formData.append('real_name', realName);
             formData.append('photo', photoFile);
+            formData.append('event_key', eventKey);
 
             uploadBtn.disabled = true;
             setStatus('Uploading to PocketBase...');

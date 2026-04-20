@@ -356,6 +356,12 @@ const PB_URL = 'https://api.datadunkers.ca/api/collections/data_skaters_shots/re
 
 // ── ON LOAD ─────────────────────────────────────────────────────
 window.onload = () => {
+    const eventKey = localStorage.getItem('event_key');
+    if (!eventKey) {
+        window.location.href = '../index.html';
+        return;
+    }
+
     const savedNick  = localStorage.getItem('lastNickname');
     const savedGroup = localStorage.getItem('lastGroup');
     if (savedNick)  document.getElementById('nickname').value = savedNick;
@@ -392,6 +398,7 @@ async function handleSubmit() {
         nickname:       nick,
         distance:       parseInt(distance, 10),
         shots_made:     parseInt(shots_made, 10),
+        event_key:      localStorage.getItem('event_key'),
     };
 
     localStorage.setItem('lastNickname', nick);
@@ -429,7 +436,8 @@ function showStatus(msg, type) {
 async function updateStats(nick) {
     document.getElementById('statsFor').textContent = nick;
     try {
-        const res  = await fetch(`${PB_URL}?filter=(nickname='${nick}')&sort=-created&perPage=50`);
+        const key = localStorage.getItem('event_key');
+        const res  = await fetch(`${PB_URL}?filter=(nickname='${nick}'%20%26%26%20event_key='${key}')&sort=-created&perPage=50`);
         const data = await res.json();
         const tbody = document.getElementById('statsBody');
         const table = document.getElementById('statsTable');

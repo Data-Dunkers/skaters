@@ -236,13 +236,15 @@
         ];
 
         async function fetchAllRecords(collectionId, updateStatus) {
+            const eventKey = localStorage.getItem('event_key');
             let records = [];
             let page = 1;
             const perPage = 500;
             
             while (true) {
                 updateStatus(`Fetching ${collectionId} (page ${page})...`);
-                const response = await fetch(`${BASE_URL}/api/collections/${collectionId}/records?page=${page}&perPage=${perPage}`);
+                const filterStr = eventKey ? `&filter=(event_key='${eventKey}')` : '';
+                const response = await fetch(`${BASE_URL}/api/collections/${collectionId}/records?page=${page}&perPage=${perPage}${filterStr}`);
                 if (!response.ok) {
                     throw new Error(`Failed to fetch ${collectionId}`);
                 }
@@ -497,7 +499,14 @@
         }
 
         // Start automatically
-        window.addEventListener("DOMContentLoaded", downloadAll);
+        window.addEventListener("DOMContentLoaded", () => {
+            const eventKey = localStorage.getItem('event_key');
+            if (!eventKey) {
+                window.location.href = '../index.html';
+                return;
+            }
+            downloadAll();
+        });
     </script>
 </body>
 </html>

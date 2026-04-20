@@ -464,6 +464,12 @@ let activeGroup = '';
 
 // ── ON LOAD ─────────────────────────────────────────────────────
 window.onload = () => {
+    const eventKey = localStorage.getItem('event_key');
+    if (!eventKey) {
+        window.location.href = '../index.html';
+        return;
+    }
+
     document.getElementById('setupSection').classList.remove('hidden');
     document.getElementById('logSection').classList.add('hidden');
     document.getElementById('historyCard').classList.add('hidden');
@@ -560,6 +566,7 @@ async function handleSubmit() {
         nickname:       nick,
         distance:       parseInt(distance, 10),
         shots_made:     parseInt(shots_made, 10),
+        event_key:      localStorage.getItem('event_key'),
     };
 
     try {
@@ -596,7 +603,8 @@ function showStatus(msg, type) {
 async function updateStats(nick) {
     document.getElementById('statsFor').textContent = nick;
     try {
-        const res  = await fetch(`${PB_URL}?filter=(nickname='${nick}'&&group=${activeGroup})&sort=-created&perPage=50`);
+        const key = localStorage.getItem('event_key');
+        const res  = await fetch(`${PB_URL}?filter=(nickname='${nick}'&&group=${activeGroup}&&event_key='${key}')&sort=-created&perPage=50`);
         const data = await res.json();
         const tbody = document.getElementById('statsBody');
         const table = document.getElementById('statsTable');
@@ -641,7 +649,8 @@ async function updateProgressIndicator() {
     }
 
     try {
-        const res = await fetch(`${PB_URL}?filter=(group=${activeGroup})&perPage=500`);
+        const key = localStorage.getItem('event_key');
+        const res = await fetch(`${PB_URL}?filter=(group=${activeGroup}&&event_key='${key}')&perPage=500`);
         const data = await res.json();
         const items = Array.isArray(data.items) ? data.items : [];
 

@@ -585,7 +585,10 @@ async function fetchPlayerFromPocketBase(nickname) {
     return { realName: '', photoUrl: '' };
   }
 
-  const filter = encodeURIComponent(`nickname="${nickname.replace(/"/g, '\\"')}"`);
+  const eventKey = new URLSearchParams(window.location.search).get('event_key') || localStorage.getItem('event_key');
+  const baseFilter = `nickname="${nickname.replace(/"/g, '\\"')}"`;
+  const filterParams = eventKey ? `${baseFilter} && event_key="${eventKey}"` : baseFilter;
+  const filter = encodeURIComponent(filterParams);
   const url = `${POCKETBASE_URL}/api/collections/${COLLECTION_NAME}/records?perPage=1&page=1&filter=${filter}&sort=-created`;
 
   const response = await fetch(url);

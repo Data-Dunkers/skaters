@@ -49,7 +49,8 @@ def upload_photos(nicknames):
                 }
                 data = {
                     'nickname': nickname,
-                    'real_name': ''
+                    'real_name': '',
+                    'event_key': 'demo'
                 }
                 response = requests.post(PHOTOS_URL, data=data, files=files)
                 

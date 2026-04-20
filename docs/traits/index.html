@@ -485,6 +485,12 @@ let heartTimerRunning = false;
 let heartTimerTimeout = null;
 
 window.onload = () => {
+    const eventKey = localStorage.getItem('event_key');
+    if (!eventKey) {
+        window.location.href = '../index.html';
+        return;
+    }
+
     const savedNick = localStorage.getItem('traitsNickname');
     if (savedNick) {
         document.getElementById('nickname').value = savedNick;
@@ -693,7 +699,8 @@ async function handleSubmit() {
         skate_size: skateSize,
         handedness: handedness,
         birth_month: birthMonth,
-        resting_heart_rate: restingHeartRate
+        resting_heart_rate: restingHeartRate,
+        event_key: localStorage.getItem('event_key')
     };
 
     const btn = document.getElementById('submitBtn');
