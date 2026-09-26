@@ -12,7 +12,7 @@ if (-not $isAdmin) {
 # ------------------------------------------------------------------------------
 # STEP 1: Check WSL Installation
 # ------------------------------------------------------------------------------
-Write-Host "`n[1/6] Checking WSL 2 installation status..." -ForegroundColor Cyan
+Write-Host "`n[1/4] Checking WSL 2 installation status..." -ForegroundColor Cyan
 $wslStatus = wsl --status 2>&1
 if ($LASTEXITCODE -ne 0) {
     Write-Host "WSL is not installed on this system." -ForegroundColor Yellow
@@ -29,7 +29,7 @@ Write-Host "WSL is installed and ready." -ForegroundColor Green
 # ------------------------------------------------------------------------------
 # STEP 2: Configure Windows Firewall and Network Profile
 # ------------------------------------------------------------------------------
-Write-Host "`n[2/6] Configuring Firewall and Network Profile..." -ForegroundColor Cyan
+Write-Host "`n[2/4] Configuring Firewall and Network Profile..." -ForegroundColor Cyan
 
 # Set active network profiles to Private
 Get-NetConnectionProfile | Where-Object NetworkCategory -eq 'Public' | Set-NetConnectionProfile -NetworkCategory Private
@@ -45,53 +45,15 @@ if (-not $fwRule) {
 }
 
 # ------------------------------------------------------------------------------
-# STEP 3: Setup Project Directory Structure & Docker Files
+# STEP 3: Setup Project Directory Structure & Download Files from GitHub
 # ------------------------------------------------------------------------------
-Write-Host "`n[3/6] Setting up project folder structure..." -ForegroundColor Cyan
+Write-Host "`n[3/4] Setting up project folder structure..." -ForegroundColor Cyan
 $projectDir = "C:\my-lan-app"
 New-Item -ItemType Directory -Force -Path "$projectDir\pb_data" | Out-Null
 New-Item -ItemType Directory -Force -Path "$projectDir\pb_public" | Out-Null
 Set-Location -Path $projectDir
 
-# Create Dockerfile
-$dockerfileContent = @"
-FROM alpine:latest
-
-ARG PB_VERSION=0.22.21
-
-RUN apk add --no-cache ca-certificates unzip wget curl
-
-ADD https://github.com/pocketbase/pocketbase/releases/download/v`${PB_VERSION}/pocketbase_`${PB_VERSION}_linux_amd64.zip /tmp/pb.zip
-RUN unzip /tmp/pb.zip -d /pb/ \
-    && rm /tmp/pb.zip \
-    && chmod +x /pb/pocketbase
-
-EXPOSE 8090
-
-CMD ["/pb/pocketbase", "serve", "--http=0.0.0.0:8090", "--dir=/pb/pb_data", "--publicDir=/pb/pb_public"]
-"@
-Set-Content -Path "$projectDir\Dockerfile" -Value $dockerfileContent
-
-# Create docker-compose.yml
-$composeContent = @"
-services:
-  pocketbase:
-    build: .
-    container_name: lan_pocketbase
-    restart: unless-stopped
-    ports:
-      - "80:8090"
-    volumes:
-      - ./pb_data:/pb/pb_data
-      - ./pb_public:/pb/pb_public
-"@
-Set-Content -Path "$projectDir\docker-compose.yml" -Value $composeContent
-Write-Host "Project configuration files created at $projectDir" -ForegroundColor Green
-
-# ------------------------------------------------------------------------------
-# STEP 4: Download and Extract GitHub docs to pb_public
-# ------------------------------------------------------------------------------
-Write-Host "`n[4/6] Fetching static web assets from GitHub..." -ForegroundColor Cyan
+Write-Host "Fetching setup files from GitHub..." -ForegroundColor Cyan
 $zipPath = "$env:TEMP\skaters_repo.zip"
 $extractPath = "$env:TEMP\skaters_repo_extracted"
 
@@ -101,9 +63,21 @@ if (Test-Path $extractPath) { Remove-Item -Force -Recurse $extractPath }
 
 Invoke-WebRequest -Uri "https://github.com/Data-Dunkers/skaters/archive/refs/heads/main.zip" -OutFile $zipPath
 Expand-Archive -Path $zipPath -DestinationPath $extractPath -Force
+$repoRoot = "$extractPath\skaters-main"
+
+# Copy Dockerfile, docker-compose.yaml and pb_migrations from /setup
+$setupPath = "$repoRoot\setup"
+if (Test-Path $setupPath) {
+    Copy-Item -Path "$setupPath\Dockerfile" -Destination "$projectDir\Dockerfile" -Force
+    Copy-Item -Path "$setupPath\docker-compose.yaml" -Destination "$projectDir\docker-compose.yml" -Force
+    Copy-Item -Path "$setupPath\pb_migrations" -Destination "$projectDir\pb_migrations" -Recurse -Force
+    Write-Host "Downloaded Dockerfile, docker-compose.yml and pb_migrations from GitHub." -ForegroundColor Green
+} else {
+    Write-Warning "Failed to locate setup directory in downloaded repository."
+}
 
 # Copy files from /docs to pb_public
-$docsPath = "$extractPath\skaters-main\docs"
+$docsPath = "$repoRoot\docs"
 if (Test-Path $docsPath) {
     Copy-Item -Path "$docsPath\*" -Destination "$projectDir\pb_public" -Recurse -Force
     Write-Host "Successfully downloaded and extracted static files to pb_public." -ForegroundColor Green
@@ -116,9 +90,9 @@ Remove-Item -Force $zipPath
 Remove-Item -Force -Recurse $extractPath
 
 # ------------------------------------------------------------------------------
-# STEP 5: Build and Launch Docker Container
+# STEP 4: Build and Launch Docker Container
 # ------------------------------------------------------------------------------
-Write-Host "`n[5/5] Building and starting PocketBase container..." -ForegroundColor Cyan
+Write-Host "`n[4/4] Building and starting PocketBase container..." -ForegroundColor Cyan
 docker compose up -d --build
 if ($LASTEXITCODE -ne 0) {
     Write-Error "Failed to start Docker Compose. Please verify Docker Desktop is running."
