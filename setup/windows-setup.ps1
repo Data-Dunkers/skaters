@@ -10,7 +10,7 @@ if (-not $isAdmin) {
 }
 
 # Check WSL Installation
-Write-Host "`n[1/4] Checking WSL 2 installation status..." -ForegroundColor Cyan
+Write-Host "`n[1/5] Checking WSL 2 installation status..." -ForegroundColor Cyan
 $wslStatus = wsl --status 2>&1
 if ($LASTEXITCODE -ne 0) {
     Write-Host "WSL is not installed on this system." -ForegroundColor Yellow
@@ -24,8 +24,47 @@ if ($LASTEXITCODE -ne 0) {
 }
 Write-Host "WSL is installed and ready." -ForegroundColor Green
 
+# Install Docker Desktop
+Write-Host "`n[2/5] Checking Docker Desktop installation..." -ForegroundColor Cyan
+if (-not (Get-Command docker -ErrorAction SilentlyContinue)) {
+    Write-Host "Docker Desktop not found. Installing via winget..." -ForegroundColor Yellow
+    winget install --id Docker.DockerDesktop -e --accept-source-agreements --accept-package-agreements
+    if ($LASTEXITCODE -ne 0) {
+        Write-Error "Docker Desktop installation failed. Please install it manually from https://www.docker.com/products/docker-desktop and re-run this script."
+        exit
+    }
+    Write-Host "`n=================================================================" -ForegroundColor Red
+    Write-Host "ACTION REQUIRED: Docker Desktop was just installed." -ForegroundColor Red
+    Write-Host "Please launch it once, complete the first-run setup, then re-run this script." -ForegroundColor Red
+    Write-Host "=================================================================`n" -ForegroundColor Red
+    exit
+}
+Write-Host "Docker Desktop is installed." -ForegroundColor Green
+
+# Make sure the Docker daemon is running before we need it later
+$dockerDesktopExe = "$env:ProgramFiles\Docker\Docker\Docker Desktop.exe"
+docker info *> $null
+if ($LASTEXITCODE -ne 0) {
+    Write-Host "Starting Docker Desktop..." -ForegroundColor Yellow
+    if (Test-Path $dockerDesktopExe) {
+        Start-Process $dockerDesktopExe
+    }
+    $timeoutSeconds = 120
+    $elapsed = 0
+    while ($LASTEXITCODE -ne 0 -and $elapsed -lt $timeoutSeconds) {
+        Start-Sleep -Seconds 5
+        $elapsed += 5
+        docker info *> $null
+    }
+    if ($LASTEXITCODE -ne 0) {
+        Write-Error "Docker Desktop did not start in time. Please start it manually and re-run this script."
+        exit
+    }
+}
+Write-Host "Docker Desktop is running." -ForegroundColor Green
+
 # Configure Windows Firewall and Network Profile
-Write-Host "`n[2/4] Configuring Firewall and Network Profile..." -ForegroundColor Cyan
+Write-Host "`n[3/5] Configuring Firewall and Network Profile..." -ForegroundColor Cyan
 
 # Set active network profiles to Private
 Get-NetConnectionProfile | Where-Object NetworkCategory -eq 'Public' | Set-NetConnectionProfile -NetworkCategory Private
@@ -42,7 +81,7 @@ if (-not $fwRule) {
 
 # Setup Project Directory Structure & Download Files from GitHub
 
-Write-Host "`n[3/4] Setting up project folder structure..." -ForegroundColor Cyan
+Write-Host "`n[4/5] Setting up project folder structure..." -ForegroundColor Cyan
 $projectDir = "C:\my-lan-app"
 New-Item -ItemType Directory -Force -Path "$projectDir\pb_data" | Out-Null
 New-Item -ItemType Directory -Force -Path "$projectDir\pb_public" | Out-Null
@@ -86,7 +125,7 @@ Remove-Item -Force -Recurse $extractPath
 
 
 # Build and Launch Docker Container
-Write-Host "`n[4/4] Building and starting PocketBase container..." -ForegroundColor Cyan
+Write-Host "`n[5/5] Building and starting PocketBase container..." -ForegroundColor Cyan
 docker compose up -d --build
 if ($LASTEXITCODE -ne 0) {
     Write-Error "Failed to start Docker Compose. Please verify Docker Desktop is running."
