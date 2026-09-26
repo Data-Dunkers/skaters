@@ -1,0 +1,14 @@
+services:
+  pocketbase:
+    build: .
+    container_name: lan_pocketbase
+    restart: unless-stopped
+    ports:
+      - "80:8090"
+    environment:
+      - PB_ADMIN_EMAIL=service@datadunkers.ca
+      - PB_ADMIN_PASSWORD=datadunkers
+    volumes:
+      - ./pb_data:/pb/pb_data
+      - ./pb_public:/pb/pb_public
+      - ./pb_migrations:/pb/pb_migrations
