@@ -9,9 +9,7 @@ if (-not $isAdmin) {
     exit
 }
 
-# ------------------------------------------------------------------------------
-# STEP 1: Check WSL Installation
-# ------------------------------------------------------------------------------
+# Check WSL Installation
 Write-Host "`n[1/4] Checking WSL 2 installation status..." -ForegroundColor Cyan
 $wslStatus = wsl --status 2>&1
 if ($LASTEXITCODE -ne 0) {
@@ -26,9 +24,7 @@ if ($LASTEXITCODE -ne 0) {
 }
 Write-Host "WSL is installed and ready." -ForegroundColor Green
 
-# ------------------------------------------------------------------------------
-# STEP 2: Configure Windows Firewall and Network Profile
-# ------------------------------------------------------------------------------
+# Configure Windows Firewall and Network Profile
 Write-Host "`n[2/4] Configuring Firewall and Network Profile..." -ForegroundColor Cyan
 
 # Set active network profiles to Private
@@ -44,9 +40,8 @@ if (-not $fwRule) {
     Write-Host "Firewall rule for TCP Port 80 already exists." -ForegroundColor Green
 }
 
-# ------------------------------------------------------------------------------
-# STEP 3: Setup Project Directory Structure & Download Files from GitHub
-# ------------------------------------------------------------------------------
+# Setup Project Directory Structure & Download Files from GitHub
+
 Write-Host "`n[3/4] Setting up project folder structure..." -ForegroundColor Cyan
 $projectDir = "C:\my-lan-app"
 New-Item -ItemType Directory -Force -Path "$projectDir\pb_data" | Out-Null
@@ -89,9 +84,8 @@ if (Test-Path $docsPath) {
 Remove-Item -Force $zipPath
 Remove-Item -Force -Recurse $extractPath
 
-# ------------------------------------------------------------------------------
-# STEP 4: Build and Launch Docker Container
-# ------------------------------------------------------------------------------
+
+# Build and Launch Docker Container
 Write-Host "`n[4/4] Building and starting PocketBase container..." -ForegroundColor Cyan
 docker compose up -d --build
 if ($LASTEXITCODE -ne 0) {
@@ -102,9 +96,6 @@ if ($LASTEXITCODE -ne 0) {
 # Wait for container startup
 Start-Sleep -Seconds 3
 
-# ------------------------------------------------------------------------------
-# SETUP COMPLETE
-# ------------------------------------------------------------------------------
 # Admin account and collections are created automatically by the PocketBase migrations on startup
 $adminEmail = "service@datadunkers.ca"
 $adminPass = "datadunkers"
