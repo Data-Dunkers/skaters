@@ -53,11 +53,17 @@ log "Docker service is running." "$GREEN"
 
 # Configure firewall for port 80
 log "\n[2/4] Configuring firewall..." "$CYAN"
+if ! command -v ufw >/dev/null 2>&1; then
+    log "ufw not found. Installing..." "$YELLOW"
+    apt-get update -y
+    apt-get install -y ufw
+fi
+
 if command -v ufw >/dev/null 2>&1; then
     ufw allow 80/tcp >/dev/null 2>&1 || true
     log "Inbound firewall rule ensured for TCP Port 80 (ufw)." "$GREEN"
 else
-    log "ufw not found, skipping firewall configuration. Ensure port 80 is reachable on your network." "$YELLOW"
+    log "Failed to install ufw, skipping firewall configuration. Ensure port 80 is reachable on your network." "$YELLOW"
 fi
 
 # Setup Project Directory Structure & Download Files from GitHub
