@@ -406,11 +406,6 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
     }
 
-    const savedNick = localStorage.getItem('nickname');
-    if (savedNick) {
-        document.getElementById('nickname').value = savedNick;
-    }
-
     document.getElementById('rocketLeagueForm').addEventListener('submit', handleSubmit);
 });
 
@@ -451,8 +446,6 @@ async function handleSubmit(event) {
     btn.disabled = true;
     btn.textContent = 'Submitting...';
 
-    localStorage.setItem('nickname', nickname);
-
     try {
         const res = await fetch(PB_URL, {
             method: 'POST',
@@ -472,7 +465,6 @@ async function handleSubmit(event) {
         document.getElementById('assists').value = '';
         document.getElementById('saves').value = '';
         document.getElementById('shots').value = '';
-
 
     } catch (err) {
         showStatus('Error: ' + err.message, 'error');
