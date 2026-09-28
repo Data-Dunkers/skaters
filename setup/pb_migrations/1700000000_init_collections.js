@@ -55,9 +55,21 @@ migrate((db) => {
         new SchemaField({ name: "resting_heart_rate", type: "number" })
     ]);
 
+    // 4. Rocket League Collection
+    createCollection("data_skaters_rocket_league", [
+        new SchemaField({ name: "event_key",  type: "text" }),
+        new SchemaField({ name: "nickname",   type: "text" }),
+        new SchemaField({ name: "score",      type: "number" }),
+        new SchemaField({ name: "goals",      type: "number" }),
+        new SchemaField({ name: "assists",    type: "number" }),
+        new SchemaField({ name: "saves",      type: "number" }),
+        new SchemaField({ name: "shots",      type: "number" })
+    ]);
+
+
 }, (db) => {
     const dao = new Dao(db);
     try { dao.deleteCollection(dao.findCollectionByNameOrId("data_skaters_photos")); } catch (_) {}
     try { dao.deleteCollection(dao.findCollectionByNameOrId("data_skaters_shots")); } catch (_) {}
     try { dao.deleteCollection(dao.findCollectionByNameOrId("data_skaters_traits")); } catch (_) {}
-});
+    try { dao.deleteCollection(dao.findCollectionByNameOrId("data_skaters_rocket_league")); } catch (_) {}
