@@ -360,7 +360,7 @@
 
     <div class="form-section">
         <div class="section-label">Match Results</div>
-        <form class="card" id="rocketLeagueForm">
+        <form id="rocketLeagueForm">
         <div class="form-row cols-2">
             
             <div class="form-group">
@@ -387,21 +387,19 @@
                 <label for="shots">Shots</label>
                 <input type="number" id="shots" name="shots" min="0" max="100" step="1" placeholder="5" required>
             </div>
-            <br>
         </div>
+        <br>
         <button type="submit" id="submitBtn" class="submit-btn">Submit Results</button>
         </form>
     </div>
 
-    <!-- <button type="button" id="submitBtn" class="submit-btn" onclick="handleSubmit()">Submit Results</button> -->
-    
     <div id="statusMessage"></div>
 </div>
 <div class="home-link-wrap"><a class="home-link" href="../index.html">Home</a></div>
 <script>
 const PB_URL = 'https://api.datadunkers.ca/api/collections/data_skaters_rocket_league/records';
 
-window.onload = () => {
+document.addEventListener('DOMContentLoaded', () => {
     const eventKey = localStorage.getItem('event_key');
     if (!eventKey) {
         window.location.href = '../index.html';
@@ -413,10 +411,8 @@ window.onload = () => {
         document.getElementById('nickname').value = savedNick;
     }
 
-    document.getElementById('reactionPad').addEventListener('click', onReactionPadClick);
-    syncReactionUI();
-    syncHeartUI();
-};
+    document.getElementById('rocketLeagueForm').addEventListener('submit', handleSubmit);
+});
 
 function showStatus(msg, type) {
     const el = document.getElementById('statusMessage');
@@ -427,12 +423,8 @@ function showStatus(msg, type) {
 }
 
 
-async function handleSubmit() {
-    if (heartTimerRunning) {
-        showStatus('Wait for the 15-second timer to finish before submitting.', 'error');
-        return;
-    }
-
+async function handleSubmit(event) {
+    event.preventDefault();
     const nickname = document.getElementById('nickname').value.trim();
     const score = parseInt(document.getElementById('score').value, 10);
     const goals = parseInt(document.getElementById('goals').value, 10);
