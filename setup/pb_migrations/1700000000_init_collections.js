@@ -5,12 +5,13 @@ migrate((db) => {
         try {
             dao.findCollectionByNameOrId(name);
         } catch (_) {
+            const publicApiRule = "";
             const collection = new Collection({
                 name: name,
                 type: "base",
-                listRule: "",
-                viewRule: "",
-                createRule: "",
+                listRule: publicApiRule,
+                viewRule: publicApiRule,
+                createRule: publicApiRule,
                 updateRule: "",
                 deleteRule: ""
             });
@@ -65,11 +66,4 @@ migrate((db) => {
         new SchemaField({ name: "saves",      type: "number" }),
         new SchemaField({ name: "shots",      type: "number" })
     ]);
-
-
-}, (db) => {
-    const dao = new Dao(db);
-    try { dao.deleteCollection(dao.findCollectionByNameOrId("data_skaters_photos")); } catch (_) {}
-    try { dao.deleteCollection(dao.findCollectionByNameOrId("data_skaters_shots")); } catch (_) {}
-    try { dao.deleteCollection(dao.findCollectionByNameOrId("data_skaters_traits")); } catch (_) {}
-    try { dao.deleteCollection(dao.findCollectionByNameOrId("data_skaters_rocket_league")); } catch (_) {}
+});
