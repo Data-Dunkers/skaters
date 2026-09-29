@@ -113,7 +113,12 @@ async function handleSubmit(event) {
         });
 
         if (!res.ok) {
-            throw new Error('Server error ' + res.status);
+            let message = 'Server error ' + res.status;
+            try {
+                const errorData = await res.json();
+                if (errorData.message) message += ': ' + errorData.message;
+            } catch (_) {}
+            throw new Error(message);
         }
 
         showStatus('Results submitted successfully.', 'success');
