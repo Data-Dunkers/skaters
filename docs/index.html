@@ -1,226 +1,11 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-page="home">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Data Skaters Home</title>
     <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --primary: #FF6600;
-            --primary-dim: rgba(255, 102, 0, 0.15);
-            --bg-dark: #0076CE;
-            --bg-card: #181818;
-            --bg-input: #222222;
-            --text-main: #FFFFFF;
-            --text-muted: #888888;
-            --border: #2a2a2a;
-            --border-focus: #FF6600;
-        }
-
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-
-        .demo-banner {
-            display: none;
-            background-color: var(--primary);
-            color: #fff;
-            padding: 0.5rem 1rem;
-            text-align: center;
-            font-weight: 700;
-            width: 100%;
-            font-size: 0.9rem;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-        }
-        .demo-banner button {
-            margin-left: 10px;
-            padding: 4px 10px;
-            border: 1px solid rgba(255,255,255,0.4);
-            border-radius: 4px;
-            background: transparent;
-            color: white;
-            font-weight: bold;
-            cursor: pointer;
-            text-transform: uppercase;
-            font-size: 0.75rem;
-        }
-        .demo-banner button:hover {
-            background: rgba(255,255,255,0.2);
-        }
-
-        .key-input {
-            width: 100%;
-            padding: 11px 14px;
-            background-color: var(--bg-input);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            color: var(--text-main);
-            font-size: 1rem;
-            font-family: 'Barlow', sans-serif;
-            margin-bottom: 1rem;
-        }
-        .key-input:focus {
-            outline: none;
-            border-color: var(--border-focus);
-            box-shadow: 0 0 0 3px rgba(255,102,0,0.12);
-        }
-        .key-submit {
-            width: 100%;
-            padding: 14px;
-            background: var(--primary);
-            color: #fff;
-            border: none;
-            border-radius: 8px;
-            font-family: 'Barlow Condensed', sans-serif;
-            font-size: 1.2rem;
-            font-weight: 700;
-            letter-spacing: 0.1em;
-            text-transform: uppercase;
-            cursor: pointer;
-            transition: opacity 0.2s, transform 0.1s;
-        }
-        .key-submit:hover { opacity: 0.9; }
-        .key-submit:active { transform: scale(0.98); }
-
-        body {
-            font-family: 'Barlow', sans-serif;
-            background-color: var(--bg-dark);
-            background-image:
-                radial-gradient(ellipse at 20% 0%, rgba(255,102,0,0.07) 0%, transparent 60%),
-                radial-gradient(ellipse at 80% 100%, rgba(255,102,0,0.04) 0%, transparent 60%);
-            color: var(--text-main);
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 2rem 1rem 3rem;
-        }
-
-        .page-header {
-            text-align: center;
-            margin-bottom: 1.4rem;
-        }
-
-        .page-header .eyebrow {
-            font-family: 'Barlow Condensed', sans-serif;
-            font-size: 0.75rem;
-            font-weight: 600;
-            letter-spacing: 0.25em;
-            text-transform: uppercase;
-            color: var(--primary);
-            margin-bottom: 0.4rem;
-        }
-
-        .page-header h1 {
-            font-family: 'Barlow Condensed', sans-serif;
-            font-size: 3rem;
-            font-weight: 800;
-            letter-spacing: 0.05em;
-            text-transform: uppercase;
-            line-height: 1;
-            color: var(--text-main);
-        }
-
-        .page-header h1 span { color: var(--primary); }
-
-        .card {
-            background-color: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 14px;
-            padding: 2rem;
-            width: 100%;
-            max-width: 560px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
-        }
-
-        .section-label {
-            font-family: 'Barlow Condensed', sans-serif;
-            font-size: 0.75rem;
-            font-weight: 700;
-            letter-spacing: 0.2em;
-            text-transform: uppercase;
-            color: var(--primary);
-            margin-bottom: 0.9rem;
-            padding-bottom: 0.4rem;
-            border-bottom: 1px solid var(--border);
-        }
-
-        .intro {
-            color: var(--text-muted);
-            font-size: 0.96rem;
-            line-height: 1.55;
-            margin-bottom: 1.35rem;
-        }
-
-        .link-grid {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 0.9rem;
-        }
-
-        .link-card {
-            display: block;
-            text-decoration: none;
-            color: var(--text-main);
-            border: 1px solid var(--border);
-            border-radius: 10px;
-            background: var(--bg-input);
-            padding: 1rem 1.1rem;
-            transition: border-color 0.2s, transform 0.1s, background 0.2s;
-        }
-
-        .link-card:hover,
-        .link-card:focus-visible {
-            border-color: var(--border-focus);
-            background: #252525;
-            transform: translateY(-1px);
-            outline: none;
-        }
-
-        .link-title {
-            font-family: 'Barlow Condensed', sans-serif;
-            font-size: 1.2rem;
-            font-weight: 700;
-            letter-spacing: 0.05em;
-            text-transform: uppercase;
-            color: var(--primary);
-            margin-bottom: 0.25rem;
-        }
-
-        .link-desc {
-            color: var(--text-muted);
-            font-size: 0.9rem;
-        }
-
-        .change-key-btn {
-            margin-top: 2rem;
-            padding: 10px 20px;
-            background: transparent;
-            color: var(--text-muted);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            font-family: 'Barlow Condensed', sans-serif;
-            font-size: 1rem;
-            font-weight: 600;
-            letter-spacing: 0.05em;
-            text-transform: uppercase;
-            cursor: pointer;
-            transition: all 0.2s;
-            width: 100%;
-        }
-
-        .change-key-btn:hover {
-            color: var(--text-main);
-            border-color: var(--text-muted);
-            background: rgba(255,255,255,0.05);
-        }
-
-        @media (max-width: 760px) {
-            .page-header h1 { font-size: 2.25rem; }
-            .card { padding: 1.25rem; }
-        }
-    </style>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div id="demoBanner" class="demo-banner">
@@ -232,7 +17,7 @@
         <h1>Data <span>Skaters</span></h1>
     </div>
 
-    <div class="card" id="keyEntryCard" style="display: none;">
+    <div class="card extracted-style-1" id="keyEntryCard">
         <div class="section-label">Access Restricted</div>
         <p class="intro">
             Enter your key, or use "demo" to see a demonstration.
@@ -241,7 +26,7 @@
         <button class="key-submit" onclick="saveEventKey()">Enter</button>
     </div>
 
-    <div class="card" id="mainCard" style="display: none;">
+    <div class="card extracted-style-1" id="mainCard">
         <div class="section-label">Data Skaters Data Forms</div>
         <p class="intro">
             Welcome to Data Skaters. Use the links below to access the data entry forms for recording player traits and shot data.

@@ -1,103 +1,11 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-page="card-creator-api">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Data Skaters Card API</title>
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,400;0,600;0,700;0,800;0,900;1,700&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
-<style>
-  :root {
-    --bg: #060f1e;
-    --panel: rgba(255, 255, 255, 0.06);
-    --line: rgba(255, 255, 255, 0.15);
-    --text: #ffffff;
-    --muted: rgba(255, 255, 255, 0.65);
-    --accent: #0076ce;
-  }
-
-  * { box-sizing: border-box; }
-
-  body {
-    margin: 0;
-    min-height: 100vh;
-    background: radial-gradient(circle at 20% 20%, #103764 0%, var(--bg) 55%);
-    color: var(--text);
-    font-family: 'Barlow', sans-serif;
-    display: grid;
-    place-items: center;
-    padding: 20px;
-  }
-
-  .panel {
-    width: min(980px, 100%);
-    background: var(--panel);
-    border: 1px solid var(--line);
-    border-radius: 14px;
-    padding: 18px;
-  }
-
-  h1 {
-    margin: 0 0 8px;
-    font-family: 'Barlow Condensed', sans-serif;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-    font-size: 36px;
-  }
-
-  .muted {
-    color: var(--muted);
-    margin: 0 0 12px;
-  }
-
-  .status {
-    border-left: 4px solid var(--accent);
-    background: rgba(0, 118, 206, 0.12);
-    padding: 10px 12px;
-    margin-bottom: 14px;
-    color: #d4ecff;
-  }
-
-  .status.error {
-    border-left-color: #ff5c5c;
-    background: rgba(255, 92, 92, 0.12);
-    color: #ffd3d3;
-  }
-
-  .grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-    gap: 16px;
-  }
-
-  .canvas-wrap {
-    background: rgba(0, 0, 0, 0.35);
-    border: 1px solid var(--line);
-    border-radius: 10px;
-    padding: 10px;
-  }
-
-  .canvas-wrap p {
-    margin: 0 0 8px;
-    color: var(--muted);
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    font-family: 'Barlow Condensed', sans-serif;
-  }
-
-  canvas {
-    width: 100%;
-    height: auto;
-    display: block;
-    background: #020812;
-  }
-
-  code {
-    background: rgba(0, 0, 0, 0.35);
-    border: 1px solid var(--line);
-    border-radius: 6px;
-    padding: 0 5px;
-  }
-</style>
+<link rel="stylesheet" href="../style.css">
 </head>
 <body>
   <div class="panel" id="fallback-panel" hidden>

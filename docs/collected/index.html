@@ -1,217 +1,36 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-page="collected-index">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Data Skaters - Collected Data</title>
     <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --primary: #FF6600;
-            --primary-dim: rgba(255, 102, 0, 0.15);
-            --bg-dark: #0076CE;
-            --bg-card: #181818;
-            --bg-input: #222222;
-            --text-main: #FFFFFF;
-            --text-muted: #888888;
-            --border: #2a2a2a;
-            --border-focus: #FF6600;
-        }
-
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-
-        body {
-            font-family: 'Barlow', sans-serif;
-            background-color: var(--bg-dark);
-            background-image:
-                radial-gradient(ellipse at 20% 0%, rgba(255,102,0,0.07) 0%, transparent 60%),
-                radial-gradient(ellipse at 80% 100%, rgba(255,102,0,0.04) 0%, transparent 60%);
-            color: var(--text-main);
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 2rem 1rem 3rem;
-        }
-
-        .page-header {
-            text-align: center;
-            margin-bottom: 1.4rem;
-        }
-
-        .page-header .eyebrow {
-            font-family: 'Barlow Condensed', sans-serif;
-            font-size: 0.75rem;
-            font-weight: 600;
-            letter-spacing: 0.25em;
-            text-transform: uppercase;
-            color: var(--primary);
-            margin-bottom: 0.4rem;
-        }
-
-        .page-header h1 {
-            font-family: 'Barlow Condensed', sans-serif;
-            font-size: 3rem;
-            font-weight: 800;
-            letter-spacing: 0.05em;
-            text-transform: uppercase;
-            line-height: 1;
-            color: var(--text-main);
-        }
-
-        .page-header h1 span { color: var(--primary); }
-
-        .card {
-            background-color: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 14px;
-            padding: 2rem;
-            width: 100%;
-            max-width: 1000px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
-            margin-bottom: 2rem;
-        }
-
-        .section-label {
-            font-family: 'Barlow Condensed', sans-serif;
-            font-size: 1.2rem;
-            font-weight: 700;
-            letter-spacing: 0.1em;
-            text-transform: uppercase;
-            color: var(--primary);
-            margin-bottom: 0.9rem;
-            padding-bottom: 0.4rem;
-            border-bottom: 1px solid var(--border);
-        }
-
-        #progress-container {
-            text-align: center;
-            margin: 2rem 0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 1rem;
-        }
-
-        progress {
-            width: 100%;
-            max-width: 400px;
-            height: 12px;
-            border-radius: 6px;
-            appearance: none;
-            -webkit-appearance: none;
-        }
-
-        progress::-webkit-progress-bar {
-            background-color: var(--bg-input);
-            border-radius: 6px;
-        }
-
-        progress::-webkit-progress-value {
-            background-color: var(--primary);
-            border-radius: 6px;
-            transition: width 0.2s ease;
-        }
-
-        .status-text {
-            color: var(--text-muted);
-            font-size: 0.96rem;
-            font-weight: 500;
-        }
-
-        .table-container {
-            overflow-x: auto;
-            margin-bottom: 2rem;
-            display: none;
-            background-color: var(--bg-input);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 0.9rem;
-        }
-
-        th, td {
-            text-align: left;
-            padding: 0.75rem 1rem;
-            border-bottom: 1px solid var(--border);
-            white-space: nowrap;
-        }
-
-        th {
-            font-family: 'Barlow Condensed', sans-serif;
-            color: var(--primary);
-            text-transform: uppercase;
-            font-size: 1rem;
-            letter-spacing: 0.05em;
-            background-color: rgba(0, 0, 0, 0.2);
-            position: sticky;
-            top: 0;
-        }
-
-        tr:last-child td {
-            border-bottom: none;
-        }
-
-        tr:hover td {
-            background-color: rgba(255, 255, 255, 0.05);
-        }
-
-        select {
-            background-color: var(--bg-input);
-            color: var(--text-main);
-            border: 1px solid var(--border);
-            border-radius: 6px;
-            padding: 0.5rem 1rem;
-            font-family: 'Barlow', sans-serif;
-            font-size: 1rem;
-            outline: none;
-            cursor: pointer;
-        }
-        select:focus {
-            border-color: var(--border-focus);
-        }
-        .filter-container {
-            display: flex;
-            align-items: center;
-            justify-content: flex-end;
-            margin-bottom: 1rem;
-            gap: 1rem;
-        }
-
-        @media (max-width: 760px) {
-            .page-header h1 { font-size: 2.25rem; }
-            .card { padding: 1.25rem; }
-        }
-    </style>
+    <link rel="stylesheet" href="../style.css">
 </head>
 <body>
     <div class="page-header">
-        <a href="../index.html" style="color: var(--text-muted); text-decoration: none; font-size: 0.9rem; margin-bottom: 1rem; display: inline-block;">&larr; Back to Home</a>
+        <a href="../index.html" class="extracted-style-1">&larr; Back to Home</a>
         <div class="eyebrow">Data Skaters</div>
         <h1>Collected <span>Data</span></h1>
     </div>
 
     <div class="card">
         <div id="progress-container">
-            <h2 class="section-label" style="border: none;">Downloading Data...</h2>
+            <h2 class="section-label extracted-style-2">Downloading Data...</h2>
             <progress id="data-progress" value="0" max="100"></progress>
             <div id="status-text" class="status-text">Connecting to api.datadunkers.ca...</div>
         </div>
 
         <div id="tables-container">
-            <div id="filter-container" class="filter-container" style="display: none;">
+            <div id="filter-container" class="filter-container extracted-style-3">
                 <label for="date-select" class="status-text">Filter by Date:</label>
                 <select id="date-select">
                     <option value="All Dates">All Dates</option>
                 </select>
             </div>
 
-            <div class="section-label" id="submission-label" style="display: none;">Data Submissions</div>
-            <div class="table-container" id="submission-container" style="display: none;">
+            <div class="section-label extracted-style-3" id="submission-label">Data Submissions</div>
+            <div class="table-container extracted-style-3" id="submission-container">
                 <table id="submission-table">
                     <thead>
                         <!-- Headings injected by JS -->
@@ -306,9 +125,9 @@
             const trHead = document.createElement('tr');
             trHead.innerHTML = `
                 <th>Nickname</th>
-                <th style="text-align:center;">Group</th>
-                <th style="text-align:center;">Traits</th>
-                <th style="text-align:center;">Photo</th>
+                <th class="extracted-style-4">Group</th>
+                <th class="extracted-style-4">Traits</th>
+                <th class="extracted-style-4">Photo</th>
             `;
             sortedDistances.forEach(d => {
                 const th = document.createElement('th');
@@ -350,20 +169,20 @@
                 const hasTraits = fTraits.some(t => t.nickname && t.nickname.trim().toLowerCase() === nick.toLowerCase());
                 const tdTraits = document.createElement('td');
                 tdTraits.style.textAlign = 'center';
-                tdTraits.innerHTML = hasTraits ? '<span style="color: #4ade80;">✔</span>' : '<span style="color: #f87171;">✘</span>';
+                tdTraits.innerHTML = hasTraits ? '<span class="extracted-style-5">✔</span>' : '<span class="extracted-style-6">✘</span>';
                 tr.appendChild(tdTraits);
 
                 const hasPhoto = fPhotos.some(p => p.nickname && p.nickname.trim().toLowerCase() === nick.toLowerCase());
                 const tdPhoto = document.createElement('td');
                 tdPhoto.style.textAlign = 'center';
-                tdPhoto.innerHTML = hasPhoto ? '<span style="color: #4ade80;">✔</span>' : '<span style="color: #f87171;">✘</span>';
+                tdPhoto.innerHTML = hasPhoto ? '<span class="extracted-style-5">✔</span>' : '<span class="extracted-style-6">✘</span>';
                 tr.appendChild(tdPhoto);
 
                 sortedDistances.forEach(d => {
                     const hasShot = fShots.some(s => s.nickname && s.nickname.trim().toLowerCase() === nick.toLowerCase() && String(s.distance).trim() === d);
                     const tdShot = document.createElement('td');
                     tdShot.style.textAlign = 'center';
-                    tdShot.innerHTML = hasShot ? '<span style="color: #4ade80;">✔</span>' : '<span style="color: #f87171;">✘</span>';
+                    tdShot.innerHTML = hasShot ? '<span class="extracted-style-5">✔</span>' : '<span class="extracted-style-6">✘</span>';
                     tr.appendChild(tdShot);
                 });
 

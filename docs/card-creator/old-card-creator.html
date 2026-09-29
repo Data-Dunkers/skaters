@@ -1,278 +1,18 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-page="card-creator-old-card-creator">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Data Skaters — Player Card Creator</title>
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,400;0,600;0,700;0,800;0,900;1,700&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
-<style>
-  :root {
-    --dell-blue: #0076CE;
-    --dell-dark: #003B6F;
-    --dell-light: #5BB3E8;
-    --ice: #E8F4FD;
-    --ice2: #C5E3F5;
-    --orange: #F26622;
-    --white: #FFFFFF;
-    --dark: #0A1628;
-    --mid: #1A3A5C;
-  }
-
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-
-  body {
-    background: #060F1E;
-    color: var(--white);
-    font-family: 'Barlow', sans-serif;
-    min-height: 100vh;
-    background-image: 
-      radial-gradient(ellipse at 20% 50%, rgba(0,118,206,0.15) 0%, transparent 60%),
-      radial-gradient(ellipse at 80% 20%, rgba(91,179,232,0.1) 0%, transparent 50%);
-  }
-
-  /* ── HEADER ── */
-  header {
-    text-align: center;
-    padding: 36px 20px 24px;
-    position: relative;
-  }
-  header::after {
-    content: '';
-    display: block;
-    width: 60px;
-    height: 3px;
-    background: var(--dell-blue);
-    margin: 16px auto 0;
-  }
-  .header-eyebrow {
-    font-family: 'Barlow Condensed', sans-serif;
-    font-size: 11px;
-    font-weight: 700;
-    letter-spacing: 4px;
-    text-transform: uppercase;
-    color: var(--dell-light);
-    margin-bottom: 8px;
-  }
-  h1 {
-    font-family: 'Barlow Condensed', sans-serif;
-    font-size: clamp(36px, 5vw, 56px);
-    font-weight: 900;
-    text-transform: uppercase;
-    letter-spacing: 2px;
-    color: var(--white);
-    line-height: 1;
-  }
-  h1 span { color: var(--dell-blue); }
-
-  /* ── MAIN LAYOUT ── */
-  .app-wrap {
-    display: flex;
-    gap: 32px;
-    max-width: 1300px;
-    margin: 0 auto;
-    padding: 20px 24px 60px;
-    align-items: flex-start;
-  }
-
-  /* ── FORM PANEL ── */
-  .form-panel {
-    flex: 0 0 320px;
-    background: rgba(255,255,255,0.04);
-    border: 1px solid rgba(255,255,255,0.08);
-    border-radius: 16px;
-    padding: 28px 24px;
-    backdrop-filter: blur(10px);
-    position: sticky;
-    top: 20px;
-  }
-  .form-section-title {
-    font-family: 'Barlow Condensed', sans-serif;
-    font-size: 11px;
-    font-weight: 700;
-    letter-spacing: 3px;
-    text-transform: uppercase;
-    color: var(--dell-light);
-    margin: 20px 0 12px;
-    padding-bottom: 6px;
-    border-bottom: 1px solid rgba(91,179,232,0.2);
-  }
-  .form-section-title:first-child { margin-top: 0; }
-  .field {
-    margin-bottom: 12px;
-  }
-  label {
-    display: block;
-    font-size: 11px;
-    font-weight: 600;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-    color: rgba(255,255,255,0.5);
-    margin-bottom: 5px;
-  }
-  input[type="text"], input[type="number"], select {
-    width: 100%;
-    background: rgba(255,255,255,0.07);
-    border: 1px solid rgba(255,255,255,0.12);
-    border-radius: 8px;
-    color: var(--white);
-    font-family: 'Barlow', sans-serif;
-    font-size: 14px;
-    padding: 9px 12px;
-    transition: border-color 0.2s, background 0.2s;
-    -webkit-appearance: none;
-  }
-  input[type="text"]:focus, input[type="number"]:focus, select:focus {
-    outline: none;
-    border-color: var(--dell-blue);
-    background: rgba(0,118,206,0.1);
-  }
-  select option { background: #1A3A5C; color: white; }
-
-  .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-
-  /* Photo upload */
-  .photo-upload {
-    border: 2px dashed rgba(0,118,206,0.4);
-    border-radius: 10px;
-    padding: 18px;
-    text-align: center;
-    cursor: pointer;
-    transition: border-color 0.2s, background 0.2s;
-    background: rgba(0,118,206,0.05);
-    position: relative;
-  }
-  .photo-upload:hover { border-color: var(--dell-blue); background: rgba(0,118,206,0.1); }
-  .photo-upload input { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; }
-  .photo-upload svg { display: block; margin: 0 auto 8px; opacity: 0.5; }
-  .photo-upload span { font-size: 12px; color: rgba(255,255,255,0.5); display: block; }
-  .photo-upload strong { font-size: 13px; color: var(--dell-light); display: block; }
-  #photo-preview {
-    width: 100%;
-    height: 100px;
-    object-fit: cover;
-    border-radius: 6px;
-    display: none;
-    margin-top: 10px;
-  }
-
-  /* Generate button */
-  .btn-generate {
-    width: 100%;
-    margin-top: 20px;
-    padding: 14px;
-    background: var(--dell-blue);
-    color: white;
-    font-family: 'Barlow Condensed', sans-serif;
-    font-size: 16px;
-    font-weight: 800;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    border: none;
-    border-radius: 10px;
-    cursor: pointer;
-    transition: background 0.2s, transform 0.1s;
-  }
-  .btn-generate:hover { background: #0086EB; }
-  .btn-generate:active { transform: scale(0.98); }
-
-  /* ── PREVIEW PANEL ── */
-  .preview-panel {
-    flex: 1;
-    min-width: 0;
-  }
-  .preview-label {
-    font-family: 'Barlow Condensed', sans-serif;
-    font-size: 11px;
-    font-weight: 700;
-    letter-spacing: 3px;
-    text-transform: uppercase;
-    color: rgba(255,255,255,0.3);
-    margin-bottom: 16px;
-  }
-  .canvas-row {
-    display: flex;
-    gap: 24px;
-    flex-wrap: wrap;
-    align-items: flex-start;
-    margin-bottom: 20px;
-  }
-  .canvas-wrap {
-    text-align: center;
-  }
-  .canvas-wrap p {
-    font-family: 'Barlow Condensed', sans-serif;
-    font-size: 12px;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    color: rgba(255,255,255,0.35);
-    margin-bottom: 8px;
-  }
-  canvas {
-    border-radius: 0;
-    box-shadow: 0 20px 60px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.06);
-    display: block;
-  }
-  .download-row {
-    display: flex;
-    gap: 12px;
-    flex-wrap: wrap;
-  }
-  .btn-dl {
-    padding: 11px 22px;
-    background: rgba(255,255,255,0.06);
-    border: 1px solid rgba(255,255,255,0.14);
-    border-radius: 8px;
-    color: white;
-    font-family: 'Barlow Condensed', sans-serif;
-    font-size: 13px;
-    font-weight: 700;
-    letter-spacing: 1.5px;
-    text-transform: uppercase;
-    cursor: pointer;
-    transition: background 0.2s, border-color 0.2s;
-  }
-  .btn-dl:hover { background: rgba(0,118,206,0.3); border-color: var(--dell-blue); }
-
-  .home-link-wrap {
-    text-align: center;
-    margin-top: 8px;
-  }
-  .home-link {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    padding: 10px 16px;
-    border: 1px solid rgba(255,255,255,0.16);
-    border-radius: 8px;
-    background: rgba(255,255,255,0.05);
-    color: var(--white);
-    font-family: 'Barlow Condensed', sans-serif;
-    font-size: 13px;
-    font-weight: 700;
-    letter-spacing: 1.5px;
-    text-transform: uppercase;
-    text-decoration: none;
-    transition: border-color 0.2s, background 0.2s, color 0.2s, transform 0.1s;
-  }
-  .home-link:hover {
-    border-color: var(--dell-blue);
-    background: rgba(0,118,206,0.25);
-    color: var(--ice);
-  }
-  .home-link:active { transform: scale(0.98); }
-
-  @media (max-width: 800px) {
-    .app-wrap { flex-direction: column; }
-    .form-panel { position: static; flex: none; width: 100%; }
-  }
-</style>
+<link rel="stylesheet" href="../style.css">
 </head>
 <body>
 
 <header>
   <div class="header-eyebrow">Powered by Dell Technologies</div>
   <h1>Data <span>Skaters</span></h1>
-  <div style="font-size:13px;color:rgba(255,255,255,0.4);margin-top:8px;font-family:'Barlow Condensed',sans-serif;letter-spacing:1px;">Player Card Creator</div>
+  <div class="extracted-style-1">Player Card Creator</div>
 </header>
 
 <div class="home-link-wrap"><a class="home-link" href="../index.html">Home</a></div>
@@ -385,11 +125,11 @@
     <div class="canvas-row">
       <div class="canvas-wrap">
         <p>Front</p>
-        <canvas id="front-canvas" width="750" height="1050" style="width:300px;height:420px;"></canvas>
+        <canvas id="front-canvas" width="750" height="1050" class="extracted-style-2"></canvas>
       </div>
       <div class="canvas-wrap">
         <p>Back</p>
-        <canvas id="back-canvas" width="750" height="1050" style="width:300px;height:420px;"></canvas>
+        <canvas id="back-canvas" width="750" height="1050" class="extracted-style-2"></canvas>
       </div>
     </div>
     <div class="download-row">
