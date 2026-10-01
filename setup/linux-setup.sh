@@ -68,7 +68,7 @@ fi
 
 # Setup Project Directory Structure & Download Files from GitHub
 log "\n[3/4] Setting up project folder structure..." "$CYAN"
-projectDir="/opt/my-lan-app"
+projectDir="/opt/dataskaters"
 mkdir -p "$projectDir/pb_data" "$projectDir/pb_public"
 cd "$projectDir"
 
@@ -117,15 +117,13 @@ docker compose up -d --build
 # Wait for container startup
 sleep 3
 
-# Admin account and collections are created automatically by the PocketBase migrations on startup
-adminEmail="service@datadunkers.ca"
-adminPass="datadunkers"
-
 localIp=$(hostname -I 2>/dev/null | awk '{print $1}')
 
 log "\n=================================================================" "$GREEN"
 log "SETUP COMPLETE!" "$GREEN"
+log "Files are in: $projectDir" "$WHITE"
 log "Web Server URL (LAN):  http://$localIp" "$WHITE"
 log "PocketBase Admin UI:   http://$localIp/_/" "$WHITE"
-log "Admin Credentials:     $adminEmail / $adminPass" "$WHITE"
+log "Admin Credentials:     service@datadunkers.ca / datadunkers" "$WHITE"
 log "=================================================================\n" "$GREEN"
+docker compose ps
