@@ -51,6 +51,19 @@ if ! systemctl is-active --quiet docker; then
 fi
 log "Docker service is running." "$GREEN"
 
+# Force the rootful (default) Docker context in case a rootless context is active,
+# since rootless Docker cannot bind privileged ports (e.g. 80) without extra config.
+docker context use default >/dev/null 2>&1 || true
+
+# Allow binding to privileged ports (<1024) without CAP_NET_BIND_SERVICE.
+# This is required on systems where rootless Docker/rootlesskit is involved,
+# and is otherwise harmless for a standard rootful Docker install.
+if [ "$(sysctl -n net.ipv4.ip_unprivileged_port_start 2>/dev/null || echo 1024)" -gt 0 ]; then
+    log "Allowing privileged port binding (net.ipv4.ip_unprivileged_port_start=0)..." "$YELLOW"
+    echo "net.ipv4.ip_unprivileged_port_start=0" > /etc/sysctl.d/99-docker-unprivileged-ports.conf
+    sysctl -p /etc/sysctl.d/99-docker-unprivileged-ports.conf >/dev/null
+fi
+
 # Configure firewall for port 80
 log "\n[2/4] Configuring firewall..." "$CYAN"
 if ! command -v ufw >/dev/null 2>&1; then
