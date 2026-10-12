@@ -1,0 +1,126 @@
+<svg class="ice-bg arch-bg-two-way-forward" width="1000" height="700" viewBox="0 0 1000 700" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="tw_base" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#edf6fd"/>
+      <stop offset="40%" stop-color="#d6e8f8"/>
+      <stop offset="80%" stop-color="#b6d7f2"/>
+      <stop offset="100%" stop-color="#9fc7ea"/>
+    </linearGradient>
+    <linearGradient id="tw_shelfGrad1" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#145da0"/>
+      <stop offset="100%" stop-color="#072b5c"/>
+    </linearGradient>
+    <linearGradient id="tw_shelfGrad2" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#217ec7"/>
+      <stop offset="100%" stop-color="#0b407d"/>
+    </linearGradient>
+    <filter id="tw_glow" x="-10%" y="-10%" width="120%" height="120%">
+      <feGaussianBlur stdDeviation="2" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Deep Sub-zero Frozen Ice Lake Base -->
+  <rect width="1000" height="700" fill="url(#tw_base)"/>
+
+  <!-- Subsurface Ice Crystal Facets -->
+  <polygon points="0,0 380,0 210,180 0,260" fill="#ffffff" opacity="0.45"/>
+  <polygon points="380,0 720,0 600,160 210,180" fill="#cfe5f7" opacity="0.35"/>
+  <polygon points="720,0 1000,0 1000,220 780,140" fill="#ffffff" opacity="0.38"/>
+  <polygon points="0,260 210,180 290,420 0,480" fill="#8cbde5" opacity="0.25"/>
+  <polygon points="210,180 600,160 520,380 290,420" fill="#ffffff" opacity="0.28"/>
+  <polygon points="600,160 780,140 850,380 520,380" fill="#7faedb" opacity="0.20"/>
+  <polygon points="780,140 1000,220 1000,480 850,380" fill="#ffffff" opacity="0.32"/>
+  <polygon points="0,480 290,420 410,650 0,650" fill="#9fc7ea" opacity="0.28"/>
+  <polygon points="290,420 520,380 580,620 410,650" fill="#ffffff" opacity="0.25"/>
+  <polygon points="520,380 850,380 790,620 580,620" fill="#6b9ecc" opacity="0.18"/>
+  <polygon points="850,380 1000,480 1000,640 790,620" fill="#ffffff" opacity="0.30"/>
+
+  <!-- Frost Crystals / Ice Blooms (Top & Borders) -->
+  <g fill="#ffffff" opacity="0.6">
+    <!-- Top-left frost blooms -->
+    <polygon points="50,0 65,35 50,75 35,35"/>
+    <polygon points="12,40 50,55 85,40 50,28"/>
+    <polygon points="22,18 78,72 70,78 18,22"/>
+    <polygon points="75,20 20,74 25,80 80,25"/>
+
+    <polygon points="180,0 190,28 180,55 170,28"/>
+    <polygon points="155,28 180,38 205,28 180,18"/>
+
+    <!-- Top-right frost blooms -->
+    <polygon points="880,0 892,30 880,60 868,30"/>
+    <polygon points="850,30 880,40 910,30 880,20"/>
+    <polygon points="950,0 960,35 950,70 940,35"/>
+    <polygon points="915,35 950,45 985,35 950,25"/>
+
+    <!-- Left edge frost blooms -->
+    <polygon points="0,150 30,160 60,150 30,140"/>
+    <polygon points="30,120 40,150 30,180 20,150"/>
+  </g>
+
+  <!-- Detailed Ice Crack / Fracture Network -->
+  <!-- Shadow cracks (deep core) -->
+  <g fill="none" stroke="#0e3d7a" opacity="0.35" stroke-linecap="round" stroke-linejoin="round">
+    <!-- Main traverse fracture across middle -->
+    <path d="M -10,210 L 60,225 L 115,195 L 175,235 L 240,210 L 310,260 L 390,230 L 460,280 L 540,245 L 630,310 L 710,280 L 790,340 L 870,315 L 945,365 L 1010,340" stroke-width="3"/>
+    <!-- Top-center fissure descending -->
+    <path d="M 460,-10 L 485,75 L 455,140 L 510,205 L 475,260 L 530,340 L 495,420 L 550,510 L 515,590" stroke-width="2.5"/>
+    <!-- Diagonal fracture bottom-left to center -->
+    <path d="M -10,480 L 75,460 L 130,500 L 210,465 L 285,520 L 360,490 L 440,545" stroke-width="2.5"/>
+    <!-- Upper right fracture branch -->
+    <path d="M 720,-10 L 750,80 L 715,145 L 780,220 L 850,250 L 920,225 L 1010,270" stroke-width="2.5"/>
+  </g>
+
+  <!-- Bright White & Ice-Cyan Surface Fissures -->
+  <g fill="none" stroke="#ffffff" opacity="0.9" stroke-linecap="round" stroke-linejoin="round">
+    <!-- Main traverse crack -->
+    <path d="M -10,210 L 60,225 L 115,195 L 175,235 L 240,210 L 310,260 L 390,230 L 460,280 L 540,245 L 630,310 L 710,280 L 790,340 L 870,315 L 945,365 L 1010,340" stroke-width="1.8"/>
+    <!-- Top-center fissure -->
+    <path d="M 460,-10 L 485,75 L 455,140 L 510,205 L 475,260 L 530,340 L 495,420 L 550,510 L 515,590" stroke-width="1.6"/>
+    <!-- Bottom-left crack -->
+    <path d="M -10,480 L 75,460 L 130,500 L 210,465 L 285,520 L 360,490 L 440,545" stroke-width="1.6"/>
+    <!-- Upper-right crack -->
+    <path d="M 720,-10 L 750,80 L 715,145 L 780,220 L 850,250 L 920,225 L 1010,270" stroke-width="1.6"/>
+  </g>
+
+  <!-- Micro-fractures & Branching crack tendrils -->
+  <g fill="none" stroke="#e0f2fe" opacity="0.75" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.1">
+    <!-- Branches off main traverse -->
+    <path d="M 115,195 L 145,150 L 180,165"/>
+    <path d="M 175,235 L 160,280 L 195,310"/>
+    <path d="M 310,260 L 335,315 L 310,350"/>
+    <path d="M 390,230 L 420,180 L 460,195"/>
+    <path d="M 630,310 L 660,265 L 700,280"/>
+    <path d="M 710,280 L 690,335 L 730,370"/>
+    <path d="M 790,340 L 830,385 L 815,430"/>
+    <path d="M 870,315 L 890,270 L 935,285"/>
+
+    <!-- Branches off top center -->
+    <path d="M 485,75 L 530,55 L 565,80"/>
+    <path d="M 455,140 L 410,120 L 380,145"/>
+    <path d="M 510,205 L 555,190 L 590,220"/>
+    <path d="M 530,340 L 580,360 L 610,335"/>
+    <path d="M 495,420 L 450,445 L 425,420"/>
+
+    <!-- Left side fissures -->
+    <path d="M 0,90 L 45,110 L 80,85 L 115,120"/>
+    <path d="M 0,340 L 55,320 L 90,355 L 140,330"/>
+    <path d="M 210,465 L 190,420 L 230,390"/>
+
+    <!-- Right side fissures -->
+    <path d="M 1000,120 L 950,140 L 920,110 L 870,135"/>
+    <path d="M 1000,450 L 945,430 L 910,470 L 855,445"/>
+  </g>
+
+  <!-- Deep Arctic Glacial Shelf Surge (Bottom) -->
+  <polygon points="0,600 90,625 180,595 290,640 410,605 520,645 640,610 760,650 880,615 1000,645 1000,700 0,700" fill="url(#tw_shelfGrad1)"/>
+  <polygon points="0,640 120,660 230,635 340,670 470,640 590,675 720,645 840,680 950,650 1000,670 1000,700 0,700" fill="url(#tw_shelfGrad2)"/>
+  <polygon points="0,670 140,685 280,665 430,690 570,670 710,695 860,675 1000,690 1000,700 0,700" fill="#041a38"/>
+
+  <!-- Frost Crest on Glacial Shelf -->
+  <polyline points="0,600 90,625 180,595 290,640 410,605 520,645 640,610 760,650 880,615 1000,645" fill="none" stroke="#ffffff" stroke-width="2.2" opacity="0.85"/>
+  <polyline points="0,640 120,660 230,635 340,670 470,640 590,675 720,645 840,680 950,650 1000,670" fill="none" stroke="#8ec5f5" stroke-width="1.5" opacity="0.7"/>
+</svg>

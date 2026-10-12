@@ -1,0 +1,90 @@
+<svg class="ice-bg arch-bg-defenseman" width="1000" height="700" viewBox="0 0 1000 700" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="df_base" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#eaf3fa"/>
+      <stop offset="45%" stop-color="#cfe4f5"/>
+      <stop offset="100%" stop-color="#a6cdec"/>
+    </linearGradient>
+
+    <!-- Heavy Armor Plate Gradients -->
+    <linearGradient id="df_plateNavy" x1="0" y1="0" x2="0.8" y2="1">
+      <stop offset="0%" stop-color="#0a2a5c"/>
+      <stop offset="100%" stop-color="#04142b"/>
+    </linearGradient>
+
+    <linearGradient id="df_plateBlue" x1="0" y1="0" x2="0.6" y2="1">
+      <stop offset="0%" stop-color="#1e78cc"/>
+      <stop offset="100%" stop-color="#0e4380"/>
+    </linearGradient>
+
+    <linearGradient id="df_plateCyan" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#00a4e4"/>
+      <stop offset="100%" stop-color="#38bdf8"/>
+    </linearGradient>
+
+    <linearGradient id="df_plateFrost" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.55"/>
+      <stop offset="100%" stop-color="#b8defa" stop-opacity="0.20"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Heavy Glacial Base -->
+  <rect width="1000" height="700" fill="url(#df_base)"/>
+
+  <!-- Fortress Ice Wall Facets (Mid-ground crystalline barrier) -->
+  <polygon points="0,0 360,0 240,240 0,310" fill="#ffffff" opacity="0.40"/>
+  <polygon points="360,0 680,0 560,200 240,240" fill="#c3e0f7" opacity="0.32"/>
+  <polygon points="680,0 1000,0 1000,280 820,180" fill="#ffffff" opacity="0.38"/>
+  <polygon points="0,310 240,240 310,480 0,550" fill="#8cbde5" opacity="0.28"/>
+  <polygon points="240,240 560,200 480,440 310,480" fill="#ffffff" opacity="0.22"/>
+  <polygon points="560,200 820,180 780,440 480,440" fill="#7faedb" opacity="0.24"/>
+  <polygon points="820,180 1000,280 1000,520 780,440" fill="#ffffff" opacity="0.30"/>
+
+  <!-- Heavy Crystalline Frost Clusters (Top & Left Margins) -->
+  <g fill="#ffffff" opacity="0.65">
+    <polygon points="0,0 180,0 130,45 70,25 35,60 0,45"/>
+    <polygon points="170,0 340,0 290,40 210,55 160,30"/>
+    <polygon points="640,0 840,0 800,45 720,25 670,50"/>
+    <polygon points="830,0 1000,0 1000,70 940,45 880,60"/>
+    <!-- Left edge crystals -->
+    <polygon points="0,180 40,210 20,245 0,230"/>
+    <polygon points="0,390 35,415 15,445 0,435"/>
+  </g>
+
+  <!-- Ice Fissures in Fortress Wall -->
+  <g fill="none" stroke="#ffffff" opacity="0.75" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M 0,280 L 50,295 L 90,270 L 140,305 L 200,280 L 250,320" stroke-width="1.8"/>
+    <path d="M 780,140 L 820,180 L 870,165 L 930,210 L 1000,190" stroke-width="1.8"/>
+    <path d="M 520,0 L 540,65 L 515,120 L 550,170" stroke-width="1.6"/>
+  </g>
+
+  <!-- Heavy Bastion Protective Armor Plates (Bottom & Right) -->
+  <!-- Foundation Dark Navy Armor Plate -->
+  <polygon points="0,670 190,670 290,570 510,570 570,630 790,630 840,575 1000,575 1000,700 0,700" fill="url(#df_plateNavy)"/>
+
+  <!-- Mid-tier Royal Blue Shield Plate -->
+  <polygon points="0,685 170,685 260,590 490,590 550,650 770,650 820,595 1000,595 1000,700 0,700" fill="url(#df_plateBlue)"/>
+
+  <!-- High-Tech Cyan Seam & Edge Bevels -->
+  <polygon points="260,590 490,590 500,596 268,596" fill="url(#df_plateCyan)"/>
+  <polygon points="820,595 1000,595 1000,601 828,601" fill="url(#df_plateCyan)"/>
+  <polygon points="550,650 770,650 778,655 558,655" fill="url(#df_plateCyan)"/>
+
+  <!-- Powerful Upward-Angled Bastion Blade (Lower-Right Defense Corner) -->
+  <polygon points="410,700 580,575 640,575 470,700" fill="url(#df_plateCyan)" opacity="0.9"/>
+  <polygon points="470,700 640,575 730,575 560,700" fill="url(#df_plateNavy)"/>
+  <polygon points="560,700 730,575 800,575 630,700" fill="url(#df_plateBlue)"/>
+
+  <!-- Right Edge Bastion Plate -->
+  <polygon points="880,700 1000,590 1000,650 940,700" fill="url(#df_plateCyan)"/>
+  <polygon points="930,700 1000,630 1000,700 870,700" fill="url(#df_plateNavy)"/>
+
+  <!-- Bottom-Left Defensive Angle Plates -->
+  <polygon points="0,640 100,560 160,560 0,700" fill="url(#df_plateBlue)" opacity="0.65"/>
+  <polygon points="0,690 180,690 130,700 0,700" fill="#ffffff" opacity="0.4"/>
+
+  <!-- Bevel Highlights on Armor Plates -->
+  <line x1="290" y1="570" x2="510" y2="570" stroke="#ffffff" stroke-width="1.5" opacity="0.75"/>
+  <line x1="840" y1="575" x2="1000" y2="575" stroke="#ffffff" stroke-width="1.5" opacity="0.75"/>
+  <line x1="570" y1="630" x2="790" y2="630" stroke="#ffffff" stroke-width="1.5" opacity="0.75"/>
+</svg>

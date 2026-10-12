@@ -8,6 +8,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <link rel="stylesheet" href="../style.css">
 <link rel="stylesheet" href="card.css">
+<script src="backgrounds.js"></script>
 </head>
 <body>
 
@@ -103,6 +104,13 @@ const ATTEMPTS_PER_RECORD = 10;
 
 const AXES = ['Sniper', 'Speed Winger', 'Playmaker', 'Defenseman', 'Power Forward', 'Two-way Forward'];
 const HEAT_KEYS = ['height_cm', 'reaction_time_ms', 'resting_heart_rate', 'skate_size', 'wingspan_cm'];
+const HEAT_LABELS = {
+    height_cm: 'Height',
+    reaction_time_ms: 'Reaction Time',
+    resting_heart_rate: 'Resting Heart Rate',
+    skate_size: 'Skate Size',
+    wingspan_cm: 'Wingspan'
+};
 
 let cohortCorr = null; // correlation matrix, computed once for the whole cohort
 
@@ -307,7 +315,7 @@ function buildHeat(el, corr) {
     const x0 = 130, y0 = 30, cw = 34, ch = 30, W = 330;
     let html = '<span class="htitle">Correlation Heat Map</span>';
     HEAT_KEYS.forEach((k, r) => {
-        html += `<span class="hrow" style="right:${W - (x0 - 8)}px;top:${y0 + r * ch + 7}px">${k}</span>`;
+        html += `<span class="hrow" style="right:${W - (x0 - 8)}px;top:${y0 + r * ch + 7}px">${HEAT_LABELS[k]}</span>`;
         HEAT_KEYS.forEach((_, c) => {
             const v = corr ? corr[r][c] : 0;
             const color = correlationColor(v);
@@ -315,7 +323,7 @@ function buildHeat(el, corr) {
         });
     });
     HEAT_KEYS.forEach((k, c) => {
-        html += `<span class="hcol" style="right:${W - (x0 + c * cw + cw / 2)}px;top:${y0 + HEAT_KEYS.length * ch + 6}px">${k}</span>`;
+        html += `<span class="hcol" style="right:${W - (x0 + c * cw + cw / 2)}px;top:${y0 + HEAT_KEYS.length * ch + 6}px">${HEAT_LABELS[k]}</span>`;
     });
     el.innerHTML = html;
 }
@@ -336,8 +344,19 @@ async function renderCard(p, t, esportScore, container) {
     const fullName = p.real_name || p.full_name || p.name || t.full_name || t.name || nick;
     const [first, last] = splitName(fullName);
     const jersey = p.jersey_number ?? t.jersey_number ?? p.number ?? t.number ?? ((nick.match(/\d+/) || [''])[0]);
-    const archetype = t.computedArchetype || 'N/A';
+    const archetype = t.computedArchetype || 'Playmaker';
     const has = v => v !== undefined && v !== null && v !== '';
+
+    // Apply archetype-specific background SVG and CSS styling
+    const archKey = typeof normalizeArchetype === 'function' ? normalizeArchetype(archetype) : 'playmaker';
+    node.classList.add(`arch-${archKey}`);
+    const bgSvg = typeof getArchetypeBackgroundSvg === 'function' ? getArchetypeBackgroundSvg(archKey) : null;
+    if (bgSvg) {
+        const bgEl = node.querySelector('.ice-bg');
+        if (bgEl) {
+            bgEl.outerHTML = bgSvg;
+        }
+    }
 
     node.querySelector('#tpl-first').textContent = first;
     node.querySelector('#tpl-last').textContent = last;

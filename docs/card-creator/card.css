@@ -84,6 +84,99 @@
   font-size: 66px; line-height: 74px; color: #fff; text-align: center; white-space: nowrap;
 }
 
+/* ---------- Archetype-specific banners & styling ---------- */
+/* Power Forward */
+.card-scene.arch-power-forward .banner .arch-bg {
+  background: #ffffff;
+  border: 3px solid #0a2a5c;
+}
+.card-scene.arch-power-forward .banner .arch-text {
+  color: #0a2a5c;
+}
+.card-scene.arch-power-forward .banner .num-bg {
+  background: #ffffff;
+  border: 3px solid #0a2a5c;
+}
+.card-scene.arch-power-forward .banner .num-text {
+  color: #0a2a5c;
+}
+
+/* Speed Winger */
+.card-scene.arch-speed-winger .banner .arch-bg {
+  background: rgba(255, 255, 255, 0.95);
+  border: 2.5px solid #008ecc;
+}
+.card-scene.arch-speed-winger .banner .arch-text {
+  color: #0a2f6b;
+}
+.card-scene.arch-speed-winger .banner .num-bg {
+  background: rgba(255, 255, 255, 0.95);
+  border: 2.5px solid #008ecc;
+}
+.card-scene.arch-speed-winger .banner .num-text {
+  color: #0a2f6b;
+}
+
+/* Sniper */
+.card-scene.arch-sniper .banner .arch-bg {
+  background: #1565b0;
+}
+.card-scene.arch-sniper .banner .arch-text {
+  color: #ffffff;
+}
+.card-scene.arch-sniper .banner .num-bg {
+  background: #0a3d8f;
+}
+.card-scene.arch-sniper .banner .num-text {
+  color: #ffffff;
+}
+
+/* Defenseman */
+.card-scene.arch-defenseman .banner .arch-bg {
+  background: #f0f6fc;
+  border: 3px solid #0a2a5c;
+}
+.card-scene.arch-defenseman .banner .arch-text {
+  color: #0a2a5c;
+}
+.card-scene.arch-defenseman .banner .num-bg {
+  background: #ffffff;
+  border: 3px solid #0a2a5c;
+}
+.card-scene.arch-defenseman .banner .num-text {
+  color: #0a2a5c;
+}
+
+/* Two-Way Forward */
+.card-scene.arch-two-way-forward .banner .arch-bg {
+  background: #0a2a5c;
+}
+.card-scene.arch-two-way-forward .banner .arch-text {
+  color: #ffffff;
+}
+.card-scene.arch-two-way-forward .banner .num-bg {
+  background: #f0f6fc;
+  border: 3px solid #0a2a5c;
+}
+.card-scene.arch-two-way-forward .banner .num-text {
+  color: #0a2a5c;
+}
+
+/* Playmaker */
+.card-scene.arch-playmaker .banner .arch-bg {
+  background: #0a2a5c;
+}
+.card-scene.arch-playmaker .banner .arch-text {
+  color: #ffffff;
+}
+.card-scene.arch-playmaker .banner .num-bg {
+  background: #f0f6fc;
+  border: 3px solid #0a2a5c;
+}
+.card-scene.arch-playmaker .banner .num-text {
+  color: #0a2a5c;
+}
+
 /* ---------- Right column ---------- */
 .card-scene .nick-title {
   position: absolute; left: 30px; top: 26px;

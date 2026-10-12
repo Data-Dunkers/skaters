@@ -1,0 +1,87 @@
+<svg class="ice-bg arch-bg-playmaker" width="1000" height="700" viewBox="0 0 1000 700" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="pm_iceBase" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#e8f2fb"/>
+      <stop offset="50%" stop-color="#d2e5f4"/>
+      <stop offset="100%" stop-color="#b7d4ec"/>
+    </linearGradient>
+    <radialGradient id="pm_spotGlow" cx="20%" cy="0%" r="50%">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.85"/>
+      <stop offset="35%" stop-color="#d4ecfd" stop-opacity="0.45"/>
+      <stop offset="70%" stop-color="#b2dbfc" stop-opacity="0.15"/>
+      <stop offset="100%" stop-color="#b2dbfc" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="pm_beam1" x1="0" y1="0" x2="0.8" y2="1">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.40"/>
+      <stop offset="50%" stop-color="#d9eefa" stop-opacity="0.18"/>
+      <stop offset="100%" stop-color="#b8defa" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="pm_beam2" x1="0" y1="0" x2="0.6" y2="1">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.32"/>
+      <stop offset="60%" stop-color="#d9eefa" stop-opacity="0.12"/>
+      <stop offset="100%" stop-color="#b8defa" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="pm_beam3" x1="0" y1="0" x2="0.4" y2="1">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.25"/>
+      <stop offset="50%" stop-color="#cde7f8" stop-opacity="0.08"/>
+      <stop offset="100%" stop-color="#cde7f8" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="pm_mountainGrad1" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#8bbbe2" stop-opacity="0.65"/>
+      <stop offset="100%" stop-color="#5591c8" stop-opacity="0.85"/>
+    </linearGradient>
+    <linearGradient id="pm_mountainGrad2" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#6ba6d8" stop-opacity="0.75"/>
+      <stop offset="100%" stop-color="#2a6ca8" stop-opacity="0.95"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Ice Base -->
+  <rect width="1000" height="700" fill="url(#pm_iceBase)"/>
+
+  <!-- Stadium Arena Floodlight Glow and Beams (Top-Left) -->
+  <ellipse cx="140" cy="0" rx="340" ry="180" fill="url(#pm_spotGlow)"/>
+  <ellipse cx="280" cy="-20" rx="260" ry="140" fill="url(#pm_spotGlow)" opacity="0.6"/>
+
+  <!-- Spotlight Cones / Beams -->
+  <polygon points="40,-20 180,-20 440,520 180,520" fill="url(#pm_beam1)"/>
+  <polygon points="120,-20 280,-20 560,460 300,460" fill="url(#pm_beam2)"/>
+  <polygon points="220,-20 360,-20 680,380 460,380" fill="url(#pm_beam3)"/>
+
+  <!-- Tiny Stadium Light fixtures at top -->
+  <g fill="#ffffff" opacity="0.85">
+    <circle cx="80" cy="6" r="3.5"/>
+    <circle cx="110" cy="5" r="3.5"/>
+    <circle cx="140" cy="4" r="4"/>
+    <circle cx="170" cy="4" r="4"/>
+    <circle cx="200" cy="5" r="3.5"/>
+    <circle cx="230" cy="6" r="3.5"/>
+  </g>
+
+  <!-- Playmaker Ice Shard Facets -->
+  <polygon points="0,0 420,0 260,230 0,330" fill="#ffffff" opacity="0.38"/>
+  <polygon points="420,0 640,0 520,170 330,150" fill="#ffffff" opacity="0.22"/>
+  <polygon points="0,330 260,230 330,470 0,520" fill="#9fc6e6" opacity="0.30"/>
+  <polygon points="700,0 1000,0 1000,260 820,150" fill="#ffffff" opacity="0.30"/>
+  <polygon points="0,520 330,470 460,700 0,700" fill="#ffffff" opacity="0.28"/>
+  <polygon points="520,170 820,150 760,420 560,380" fill="#8dbbe2" opacity="0.16"/>
+  <polygon points="1000,260 1000,520 800,600 760,420" fill="#ffffff" opacity="0.24"/>
+
+  <!-- Jagged Mountain / Glacier Silhouette (Bottom Right) -->
+  <polygon points="480,700 580,630 640,650 710,580 770,610 840,540 910,570 960,520 1000,540 1000,700" fill="url(#pm_mountainGrad1)"/>
+  <polygon points="540,700 630,640 700,660 760,610 830,635 890,575 950,615 1000,565 1000,700" fill="url(#pm_mountainGrad2)"/>
+  <polygon points="620,700 710,650 780,670 850,620 920,650 970,610 1000,630 1000,700" fill="#205c96" opacity="0.75"/>
+
+  <!-- Mountain snowcaps -->
+  <polygon points="840,540 855,565 825,565" fill="#ffffff" opacity="0.6"/>
+  <polygon points="960,520 975,545 948,545" fill="#ffffff" opacity="0.6"/>
+  <polygon points="710,580 722,600 700,600" fill="#ffffff" opacity="0.5"/>
+  <polygon points="890,575 905,595 878,595" fill="#ffffff" opacity="0.55"/>
+
+  <!-- Bottom Blue Ice Waves -->
+  <polygon points="0,640 330,700 0,700" fill="#1565b0"/>
+  <polygon points="0,672 180,700 0,700" fill="#0a3d8f"/>
+  <polygon points="470,700 640,650 1000,700" fill="#2a85d6" opacity="0.9"/>
+  <polygon points="610,700 860,664 1000,684 1000,700" fill="#0a3d8f"/>
+  <polygon points="800,700 930,640 1000,650 1000,700" fill="#1670c4" opacity="0.85"/>
+</svg>
