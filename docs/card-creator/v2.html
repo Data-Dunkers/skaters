@@ -12,7 +12,7 @@
 </head>
 <body>
 
-<h1>Generating Player Cards...</h1>
+<h1 id="top-h1">Generating Player Cards...</h1>
 <div id="status">Fetching data from API...</div>
 
 <div id="cards-container"></div>
@@ -497,7 +497,9 @@ async function start() {
             await renderCard(p, t, esportScore, container);
         }
 
-        document.getElementById('status').textContent = 'All cards generated successfully.';
+        //document.getElementById('status').textContent = 'All cards generated successfully.';
+        document.getElementById('status').style.display = 'none';
+        document.getElementById('top-h1').textContent = 'Player Cards';
         document.getElementById('render-workspace').style.display = 'none';
 
     } catch (err) {
