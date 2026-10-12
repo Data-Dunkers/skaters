@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="en" data-page="card-creator-v2">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Data Skaters - Player Card Creator</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,400;0,600;0,700;0,800;0,900;1,700;1,800;1,900&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<link rel="stylesheet" href="../style.css">
+<link rel="stylesheet" href="card.css">
+</head>
+<body>
+
+<h1>Generating Player Cards...</h1>
+<div id="status">Fetching data from API...</div>
+
+<div id="cards-container"></div>
+
+<!-- Workspace for rendering -->
+<div id="render-workspace">
+  <div id="card-template" class="card-scene">
+
+    <!-- Ice background (shapes only, no text, so html2canvas renders it reliably) -->
+    <svg class="ice-bg" width="1000" height="700" viewBox="0 0 1000 700" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="iceBase" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stop-color="#e8f2fb"/>
+          <stop offset="0.5" stop-color="#d2e5f4"/>
+          <stop offset="1" stop-color="#b7d4ec"/>
+        </linearGradient>
+      </defs>
+      <rect width="1000" height="700" fill="url(#iceBase)"/>
+      <polygon points="0,0 420,0 260,230 0,330" fill="#ffffff" opacity="0.38"/>
+      <polygon points="420,0 640,0 520,170 330,150" fill="#ffffff" opacity="0.22"/>
+      <polygon points="0,330 260,230 330,470 0,520" fill="#9fc6e6" opacity="0.30"/>
+      <polygon points="700,0 1000,0 1000,260 820,150" fill="#ffffff" opacity="0.30"/>
+      <polygon points="0,520 330,470 460,700 0,700" fill="#ffffff" opacity="0.28"/>
+      <polygon points="520,170 820,150 760,420 560,380" fill="#8dbbe2" opacity="0.16"/>
+      <polygon points="1000,260 1000,520 800,600 760,420" fill="#ffffff" opacity="0.24"/>
+      <!-- bottom blue ice -->
+      <polygon points="0,640 330,700 0,700" fill="#1565b0"/>
+      <polygon points="0,672 180,700 0,700" fill="#0a3d8f"/>
+      <polygon points="470,700 640,650 1000,700" fill="#2a85d6" opacity="0.9"/>
+      <polygon points="610,700 860,664 1000,684 1000,700" fill="#0a3d8f"/>
+      <polygon points="800,700 930,640 1000,650 1000,700" fill="#1670c4" opacity="0.85"/>
+    </svg>
+
+    <div class="card-left">
+      <img id="tpl-logo-dell" class="logo-dell" alt="">
+      <div class="name-block">
+        <span id="tpl-first">FIRST</span>
+        <span id="tpl-last">LAST</span>
+      </div>
+      <img id="tpl-logo-event" class="logo-event" alt="">
+
+      <div class="photo-frame">
+        <div id="tpl-photo" class="photo-img"></div>
+      </div>
+
+      <div class="banner">
+        <div class="arch-bg"></div>
+        <div class="num-bg"></div>
+        <div id="tpl-front-archetype" class="arch-text">Archetype</div>
+        <div id="tpl-number" class="num-text">00</div>
+      </div>
+    </div>
+
+    <div class="card-right">
+      <div id="tpl-nickname" class="nick-title">PS43</div>
+
+      <div class="stats-col">
+        <div class="stat"><span class="lbl">Height</span><span class="val" id="tpl-height">183 cm</span></div>
+        <div class="stat"><span class="lbl">Wingspan</span><span class="val" id="tpl-wingspan">191 cm</span></div>
+        <div class="stat"><span class="lbl">Reaction</span><span class="val" id="tpl-reaction">195 ms</span></div>
+        <div class="stat"><span class="lbl">Resting HR</span><span class="val" id="tpl-hr">62 bpm</span></div>
+        <div class="stat"><span class="lbl">Skate Size</span><span class="val" id="tpl-skate">9.5</span></div>
+        <div class="stat"><span class="lbl">Handedness</span><span class="val" id="tpl-hand">Right</span></div>
+        <div class="stat"><span class="lbl">Birth Month</span><span class="val" id="tpl-month">October</span></div>
+        <div class="stat"><span class="lbl">Shot %</span><span class="val" id="tpl-shotpct">75</span></div>
+      </div>
+
+      <div class="panel radar-panel" id="tpl-radar"></div>
+      <div class="panel heat-panel" id="tpl-heat"></div>
+
+      <div class="logos-row"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+const BASE_URL = "https://api.datadunkers.ca";
+
+// Optional: path to the DCAP | PCAP logo shown top-right of the header.
+// Leave as '' to hide it.
+const EVENT_LOGO_SRC = 'ocap.png';
+
+// Bottom logo row, in order: community, 43 Foundation, Dell, lotus.
+// The Dell logo (3rd) is also reused in the card header.
+const ROW_LOGO_SRCS = ['mfnerc-logo.png', 'ps43-foundation-logo.png', 'dell-logo.png', 'lotus-8-esports-logo.png'];
+let rowLogoData = null; // loaded once as data URLs so html2canvas can render them
+
+// Shot % = made / attempted. If your shot records have an attempts field, it is used
+// (shots_attempted, shots_taken or attempts). Otherwise each record is assumed to be
+// this many attempts.
+const ATTEMPTS_PER_RECORD = 10;
+
+const AXES = ['Sniper', 'Speed Winger', 'Playmaker', 'Defenseman', 'Power Forward', 'Two-way Forward'];
+const HEAT_KEYS = ['height_cm', 'reaction_time_ms', 'resting_heart_rate', 'skate_size', 'wingspan_cm'];
+
+let cohortCorr = null; // correlation matrix, computed once for the whole cohort
+
+/* ------------------------------ data ------------------------------ */
+
+async function fetchAll(collection) {
+    let results = [];
+    let page = 1;
+    const eventKey = localStorage.getItem('event_key');
+    const filterStr = eventKey ? `&filter=(event_key='${eventKey}')` : '';
+    while (true) {
+        const res = await fetch(`${BASE_URL}/api/collections/${collection}/records?perPage=500&page=${page}${filterStr}`);
+        if (!res.ok) throw new Error(`HTTP Error ${res.status}`);
+        const data = await res.json();
+        results = results.concat(data.items || []);
+        if (page >= data.totalPages) break;
+        page++;
+    }
+    return results;
+}
+
+function calcZ(val, arr) {
+    if (val === undefined || isNaN(val) || val === null) return 0;
+    if (arr.length === 0) return 0;
+    let sum = 0;
+    for (let x of arr) sum += x;
+    let mean = sum / arr.length;
+    let sqSum = 0;
+    for (let x of arr) sqSum += (x - mean) * (x - mean);
+    let std = Math.sqrt(sqSum / arr.length);
+    if (std === 0) return 0;
+    return (val - mean) / std;
+}
+
+function pearson(a, b) {
+    const n = a.length;
+    if (n < 2) return 0;
+    const ma = a.reduce((s, x) => s + x, 0) / n;
+    const mb = b.reduce((s, x) => s + x, 0) / n;
+    let num = 0, da = 0, db = 0;
+    for (let i = 0; i < n; i++) {
+        num += (a[i] - ma) * (b[i] - mb);
+        da += (a[i] - ma) ** 2;
+        db += (b[i] - mb) ** 2;
+    }
+    return da && db ? num / Math.sqrt(da * db) : 0;
+}
+
+function computeCorrelations(traits) {
+    const rows = traits.filter(t => HEAT_KEYS.every(k => Number.isFinite(Number(t[k])) && t[k] !== null && t[k] !== ''));
+    const cols = HEAT_KEYS.map(k => rows.map(t => Number(t[k])));
+    return HEAT_KEYS.map((_, i) => HEAT_KEYS.map((_, j) => (i === j ? 1 : pearson(cols[i], cols[j]))));
+}
+
+async function getImageDataUrl(url) {
+    try {
+        const response = await fetch(url);
+        if (!response.ok) return null;
+        const blob = await response.blob();
+        return new Promise((resolve) => {
+            const reader = new FileReader();
+            reader.onloadend = () => resolve(reader.result);
+            reader.readAsDataURL(blob);
+        });
+    } catch {
+        return null;
+    }
+}
+
+// Archetypes (same scoring as before) + radar values + shot %
+function computeArchetypes(traits, shots) {
+    const shotData = {};
+    for (let s of shots) {
+        let nick = (s.nickname || "").toUpperCase();
+        if (!nick) continue;
+        if (!shotData[nick]) shotData[nick] = { d2: 0, d5: 0, d7: 0, d10: 0, made: 0, att: 0 };
+        const made = s.shots_made || 0;
+        const att = s.shots_attempted ?? s.shots_taken ?? s.attempts ?? ATTEMPTS_PER_RECORD;
+        shotData[nick].made += made;
+        shotData[nick].att += att;
+        if (s.distance === 2) shotData[nick].d2 += made;
+        if (s.distance === 5) shotData[nick].d5 += made;
+        if (s.distance === 7) shotData[nick].d7 += made;
+        if (s.distance === 10) shotData[nick].d10 += made;
+    }
+
+    const traitMap = {};
+    traits.forEach(t => {
+        if (t.nickname) traitMap[t.nickname.toUpperCase()] = t;
+    });
+
+    const allD2 = [], allD5 = [], allD7 = [], allD10 = [], allMinShots = [];
+    const allHeight = [], allWing = [], allReact = [], allHR = [];
+
+    Object.keys(traitMap).forEach(nick => {
+        let t = traitMap[nick];
+        if (typeof t.height_cm === 'number') allHeight.push(t.height_cm);
+        if (typeof t.wingspan_cm === 'number') allWing.push(t.wingspan_cm);
+        if (typeof t.reaction_time_ms === 'number') allReact.push(t.reaction_time_ms);
+        if (typeof t.resting_heart_rate === 'number') allHR.push(t.resting_heart_rate);
+
+        if (shotData[nick]) {
+            allD2.push(shotData[nick].d2);
+            allD5.push(shotData[nick].d5);
+            allD7.push(shotData[nick].d7);
+            allD10.push(shotData[nick].d10);
+            allMinShots.push(Math.min(shotData[nick].d2, shotData[nick].d5, shotData[nick].d7, shotData[nick].d10));
+        }
+    });
+
+    for (let nick of Object.keys(traitMap)) {
+        let t = traitMap[nick];
+        let s = shotData[nick] || { d2: 0, d5: 0, d7: 0, d10: 0, made: 0, att: 0 };
+
+        let z10 = calcZ(s.d10, allD10);
+        let z7 = calcZ(s.d7, allD7);
+        let z5 = calcZ(s.d5, allD5);
+        let z2 = calcZ(s.d2, allD2);
+        let zMin = calcZ(Math.min(s.d2, s.d5, s.d7, s.d10), allMinShots);
+
+        let zHeight = calcZ(t.height_cm, allHeight);
+        let zWing = calcZ(t.wingspan_cm, allWing);
+        let zReact = calcZ(t.reaction_time_ms, allReact);
+        let zHR = calcZ(t.resting_heart_rate, allHR);
+
+        let scores = {
+            "Sniper": z10,
+            "Speed Winger": z7 - zReact,
+            "Playmaker": zMin + zWing,
+            "Defenseman": z2 + zHeight,
+            "Power Forward": z2 + z5 + zHeight + zWing,
+            "Two-way Forward": z5 + z7 - zHR
+        };
+
+        let maxScore = -Infinity;
+        let archetype = "Unknown";
+        for (let k in scores) {
+            if (scores[k] > maxScore) {
+                maxScore = scores[k];
+                archetype = k;
+            }
+        }
+        t.computedArchetype = archetype;
+        // 0..1 radar values; a monotonic squash keeps the biggest spoke = the chosen archetype
+        t.radar = AXES.map(a => 1 / (1 + Math.exp(-scores[a] / 2)));
+        t.shotPct = s.att > 0 ? Math.round((s.made / s.att) * 100) : null;
+    }
+
+    return traitMap;
+}
+
+/* ------------------------------ card pieces ------------------------------ */
+
+function fitText(el, maxWidth, startSize, minSize = 18) {
+    let size = startSize;
+    el.style.fontSize = size + 'px';
+    while (el.scrollWidth > maxWidth && size > minSize) {
+        size -= 1;
+        el.style.fontSize = size + 'px';
+    }
+}
+
+function viridis(t) {
+    const stops = [[68, 1, 84], [59, 82, 139], [33, 144, 141], [93, 200, 99], [253, 231, 37]];
+    t = Math.max(0, Math.min(1, t));
+    const x = t * (stops.length - 1);
+    const i = Math.min(stops.length - 2, Math.floor(x));
+    const f = x - i;
+    const c = stops[i].map((v, k) => Math.round(v + (stops[i + 1][k] - v) * f));
+    return { css: `rgb(${c[0]},${c[1]},${c[2]})`, light: t > 0.62 };
+}
+
+function buildRadar(el, values) {
+    const cx = 175, cy = 112, R = 70;
+    const pt = (i, r) => {
+        const a = (-90 + i * 60) * Math.PI / 180;
+        return [cx + r * Math.cos(a), cy + r * Math.sin(a)];
+    };
+    const poly = values.map((v, i) => pt(i, R * (0.08 + 0.92 * v)).map(n => n.toFixed(1)).join(',')).join(' ');
+    let svg = `<svg width="330" height="225" viewBox="0 0 330 225" xmlns="http://www.w3.org/2000/svg" style="position:absolute;left:0;top:0">`;
+    [1 / 3, 2 / 3, 1].forEach(f => {
+        svg += `<circle cx="${cx}" cy="${cy}" r="${R * f}" fill="none" stroke="#d3d9e3" stroke-width="1"/>`;
+    });
+    for (let i = 0; i < 6; i++) {
+        const [x, y] = pt(i, R);
+        svg += `<line x1="${cx}" y1="${cy}" x2="${x.toFixed(1)}" y2="${y.toFixed(1)}" stroke="#d3d9e3" stroke-width="1"/>`;
+    }
+    svg += `<polygon points="${poly}" fill="#6f7cf0" fill-opacity="0.45" stroke="#4f5be0" stroke-width="1.5" stroke-linejoin="round"/>`;
+    svg += `</svg>`;
+
+    const labelPos = [
+        'left:175px;top:6px;transform:translateX(-50%)',   // Sniper
+        'left:246px;top:69px',                             // Speed Winger
+        'left:246px;top:139px',                            // Playmaker
+        'left:175px;top:196px;transform:translateX(-50%)', // Defenseman
+        'right:226px;top:139px',                           // Power Forward
+        'right:226px;top:69px'                             // Two-way Forward
+    ];
+    const labels = AXES.map((a, i) => `<span class="rlabel" style="${labelPos[i]}">${a}</span>`).join('');
+    el.innerHTML = svg + labels;
+}
+
+function buildHeat(el, corr) {
+    const x0 = 118, y0 = 14, cw = 34, ch = 30, W = 330;
+    let html = '';
+    HEAT_KEYS.forEach((k, r) => {
+        html += `<span class="hrow" style="right:${W - (x0 - 8)}px;top:${y0 + r * ch + 7}px">${k}</span>`;
+        HEAT_KEYS.forEach((_, c) => {
+            const v = corr ? corr[r][c] : 0;
+            const col = viridis((v + 0.2) / 1.2);
+            html += `<div class="hcell" style="left:${x0 + c * cw}px;top:${y0 + r * ch}px;background:${col.css};color:${col.light ? '#222' : '#fff'}">${v.toFixed(2)}</div>`;
+        });
+    });
+    HEAT_KEYS.forEach((k, c) => {
+        html += `<span class="hcol" style="right:${W - (x0 + c * cw + cw / 2)}px;top:${y0 + HEAT_KEYS.length * ch + 6}px">${k}</span>`;
+    });
+    el.innerHTML = html;
+}
+
+function splitName(full) {
+    const parts = (full || '').trim().split(/\s+/).filter(Boolean);
+    if (parts.length <= 1) return [parts[0] || '', ''];
+    return [parts.slice(0, -1).join(' '), parts[parts.length - 1]];
+}
+
+/* ------------------------------ render ------------------------------ */
+
+async function renderCard(p, t, container) {
+    const node = document.getElementById('card-template').cloneNode(true);
+    node.id = '';
+
+    const nick = (p.nickname || 'UNKNOWN').toUpperCase();
+    const fullName = p.full_name || p.name || t.full_name || t.name
+        || [p.first_name || t.first_name, p.last_name || t.last_name].filter(Boolean).join(' ')
+        || nick;
+    const jersey = p.jersey_number ?? t.jersey_number ?? p.number ?? t.number ?? ((nick.match(/\d+/) || [''])[0]);
+    const [first, last] = splitName(fullName);
+    const archetype = t.computedArchetype || 'N/A';
+    const has = v => v !== undefined && v !== null && v !== '';
+
+    node.querySelector('#tpl-first').textContent = first;
+    node.querySelector('#tpl-last').textContent = last;
+    node.querySelector('#tpl-nickname').textContent = nick;
+    node.querySelector('#tpl-front-archetype').textContent = archetype;
+    node.querySelector('#tpl-number').textContent = jersey;
+    node.querySelector('#tpl-height').textContent = has(t.height_cm) ? `${t.height_cm} cm` : 'N/A';
+    node.querySelector('#tpl-wingspan').textContent = has(t.wingspan_cm) ? `${t.wingspan_cm} cm` : 'N/A';
+    node.querySelector('#tpl-reaction').textContent = has(t.reaction_time_ms) ? `${t.reaction_time_ms} ms` : 'N/A';
+    node.querySelector('#tpl-hr').textContent = has(t.resting_heart_rate) ? `${t.resting_heart_rate} bpm` : 'N/A';
+    node.querySelector('#tpl-skate').textContent = has(t.skate_size) ? t.skate_size : 'N/A';
+    node.querySelector('#tpl-hand').textContent = t.handedness || 'N/A';
+    node.querySelector('#tpl-month').textContent = t.birth_month || 'N/A';
+    node.querySelector('#tpl-shotpct').textContent = has(t.shotPct) ? t.shotPct : 'N/A';
+
+    buildRadar(node.querySelector('#tpl-radar'), t.radar || [0, 0, 0, 0, 0, 0].map(() => 0.1));
+    buildHeat(node.querySelector('#tpl-heat'), cohortCorr);
+
+    // Dell logo in the header reuses the 3rd image of the bottom logo row
+    if (!rowLogoData) rowLogoData = await Promise.all(ROW_LOGO_SRCS.map(getImageDataUrl));
+    const logosRow = node.querySelector('.logos-row');
+    rowLogoData.forEach(d => {
+        if (!d) return;
+        const im = document.createElement('img');
+        im.src = d;
+        logosRow.appendChild(im);
+    });
+    const dellImg = node.querySelector('#tpl-logo-dell');
+    if (rowLogoData[2]) dellImg.src = rowLogoData[2]; else dellImg.style.display = 'none';
+
+    // Event (OCAP) logo
+    const evImg = node.querySelector('#tpl-logo-event');
+    const evData = EVENT_LOGO_SRC ? await getImageDataUrl(EVENT_LOGO_SRC) : null;
+    if (evData) evImg.src = evData; else evImg.style.display = 'none';
+
+    // Player photo
+    let photoFilename = "";
+    if (Array.isArray(p.photo) && p.photo.length > 0) {
+        photoFilename = p.photo[0];
+    } else if (typeof p.photo === 'string') {
+        photoFilename = p.photo;
+    }
+    const photoUrl = photoFilename
+        ? `${BASE_URL}/api/files/data_skaters_photos/${p.id}/${photoFilename}`
+        : null;
+
+    const imgEl = node.querySelector('.photo-img');
+    let imgData = null;
+    if (photoUrl) imgData = await getImageDataUrl(photoUrl);
+    // Transparent pixel if no image loaded, so the white frame shows and canvas doesn't hang
+    const finalImg = imgData || 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=';
+    imgEl.style.backgroundImage = `url("${finalImg}")`;
+
+    const wrap = document.createElement('div');
+    wrap.style.display = 'flex';
+    wrap.style.flexDirection = 'column';
+    wrap.style.alignItems = 'center';
+    wrap.style.gap = '10px';
+    wrap.style.marginBottom = '20px';
+
+    wrap.appendChild(node);
+    container.appendChild(wrap);
+
+    // Shrink long names / archetypes to fit (needs to be in the DOM)
+    node.querySelectorAll('.name-block span').forEach(s => fitText(s, 250, 54));
+    fitText(node.querySelector('#tpl-front-archetype'), 290, 40);
+    fitText(node.querySelector('#tpl-number'), 128, 66, 36);
+
+    // Yield control briefly to ensure DOM paints it properly
+    await new Promise(r => setTimeout(r, 50));
+
+    try {
+        const canvas = await html2canvas(node, { scale: 1.5, backgroundColor: '#ffffff' });
+        const dataUrl = canvas.toDataURL('image/png');
+
+        const img = document.createElement('img');
+        img.className = 'card-img';
+        img.src = dataUrl;
+        img.alt = `Player Card - ${p.nickname}`;
+
+        const downloadLink = document.createElement('a');
+        downloadLink.href = dataUrl;
+        downloadLink.download = `${p.nickname}_card.png`;
+        downloadLink.textContent = `Download ${p.nickname} Card`;
+        downloadLink.style.fontFamily = "'Barlow Condensed', sans-serif";
+        downloadLink.style.fontWeight = "bold";
+        downloadLink.style.color = "#136399";
+        downloadLink.style.textDecoration = "none";
+        downloadLink.style.fontSize = "20px";
+
+        // Swap out the actual DOM block for the generated Image File
+        wrap.innerHTML = '';
+        wrap.appendChild(img);
+        wrap.appendChild(downloadLink);
+    } catch (e) {
+        console.error("Canvas error for", p.nickname, e);
+        // Fallback: keep the DOM node visible if canvas fails
+    }
+}
+
+async function start() {
+    try {
+        document.getElementById('status').textContent = 'Fetching traits...';
+        const traits = await fetchAll('data_skaters_traits');
+
+        document.getElementById('status').textContent = 'Fetching photos...';
+        const photos = await fetchAll('data_skaters_photos');
+
+        document.getElementById('status').textContent = 'Fetching shots...';
+        const shots = await fetchAll('data_skaters_shots');
+
+        document.getElementById('status').textContent = 'Computing archetypes...';
+        const traitMap = computeArchetypes(traits, shots);
+        cohortCorr = computeCorrelations(traits);
+
+        document.getElementById('status').textContent = `Generating ${photos.length} cards...`;
+        const container = document.getElementById('cards-container');
+
+        for (let i = 0; i < photos.length; i++) {
+            const p = photos[i];
+            if (!p.nickname) continue;
+
+            document.getElementById('status').textContent = `Generating card ${i + 1} of ${photos.length} (${p.nickname})...`;
+
+            const t = traitMap[p.nickname.toUpperCase()] || {};
+            await renderCard(p, t, container);
+        }
+
+        document.getElementById('status').textContent = 'All cards generated successfully.';
+        document.getElementById('render-workspace').style.display = 'none';
+
+    } catch (err) {
+        console.error(err);
+        document.getElementById('status').textContent = 'Error: ' + err.message;
+    }
+}
+
+// Ensure fonts and images are fully loaded before capturing
+window.onload = () => {
+    const eventKey = localStorage.getItem('event_key');
+    if (!eventKey) {
+        window.location.href = '../index.html';
+        return;
+    }
+    document.fonts.ready.then(() => {
+        start();
+    });
+};
+</script>
+
+</body>
+</html>
