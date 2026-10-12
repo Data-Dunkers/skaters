@@ -46,7 +46,6 @@
     </svg>
 
     <div class="card-left">
-      <img id="tpl-logo-dell" class="logo-dell" alt="">
       <div class="name-block">
         <span id="tpl-first">FIRST</span>
         <span id="tpl-last">LAST</span>
@@ -95,14 +94,12 @@ const BASE_URL = "https://api.datadunkers.ca";
 // Leave as '' to hide it.
 const EVENT_LOGO_SRC = 'ocap-logo.png';
 
-// Bottom logo row, in order: community, 43 Foundation, Dell, lotus.
-// The Dell logo (3rd) is also reused in the card header.
-const ROW_LOGO_SRCS = ['mfnerc-logo.png', 'ps43-foundation-logo.png', 'dell-logo.png', 'lotus-8-esports-logo.png'];
+// Bottom logo row, in order: PS43 Foundation, Dell, Lotus 8 Esports, MFNERC
+const ROW_LOGO_SRCS = ['ps43-foundation-logo.png', 'dell-logo.png', 'lotus-8-esports-logo.png', 'mfnerc-logo.png'];
 let rowLogoData = null; // loaded once as data URLs so html2canvas can render them
 
 // Shot % = made / attempted. If your shot records have an attempts field, it is used
-// (shots_attempted, shots_taken or attempts). Otherwise each record is assumed to be
-// this many attempts.
+// (shots_attempted, shots_taken or attempts). Otherwise each record is assumed to be this many attempts.
 const ATTEMPTS_PER_RECORD = 10;
 
 const AXES = ['Sniper', 'Speed Winger', 'Playmaker', 'Defenseman', 'Power Forward', 'Two-way Forward'];
@@ -176,7 +173,7 @@ async function getImageDataUrl(url) {
     }
 }
 
-// Archetypes (same scoring as before) + radar values + shot %
+// Archetypes + radar values + shot %
 function computeArchetypes(traits, shots) {
     const shotData = {};
     for (let s of shots) {
@@ -361,7 +358,6 @@ async function renderCard(p, t, esportScore, container) {
     buildRadar(node.querySelector('#tpl-radar'), t.radar || [0, 0, 0, 0, 0, 0].map(() => 0.1));
     buildHeat(node.querySelector('#tpl-heat'), cohortCorr);
 
-    // Dell logo in the header reuses the 3rd image of the bottom logo row
     if (!rowLogoData) rowLogoData = await Promise.all(ROW_LOGO_SRCS.map(getImageDataUrl));
     const logosRow = node.querySelector('.logos-row');
     rowLogoData.forEach(d => {
@@ -370,8 +366,6 @@ async function renderCard(p, t, esportScore, container) {
         im.src = d;
         logosRow.appendChild(im);
     });
-    const dellImg = node.querySelector('#tpl-logo-dell');
-    if (rowLogoData[2]) dellImg.src = rowLogoData[2]; else dellImg.style.display = 'none';
 
     // Event (OCAP) logo
     const evImg = node.querySelector('#tpl-logo-event');

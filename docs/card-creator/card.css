@@ -47,11 +47,10 @@
 }
 
 /* ---------- Header (left) ---------- */
-.card-scene .logo-dell  { position: absolute; left: 26px;  top: 22px; width: 92px; height: 92px; object-fit: contain; }
 .card-scene .logo-event { position: absolute; left: 388px; top: 22px; width: 92px; height: 92px; object-fit: contain; }
 
 .card-scene .name-block {
-  position: absolute; left: 134px; top: 28px; width: 250px;
+  position: absolute; left: 36px; top: 28px; width: 250px;
   font-family: 'Barlow Condensed', sans-serif;
   font-weight: 800; font-style: italic; text-transform: uppercase;
   line-height: 0.98; letter-spacing: 0.5px; color: #0a2f6b;
