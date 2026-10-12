@@ -272,8 +272,6 @@ const ARCHETYPE_BACKGROUNDS = {
     <line x1="140" y1="42" x2="480" y2="42" stroke="#818cf8" stroke-width="0.8" opacity="0.4" stroke-dasharray="70 15 35 15"/>
     <line x1="600" y1="18" x2="880" y2="18" stroke="#a855f7" stroke-width="1" opacity="0.4" stroke-dasharray="50 12 25 12"/>
   </g>
-  <polygon points="526,680 980,680 955,645 545,645" fill="none" stroke="url(#sw_accentGrad)" stroke-width="2.5" stroke-linejoin="round"/>
-  <polygon points="534,677 972,677 950,648 550,648" fill="url(#sw_accentGrad)" opacity="0.08"/>
   <polyline points="30,70 10,70 10,120" fill="none" stroke="#38bdf8" stroke-width="1.5" opacity="0.6"/>
 </svg>`,
 
