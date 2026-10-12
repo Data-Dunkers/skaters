@@ -90,12 +90,11 @@
 <script>
 const BASE_URL = "https://api.datadunkers.ca";
 
-// Optional: path to the DCAP | PCAP logo shown top-right of the header.
-// Leave as '' to hide it.
+// OCAP logo shown top-right of the header.
 const EVENT_LOGO_SRC = 'ocap-logo.png';
 
-// Bottom logo row, in order: PS43 Foundation, Dell, Lotus 8 Esports, MFNERC
-const ROW_LOGO_SRCS = ['ps43-foundation-logo.png', 'dell-logo.png', 'lotus-8-esports-logo.png', 'mfnerc-logo.png'];
+// Bottom logo row logos
+const ROW_LOGO_SRCS = ['ps43-foundation-logo.png', 'dell-logo-black.png', 'lotus-8-esports-logo.png', 'mfnerc-logo.png'];
 let rowLogoData = null; // loaded once as data URLs so html2canvas can render them
 
 // Shot % = made / attempted. If your shot records have an attempts field, it is used
