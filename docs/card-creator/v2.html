@@ -77,6 +77,7 @@
         <div class="stat"><span class="lbl">Handedness</span><span class="val" id="tpl-hand">Right</span></div>
         <div class="stat"><span class="lbl">Birth Month</span><span class="val" id="tpl-month">October</span></div>
         <div class="stat"><span class="lbl">Shot %</span><span class="val" id="tpl-shotpct">75</span></div>
+        <div class="stat"><span class="lbl">Esport Score</span><span class="val" id="tpl-esport">N/A</span></div>
       </div>
 
       <div class="panel radar-panel" id="tpl-radar"></div>
@@ -92,7 +93,7 @@ const BASE_URL = "https://api.datadunkers.ca";
 
 // Optional: path to the DCAP | PCAP logo shown top-right of the header.
 // Leave as '' to hide it.
-const EVENT_LOGO_SRC = 'ocap.png';
+const EVENT_LOGO_SRC = 'ocap-logo.png';
 
 // Bottom logo row, in order: community, 43 Foundation, Dell, lotus.
 // The Dell logo (3rd) is also reused in the card header.
@@ -268,14 +269,12 @@ function fitText(el, maxWidth, startSize, minSize = 18) {
     }
 }
 
-function viridis(t) {
-    const stops = [[68, 1, 84], [59, 82, 139], [33, 144, 141], [93, 200, 99], [253, 231, 37]];
-    t = Math.max(0, Math.min(1, t));
-    const x = t * (stops.length - 1);
-    const i = Math.min(stops.length - 2, Math.floor(x));
-    const f = x - i;
-    const c = stops[i].map((v, k) => Math.round(v + (stops[i + 1][k] - v) * f));
-    return { css: `rgb(${c[0]},${c[1]},${c[2]})`, light: t > 0.62 };
+function correlationColor(value) {
+    const start = [236, 28, 36];
+    const end = [0, 118, 206];
+    const t = Math.max(0, Math.min(1, (value + 1) / 2));
+    const color = start.map((channel, i) => Math.round(channel + (end[i] - channel) * t));
+    return `rgb(${color[0]},${color[1]},${color[2]})`;
 }
 
 function buildRadar(el, values) {
@@ -293,7 +292,7 @@ function buildRadar(el, values) {
         const [x, y] = pt(i, R);
         svg += `<line x1="${cx}" y1="${cy}" x2="${x.toFixed(1)}" y2="${y.toFixed(1)}" stroke="#d3d9e3" stroke-width="1"/>`;
     }
-    svg += `<polygon points="${poly}" fill="#6f7cf0" fill-opacity="0.45" stroke="#4f5be0" stroke-width="1.5" stroke-linejoin="round"/>`;
+    svg += `<polygon points="${poly}" fill="#0076CE" fill-opacity="0.45" stroke="#0076CE" stroke-width="1.5" stroke-linejoin="round"/>`;
     svg += `</svg>`;
 
     const labelPos = [
@@ -309,14 +308,14 @@ function buildRadar(el, values) {
 }
 
 function buildHeat(el, corr) {
-    const x0 = 118, y0 = 14, cw = 34, ch = 30, W = 330;
-    let html = '';
+    const x0 = 130, y0 = 30, cw = 34, ch = 30, W = 330;
+    let html = '<span class="htitle">Correlation Heat Map</span>';
     HEAT_KEYS.forEach((k, r) => {
         html += `<span class="hrow" style="right:${W - (x0 - 8)}px;top:${y0 + r * ch + 7}px">${k}</span>`;
         HEAT_KEYS.forEach((_, c) => {
             const v = corr ? corr[r][c] : 0;
-            const col = viridis((v + 0.2) / 1.2);
-            html += `<div class="hcell" style="left:${x0 + c * cw}px;top:${y0 + r * ch}px;background:${col.css};color:${col.light ? '#222' : '#fff'}">${v.toFixed(2)}</div>`;
+            const color = correlationColor(v);
+            html += `<div class="hcell" style="left:${x0 + c * cw}px;top:${y0 + r * ch}px;background:${color};color:#fff">${v.toFixed(2)}</div>`;
         });
     });
     HEAT_KEYS.forEach((k, c) => {
@@ -333,16 +332,14 @@ function splitName(full) {
 
 /* ------------------------------ render ------------------------------ */
 
-async function renderCard(p, t, container) {
+async function renderCard(p, t, esportScore, container) {
     const node = document.getElementById('card-template').cloneNode(true);
     node.id = '';
 
     const nick = (p.nickname || 'UNKNOWN').toUpperCase();
-    const fullName = p.full_name || p.name || t.full_name || t.name
-        || [p.first_name || t.first_name, p.last_name || t.last_name].filter(Boolean).join(' ')
-        || nick;
-    const jersey = p.jersey_number ?? t.jersey_number ?? p.number ?? t.number ?? ((nick.match(/\d+/) || [''])[0]);
+    const fullName = p.real_name || p.full_name || p.name || t.full_name || t.name || nick;
     const [first, last] = splitName(fullName);
+    const jersey = p.jersey_number ?? t.jersey_number ?? p.number ?? t.number ?? ((nick.match(/\d+/) || [''])[0]);
     const archetype = t.computedArchetype || 'N/A';
     const has = v => v !== undefined && v !== null && v !== '';
 
@@ -359,6 +356,7 @@ async function renderCard(p, t, container) {
     node.querySelector('#tpl-hand').textContent = t.handedness || 'N/A';
     node.querySelector('#tpl-month').textContent = t.birth_month || 'N/A';
     node.querySelector('#tpl-shotpct').textContent = has(t.shotPct) ? t.shotPct : 'N/A';
+    node.querySelector('#tpl-esport').textContent = has(esportScore) ? esportScore : 'N/A';
 
     buildRadar(node.querySelector('#tpl-radar'), t.radar || [0, 0, 0, 0, 0, 0].map(() => 0.1));
     buildHeat(node.querySelector('#tpl-heat'), cohortCorr);
@@ -409,7 +407,7 @@ async function renderCard(p, t, container) {
     container.appendChild(wrap);
 
     // Shrink long names / archetypes to fit (needs to be in the DOM)
-    node.querySelectorAll('.name-block span').forEach(s => fitText(s, 250, 54));
+    node.querySelectorAll('.name-block span').forEach(s => fitText(s, 250, 40));
     fitText(node.querySelector('#tpl-front-archetype'), 290, 40);
     fitText(node.querySelector('#tpl-number'), 128, 66, 36);
 
@@ -456,6 +454,19 @@ async function start() {
         document.getElementById('status').textContent = 'Fetching shots...';
         const shots = await fetchAll('data_skaters_shots');
 
+        document.getElementById('status').textContent = 'Fetching Rocket League scores...';
+        const esportRecords = await fetchAll('data_skaters_rocket_league');
+        const esportScores = new Map();
+        for (const record of esportRecords) {
+            const nickname = (record.nickname || '').trim().toUpperCase();
+            if (!nickname) continue;
+            const created = Date.parse(record.created || '') || 0;
+            const current = esportScores.get(nickname);
+            if (!current || created >= current.created) {
+                esportScores.set(nickname, { score: record.score, created });
+            }
+        }
+
         document.getElementById('status').textContent = 'Computing archetypes...';
         const traitMap = computeArchetypes(traits, shots);
         cohortCorr = computeCorrelations(traits);
@@ -470,7 +481,8 @@ async function start() {
             document.getElementById('status').textContent = `Generating card ${i + 1} of ${photos.length} (${p.nickname})...`;
 
             const t = traitMap[p.nickname.toUpperCase()] || {};
-            await renderCard(p, t, container);
+            const esportScore = esportScores.get(p.nickname.trim().toUpperCase())?.score;
+            await renderCard(p, t, esportScore, container);
         }
 
         document.getElementById('status').textContent = 'All cards generated successfully.';
