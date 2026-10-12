@@ -42,9 +42,8 @@
 
 .card-scene .card-left  { left: 0;   width: 500px; }
 .card-scene .card-right {
-  left: 495px; width: 505px;
+  left: 500px; width: 500px;
   background: rgba(255, 255, 255, 0.30);
-  border-radius: 32px 0 0 32px;
 }
 
 /* ---------- Header (left) ---------- */
