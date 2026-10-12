@@ -21,18 +21,6 @@
   <!-- Blueprint Coordinate Grid across Entire Card -->
   <rect width="1000" height="700" fill="url(#sn_majorGrid)"/>
 
-  <!-- Corner Drafting L-Brackets -->
-  <g stroke="#0a3d8f" stroke-width="2.5" fill="none">
-    <!-- Top-left -->
-    <path d="M 14,35 L 14,14 L 35,14"/>
-    <!-- Top-right -->
-    <path d="M 965,14 L 986,14 L 986,35"/>
-    <!-- Bottom-left -->
-    <path d="M 14,665 L 14,686 L 35,686"/>
-    <!-- Bottom-right -->
-    <path d="M 965,686 L 986,686 L 986,665"/>
-  </g>
-
   <!-- Precision Calibration Marks (+) at Grid Intersections -->
   <g stroke="#0a3d8f" stroke-width="1.2" opacity="0.7">
     <!-- Row y=100 -->

@@ -294,12 +294,6 @@ const ARCHETYPE_BACKGROUNDS = {
   </defs>
   <rect width="1000" height="700" fill="url(#sn_base)"/>
   <rect width="1000" height="700" fill="url(#sn_majorGrid)"/>
-  <g stroke="#0a3d8f" stroke-width="2.5" fill="none">
-    <path d="M 14,35 L 14,14 L 35,14"/>
-    <path d="M 965,14 L 986,14 L 986,35"/>
-    <path d="M 14,665 L 14,686 L 35,686"/>
-    <path d="M 965,686 L 986,686 L 986,665"/>
-  </g>
   <g stroke="#0a3d8f" stroke-width="1.2" opacity="0.7">
     <path d="M 96,100 L 104,100 M 100,96 L 100,104"/>
     <path d="M 196,100 L 204,100 M 200,96 L 200,104"/>
