@@ -388,7 +388,12 @@ async function renderCard(p, t, esportScore, container) {
     node.querySelector('#tpl-hand').textContent = t.handedness || 'N/A';
     node.querySelector('#tpl-month').textContent = t.birth_month || 'N/A';
     node.querySelector('#tpl-shotpct').textContent = has(t.shotPct) ? t.shotPct : 'N/A';
-    node.querySelector('#tpl-esport').textContent = has(esportScore) ? esportScore : 'N/A';
+    const esportStat = node.querySelector('#tpl-esport').closest('.stat');
+    if (!has(esportScore) || (typeof esportScore === 'string' && !esportScore.trim())) {
+        esportStat.style.display = 'none';
+    } else {
+        node.querySelector('#tpl-esport').textContent = esportScore;
+    }
 
     buildRadar(node.querySelector('#tpl-radar'), t.radar || [0, 0, 0, 0, 0, 0].map(() => 0.1));
     buildHeat(node.querySelector('#tpl-heat'), cohortCorr);
