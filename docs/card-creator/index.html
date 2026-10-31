@@ -496,12 +496,18 @@ async function start() {
         const esportScores = new Map();
         for (const record of esportRecords) {
             const nickname = (record.nickname || '').trim().toUpperCase();
-            if (!nickname) continue;
-            const created = Date.parse(record.created || '') || 0;
+            const score = Number(record.score);
+            if (!nickname || record.score === null || record.score === '' || !Number.isFinite(score)) continue;
             const current = esportScores.get(nickname);
-            if (!current || created >= current.created) {
-                esportScores.set(nickname, { score: record.score, created });
+            if (current) {
+                current.total += score;
+                current.count++;
+            } else {
+                esportScores.set(nickname, { total: score, count: 1 });
             }
+        }
+        for (const [nickname, scores] of esportScores) {
+            esportScores.set(nickname, scores.total / scores.count);
         }
 
         document.getElementById('status').textContent = 'Computing archetypes...';
