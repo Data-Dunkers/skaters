@@ -6,6 +6,7 @@
 <title>Data Skaters - Player Card Creator</title>
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,400;0,600;0,700;0,800;0,900;1,700;1,800;1,900&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <link rel="stylesheet" href="../style.css">
 <link rel="stylesheet" href="card.css">
 <script src="backgrounds.js"></script>
@@ -14,6 +15,19 @@
 
 <h1 id="top-h1">Generating Player Cards...</h1>
 <div id="status">Fetching data from API...</div>
+
+<div id="pdf-btn-container" style="display:none;text-align:center;margin:20px 0">
+  <button id="download-pdf-btn" onclick="downloadAllAsPdf()"
+    style="font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:22px;
+           background:linear-gradient(135deg,#0076CE,#0a3d8f);color:#fff;
+           border:none;border-radius:10px;padding:14px 36px;
+           cursor:pointer;box-shadow:0 4px 18px rgba(0,118,206,0.45);
+           letter-spacing:0.04em;transition:transform 0.15s,box-shadow 0.15s"
+    onmouseover="this.style.transform='scale(1.04)';this.style.boxShadow='0 6px 24px rgba(0,118,206,0.6)'"
+    onmouseout="this.style.transform='';this.style.boxShadow='0 4px 18px rgba(0,118,206,0.45)'">
+    ⬇ Download All as PDF
+  </button>
+</div>
 
 <div id="cards-container"></div>
 
@@ -89,6 +103,9 @@
 </div>
 
 <script>
+// Stores {nickname, dataUrl} for every successfully rendered card, in order
+const allCardImages = [];
+
 const BASE_URL = "https://api.datadunkers.ca";
 
 // OCAP logo shown top-right of the header.
@@ -430,6 +447,9 @@ async function renderCard(p, t, esportScore, container) {
         const canvas = await html2canvas(node, { scale: 1.5, backgroundColor: '#ffffff' });
         const dataUrl = canvas.toDataURL('image/png');
 
+        // Store for PDF export
+        allCardImages.push({ nickname: p.nickname, dataUrl });
+
         const img = document.createElement('img');
         img.className = 'card-img';
         img.src = dataUrl;
@@ -483,14 +503,17 @@ async function start() {
         const traitMap = computeArchetypes(traits, shots);
         cohortCorr = computeCorrelations(traits);
 
-        document.getElementById('status').textContent = `Generating ${photos.length} cards...`;
+        const isTesting = new URLSearchParams(window.location.search).get('testing');
+        const photoList = isTesting ? photos.slice(0, 8) : photos;
+
+        document.getElementById('status').textContent = `Generating ${photoList.length} cards${isTesting ? ' (testing mode)' : ''}...`;
         const container = document.getElementById('cards-container');
 
-        for (let i = 0; i < photos.length; i++) {
-            const p = photos[i];
+        for (let i = 0; i < photoList.length; i++) {
+            const p = photoList[i];
             if (!p.nickname) continue;
 
-            document.getElementById('status').textContent = `Generating card ${i + 1} of ${photos.length} (${p.nickname})...`;
+            document.getElementById('status').textContent = `Generating card ${i + 1} of ${photoList.length} (${p.nickname})...`;
 
             const t = traitMap[p.nickname.toUpperCase()] || {};
             const esportScore = esportScores.get(p.nickname.trim().toUpperCase())?.score;
@@ -501,10 +524,73 @@ async function start() {
         document.getElementById('status').style.display = 'none';
         document.getElementById('top-h1').textContent = 'Player Cards';
         document.getElementById('render-workspace').style.display = 'none';
+        if (allCardImages.length > 0) {
+            document.getElementById('pdf-btn-container').style.display = 'block';
+        }
 
     } catch (err) {
         console.error(err);
         document.getElementById('status').textContent = 'Error: ' + err.message;
+    }
+}
+
+/* ----------------------------- PDF export ----------------------------- */
+
+async function downloadAllAsPdf() {
+    if (allCardImages.length === 0) return;
+
+    const btn = document.getElementById('download-pdf-btn');
+    btn.disabled = true;
+    btn.textContent = 'Generating PDF…';
+
+    try {
+        const { jsPDF } = window.jspdf;
+
+        // Letter landscape: 11" × 8.5"
+        const pdf = new jsPDF({ orientation: 'landscape', unit: 'in', format: 'letter' });
+
+        // Card size: 5" wide × 3.5" tall (front + back of one trading card)
+        const CARD_W = 5;
+        const CARD_H = 3.5;
+        const COLS = 2;
+        const ROWS = 2;
+        const CARDS_PER_PAGE = COLS * ROWS;
+
+        // Page dimensions
+        const PAGE_W = 11;   // landscape width
+        const PAGE_H = 8.5;  // landscape height
+
+        // Grid dimensions
+        const GRID_W = COLS * CARD_W;   // 5"
+        const GRID_H = ROWS * CARD_H;   // 7"
+
+        // Even margins
+        const COL_GAP = 0.2;  // gap between columns
+        const ROW_GAP = 0.15; // gap between rows
+        const TOTAL_W = COLS * CARD_W + (COLS - 1) * COL_GAP;
+        const TOTAL_H = ROWS * CARD_H + (ROWS - 1) * ROW_GAP;
+        const LEFT = (PAGE_W - TOTAL_W) / 2;
+        const TOP  = (PAGE_H - TOTAL_H) / 2;
+
+        for (let i = 0; i < allCardImages.length; i++) {
+            const posInPage = i % CARDS_PER_PAGE;
+            if (posInPage === 0 && i > 0) pdf.addPage();
+
+            const col = posInPage % COLS;
+            const row = Math.floor(posInPage / COLS);
+            const x = LEFT + col * (CARD_W + COL_GAP);
+            const y = TOP  + row * (CARD_H + ROW_GAP);
+
+            pdf.addImage(allCardImages[i].dataUrl, 'PNG', x, y, CARD_W, CARD_H);
+        }
+
+        pdf.save('player_cards.pdf');
+    } catch (err) {
+        console.error('PDF generation failed:', err);
+        alert('PDF generation failed: ' + err.message);
+    } finally {
+        btn.disabled = false;
+        btn.textContent = '⬇ Download All as PDF';
     }
 }
 
