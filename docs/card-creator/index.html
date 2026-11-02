@@ -16,7 +16,7 @@
 <h1 id="top-h1">Generating Player Cards...</h1>
 <div id="status">Fetching data from API...</div>
 
-<div id="pdf-btn-container" style="display:none;text-align:center;margin:20px 0">
+<div id="pdf-btn-container" style="display:none;text-align:center;margin:20px 0;gap:14px;flex-wrap:wrap;justify-content:center">
   <button id="download-pdf-btn" onclick="downloadAllAsPdf()"
     style="font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:22px;
            background:linear-gradient(135deg,#0076CE,#0a3d8f);color:#fff;
@@ -25,7 +25,17 @@
            letter-spacing:0.04em;transition:transform 0.15s,box-shadow 0.15s"
     onmouseover="this.style.transform='scale(1.04)';this.style.boxShadow='0 6px 24px rgba(0,118,206,0.6)'"
     onmouseout="this.style.transform='';this.style.boxShadow='0 4px 18px rgba(0,118,206,0.45)'">
-    ⬇ Download All as PDF
+    ⬇ Download letter-size PDF
+  </button>
+  <button id="download-4x6-btn" onclick="downloadAllAs4x6Pdf()"
+    style="font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:22px;
+           background:linear-gradient(135deg,#1a8f5a,#0d5c38);color:#fff;
+           border:none;border-radius:10px;padding:14px 36px;
+           cursor:pointer;box-shadow:0 4px 18px rgba(26,143,90,0.45);
+           letter-spacing:0.04em;transition:transform 0.15s,box-shadow 0.15s"
+    onmouseover="this.style.transform='scale(1.04)';this.style.boxShadow='0 6px 24px rgba(26,143,90,0.6)'"
+    onmouseout="this.style.transform='';this.style.boxShadow='0 4px 18px rgba(26,143,90,0.45)'">
+    ⬇ Download 4x6 PDF
   </button>
 </div>
 
@@ -536,7 +546,7 @@ async function start() {
         document.getElementById('top-h1').textContent = 'Player Cards';
         document.getElementById('render-workspace').style.display = 'none';
         if (allCardImages.length > 0) {
-            document.getElementById('pdf-btn-container').style.display = 'block';
+            document.getElementById('pdf-btn-container').style.display = 'flex';
         }
 
     } catch (err) {
@@ -601,7 +611,45 @@ async function downloadAllAsPdf() {
         alert('PDF generation failed: ' + err.message);
     } finally {
         btn.disabled = false;
-        btn.textContent = '⬇ Download All as PDF';
+        btn.textContent = '⬇ Download letter-size PDF';
+    }
+}
+
+async function downloadAllAs4x6Pdf() {
+    if (allCardImages.length === 0) return;
+
+    const btn = document.getElementById('download-4x6-btn');
+    btn.disabled = true;
+    btn.textContent = 'Generating PDF…';
+
+    try {
+        const { jsPDF } = window.jspdf;
+
+        // 4"×6" page in landscape so the 5"×3.5" card fits with margins
+        // Landscape: width=6", height=4"
+        const PAGE_W = 6;
+        const PAGE_H = 4;
+        const CARD_W = 5;
+        const CARD_H = 3.5;
+
+        // Center the card on the page
+        const x = (PAGE_W - CARD_W) / 2;
+        const y = (PAGE_H - CARD_H) / 2;
+
+        const pdf = new jsPDF({ orientation: 'landscape', unit: 'in', format: [PAGE_H, PAGE_W] });
+
+        for (let i = 0; i < allCardImages.length; i++) {
+            if (i > 0) pdf.addPage([PAGE_H, PAGE_W], 'landscape');
+            pdf.addImage(allCardImages[i].dataUrl, 'PNG', x, y, CARD_W, CARD_H);
+        }
+
+        pdf.save('player_cards_4x6.pdf');
+    } catch (err) {
+        console.error('4x6 PDF generation failed:', err);
+        alert('4x6 PDF generation failed: ' + err.message);
+    } finally {
+        btn.disabled = false;
+        btn.textContent = '⬇ Download 4x6 PDF';
     }
 }
 
