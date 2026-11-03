@@ -159,6 +159,23 @@ async function fetchAll(collection) {
     return results;
 }
 
+function latestPhotosByNickname(photos) {
+    const latestByNickname = new Map();
+    for (const photo of photos) {
+        const nickname = (photo.nickname || '').trim().toUpperCase();
+        if (!nickname) continue;
+
+        const current = latestByNickname.get(nickname);
+        const photoDate = Date.parse(photo.created || '');
+        const currentDate = current ? Date.parse(current.created || '') : NaN;
+        if (!current || (Number.isFinite(photoDate) &&
+            (!Number.isFinite(currentDate) || photoDate > currentDate))) {
+            latestByNickname.set(nickname, photo);
+        }
+    }
+    return Array.from(latestByNickname.values());
+}
+
 function calcZ(val, arr) {
     if (val === undefined || isNaN(val) || val === null) return 0;
     if (arr.length === 0) return 0;
@@ -497,6 +514,7 @@ async function start() {
 
         document.getElementById('status').textContent = 'Fetching photos...';
         const photos = await fetchAll('data_skaters_photos');
+        const latestPhotos = latestPhotosByNickname(photos);
 
         document.getElementById('status').textContent = 'Fetching shots...';
         const shots = await fetchAll('data_skaters_shots');
@@ -525,7 +543,7 @@ async function start() {
         cohortCorr = computeCorrelations(traits);
 
         const isTesting = new URLSearchParams(window.location.search).get('testing');
-        const photoList = isTesting ? photos.slice(0, 8) : photos;
+        const photoList = isTesting ? latestPhotos.slice(0, 8) : latestPhotos;
 
         document.getElementById('status').textContent = `Generating ${photoList.length} cards${isTesting ? ' (testing mode)' : ''}...`;
         const container = document.getElementById('cards-container');
