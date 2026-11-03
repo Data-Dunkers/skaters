@@ -20,7 +20,7 @@
         <div class="form-row cols-2">
             <div class="form-group">
                 <label for="nickname">Nickname</label>
-                <input type="text" id="nickname" name="nickname" placeholder="e.g. PS43" required oninput="this.value=this.value.toUpperCase().replace(/\s/g,'')" class="extracted-style-1">
+                <input type="text" id="nickname" name="nickname" placeholder="PS43" required oninput="validateNickname()" maxlength="4" autocomplete="off" class="extracted-style-1">
             </div>
             <div class="form-group">
                 <label for="handedness">Handedness</label>
@@ -150,15 +150,31 @@ window.onload = () => {
         return;
     }
 
+    /*
     const savedNick = localStorage.getItem('traitsNickname');
     if (savedNick) {
         document.getElementById('nickname').value = savedNick;
-    }
+    }//*/
 
     document.getElementById('reactionPad').addEventListener('click', onReactionPadClick);
     syncReactionUI();
     syncHeartUI();
 };
+
+function validateNickname() {
+    let val = document.getElementById('nickname').value.toUpperCase();
+    let result = '';
+    
+    for (let i = 0; i < val.length && i < 4; i++) {
+        let char = val[i];
+        if (i < 2 && /[A-Z]/.test(char)) {
+            result += char; // First 2 characters must be letters
+        } else if (i >= 2 && /[0-9]/.test(char)) {
+            result += char; // Last 2 characters must be numbers
+        }
+    }
+    document.getElementById('nickname').value = result;
+}
 
 function showStatus(msg, type) {
     const el = document.getElementById('statusMessage');
@@ -366,7 +382,7 @@ async function handleSubmit() {
     btn.disabled = true;
     btn.textContent = 'Submitting...';
 
-    localStorage.setItem('traitsNickname', nickname);
+    //localStorage.setItem('traitsNickname', nickname);
 
     try {
         const res = await fetch(PB_URL, {

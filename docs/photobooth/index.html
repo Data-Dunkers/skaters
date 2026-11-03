@@ -73,7 +73,7 @@
             <form id="upload-form" class="form-grid" novalidate>
                 <div class="field">
                     <label for="nickname">Nickname</label>
-                    <input type="text" id="nickname" name="nickname" placeholder="PS43" required maxlength="4" pattern="[A-Z]{2}[0-9]{2}" autocomplete="off">
+                    <input type="text" id="nickname" name="nickname" placeholder="PS43" required oninput="validateNickname()" maxlength="4" autocomplete="off">
                 </div>
 
                 <div class="field">
@@ -146,6 +146,22 @@
             }
             return result;
         }
+
+        /*
+        function validateNickname() {
+            let val = document.getElementById('nickname').value.toUpperCase();
+            let result = '';
+            
+            for (let i = 0; i < val.length && i < 4; i++) {
+                let char = val[i];
+                if (i < 2 && /[A-Z]/.test(char)) {
+                    result += char; // First 2 characters must be letters
+                } else if (i >= 2 && /[0-9]/.test(char)) {
+                    result += char; // Last 2 characters must be numbers
+                }
+            }
+            document.getElementById('nickname').value = result;
+        }//*/
 
         function validateNickname() {
             const value = nicknameInput.value;

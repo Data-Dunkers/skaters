@@ -26,7 +26,7 @@
             </div>
             <div class="form-group">
                 <label for="nickname">Nickname</label>
-                <input type="text" id="nickname" name="nickname" placeholder="e.g. PS43" required oninput="this.value=this.value.toUpperCase().replace(/\s/g,'')">
+                <input type="text" id="nickname" name="nickname" placeholder="PS43" required oninput="validateNickname()" maxlength="4" autocomplete="off">
             </div>
         </div>
     </div>
@@ -98,12 +98,28 @@ window.onload = () => {
         return;
     }
 
-    const savedNick  = localStorage.getItem('lastNickname');
+    //const savedNick  = localStorage.getItem('lastNickname');
     const savedGroup = localStorage.getItem('lastGroup');
-    if (savedNick)  document.getElementById('nickname').value = savedNick;
+    //if (savedNick)  document.getElementById('nickname').value = savedNick;
     if (savedGroup) document.getElementById('group').value = savedGroup;
-    if (savedNick)  updateStats(savedNick);
+    //if (savedNick)  updateStats(savedNick);
 };
+
+// ── NICKNAME VALIDATION ───────────────────────────────────────
+function validateNickname() {
+    let val = document.getElementById('nickname').value.toUpperCase();
+    let result = '';
+    
+    for (let i = 0; i < val.length && i < 4; i++) {
+        let char = val[i];
+        if (i < 2 && /[A-Z]/.test(char)) {
+            result += char; // First 2 characters must be letters
+        } else if (i >= 2 && /[0-9]/.test(char)) {
+            result += char; // Last 2 characters must be numbers
+        }
+    }
+    document.getElementById('nickname').value = result;
+}
 
 
 // ── OPTION BUTTON SELECTION ────────────────────────────────────
@@ -137,7 +153,7 @@ async function handleSubmit() {
         event_key:      localStorage.getItem('event_key'),
     };
 
-    localStorage.setItem('lastNickname', nick);
+    //localStorage.setItem('lastNickname', nick);
     localStorage.setItem('lastGroup', group);
 
     try {
@@ -165,7 +181,7 @@ function showStatus(msg, type) {
     el.textContent = msg;
     el.className = type === 'success' ? 'status-success' : 'status-error';
     el.style.display = 'block';
-    setTimeout(() => el.style.display = 'none', 3000);
+    setTimeout(() => el.style.display = 'none', 4000);
 }
 
 // ── HISTORY TABLE ────────────────────────────────────────────────
