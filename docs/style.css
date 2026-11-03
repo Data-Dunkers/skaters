@@ -1019,7 +1019,8 @@ html[data-page="collected-index"]{
         }
 
         html[data-page="collected-index"] .table-container{
-            overflow-x: auto;
+            overflow: auto;
+            max-height: 75vh;
             margin-bottom: 2rem;
             display: none;
             background-color: var(--bg-input);
@@ -1046,9 +1047,11 @@ html[data-page="collected-index"]{
             text-transform: uppercase;
             font-size: 1rem;
             letter-spacing: 0.05em;
-            background-color: rgba(0, 0, 0, 0.2);
+            background-color: var(--bg-input);
+            background-image: linear-gradient(rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.2));
             position: sticky;
             top: 0;
+            z-index: 1;
         }
 
         html[data-page="collected-index"] tr:last-child td{
@@ -1077,8 +1080,16 @@ html[data-page="collected-index"]{
             display: flex;
             align-items: center;
             justify-content: flex-end;
+            justify-content: flex-end;
             margin-bottom: 1rem;
             gap: 1rem;
+        }
+        html[data-page="collected-index"] .autorefresh-label{
+            margin-right: auto;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            cursor: pointer;
         }
 
         @media (max-width: 760px){

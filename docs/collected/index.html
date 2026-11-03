@@ -23,9 +23,16 @@
 
         <div id="tables-container">
             <div id="filter-container" class="filter-container extracted-style-3">
+                <label class="status-text autorefresh-label">
+                    <input type="checkbox" id="autorefresh-toggle"> Auto-refresh (1 min)
+                </label>
                 <label for="date-select" class="status-text">Filter by Date:</label>
                 <select id="date-select">
                     <option value="All Dates">All Dates</option>
+                </select>
+                <label for="group-select" class="status-text">Filter by Group:</label>
+                <select id="group-select">
+                    <option value="All Groups">All Groups</option>
                 </select>
             </div>
 
@@ -40,6 +47,8 @@
                     </tbody>
                 </table>
             </div>
+            <div class="section-label" id="incomplete-label">Incomplete</div>
+            <div class="status-text" id="incomplete"></div>
         </div>
     </div>
 
@@ -83,16 +92,29 @@
             return records;
         }
 
-        function renderAllTables(dateFilter = "All Dates") {
+        function renderAllTables() {
+            const dateFilter = document.getElementById("date-select").value;
+            const groupFilter = document.getElementById("group-select").value;
             const filterFn = rec => {
                 if (dateFilter === "All Dates") return true;
                 if (!rec.created) return true;
                 return rec.created.split(" ")[0] === dateFilter;
             };
 
-            const fTraits = globalTraits.filter(filterFn);
-            const fPhotos = globalPhotos.filter(filterFn);
-            const fShots = globalShots.filter(filterFn);
+            let fTraits = globalTraits.filter(filterFn);
+            let fPhotos = globalPhotos.filter(filterFn);
+            let fShots = globalShots.filter(filterFn);
+
+            // Group membership is defined by the Shots records
+            if (groupFilter !== "All Groups") {
+                const members = new Set(fShots
+                    .filter(s => s.nickname && String(s.group).trim() === groupFilter)
+                    .map(s => s.nickname.trim().toLowerCase()));
+                const inGroup = r => r.nickname && members.has(r.nickname.trim().toLowerCase());
+                fTraits = fTraits.filter(inGroup);
+                fPhotos = fPhotos.filter(inGroup);
+                fShots = fShots.filter(inGroup);
+            }
 
             const submissionContainer = document.getElementById('submission-container');
             const submissionLabel = document.getElementById('submission-label');
@@ -102,6 +124,9 @@
 
             thead.innerHTML = '';
             tbody.innerHTML = '';
+            const incompleteDiv = document.getElementById('incomplete');
+            const incompleteNicknames = [];
+            incompleteDiv.textContent = '';
 
             if (fTraits.length === 0 && fPhotos.length === 0 && fShots.length === 0) {
                 submissionContainer.style.display = 'none';
@@ -178,16 +203,21 @@
                 tdPhoto.innerHTML = hasPhoto ? '<span class="extracted-style-5">✔</span>' : '<span class="extracted-style-6">✘</span>';
                 tr.appendChild(tdPhoto);
 
+                let complete = hasTraits && hasPhoto;
                 sortedDistances.forEach(d => {
                     const hasShot = fShots.some(s => s.nickname && s.nickname.trim().toLowerCase() === nick.toLowerCase() && String(s.distance).trim() === d);
+                    if (!hasShot) complete = false;
                     const tdShot = document.createElement('td');
                     tdShot.style.textAlign = 'center';
                     tdShot.innerHTML = hasShot ? '<span class="extracted-style-5">✔</span>' : '<span class="extracted-style-6">✘</span>';
                     tr.appendChild(tdShot);
                 });
+                if (!complete) incompleteNicknames.push(nick);
 
                 tbody.appendChild(tr);
             });
+
+            incompleteDiv.textContent = incompleteNicknames.join(', ') || 'None';
 
             submissionContainer.style.display = 'block';
             submissionLabel.style.display = 'block';
@@ -246,30 +276,88 @@
                 });
             });
         }
-        function setupDateFilter() {
-            const allRecords = [...globalTraits, ...globalPhotos, ...globalShots];
+        function populateFilterOptions() {
             const dates = new Set();
-            allRecords.forEach(rec => {
-                if (rec.created) {
-                    dates.add(rec.created.split(" ")[0]);
-                }
+            [...globalTraits, ...globalPhotos, ...globalShots].forEach(rec => {
+                if (rec.created) dates.add(rec.created.split(" ")[0]);
             });
-            
-            const sortedDates = Array.from(dates).sort().reverse();
             const select = document.getElementById("date-select");
-            
-            sortedDates.forEach(date => {
+            const prevDate = select.value;
+            select.length = 1;
+            Array.from(dates).sort().reverse().forEach(date => {
                 const option = document.createElement("option");
                 option.value = date;
                 option.textContent = date;
                 select.appendChild(option);
             });
-            
-            document.getElementById("filter-container").style.display = "flex";
-            
-            select.addEventListener("change", (e) => {
-                renderAllTables(e.target.value);
+            if (dates.has(prevDate)) select.value = prevDate;
+
+            const groups = new Set();
+            globalShots.forEach(s => {
+                if (s.group !== undefined && s.group !== null && String(s.group).trim() !== "") {
+                    groups.add(String(s.group).trim());
+                }
             });
+            const groupSelect = document.getElementById("group-select");
+            const prevGroup = groupSelect.value !== "All Groups" ? groupSelect.value : localStorage.getItem('collected_group_filter');
+            groupSelect.length = 1;
+            Array.from(groups).sort((a, b) => {
+                const numA = parseFloat(a);
+                const numB = parseFloat(b);
+                if (!isNaN(numA) && !isNaN(numB)) return numA - numB;
+                return a.localeCompare(b);
+            }).forEach(g => {
+                const option = document.createElement("option");
+                option.value = g;
+                option.textContent = g;
+                groupSelect.appendChild(option);
+            });
+            if (prevGroup && groups.has(prevGroup)) groupSelect.value = prevGroup;
+        }
+
+        let refreshTimer = null;
+        let refreshing = false;
+
+        async function refreshData() {
+            if (refreshing) return;
+            refreshing = true;
+            try {
+                const [traits, photos, shots] = await Promise.all(
+                    COLLECTIONS.map(c => fetchAllRecords(c.id, () => {}))
+                );
+                globalTraits = traits;
+                globalPhotos = photos;
+                globalShots = shots;
+                populateFilterOptions();
+                renderAllTables();
+            } catch (error) {
+                console.error("Auto-refresh failed", error);
+            } finally {
+                refreshing = false;
+            }
+        }
+
+        function setupAutoRefresh() {
+            const toggle = document.getElementById("autorefresh-toggle");
+            const apply = () => {
+                clearInterval(refreshTimer);
+                refreshTimer = toggle.checked ? setInterval(refreshData, 60000) : null;
+                localStorage.setItem('collected_autorefresh', toggle.checked ? '1' : '0');
+            };
+            toggle.checked = localStorage.getItem('collected_autorefresh') === '1';
+            toggle.addEventListener("change", apply);
+            apply();
+        }
+
+        function setupDateFilter() {
+            populateFilterOptions();
+            document.getElementById("filter-container").style.display = "flex";
+            document.getElementById("date-select").addEventListener("change", () => renderAllTables());
+            document.getElementById("group-select").addEventListener("change", (e) => {
+                localStorage.setItem('collected_group_filter', e.target.value);
+                renderAllTables();
+            });
+            setupAutoRefresh();
         }
 
         async function downloadAll() {
@@ -307,7 +395,7 @@
                 setTimeout(() => {
                     progressContainer.style.display = 'none';
                     setupDateFilter();
-                    renderAllTables("All Dates");
+                    renderAllTables();
                 }, 500);
 
             } catch (error) {
