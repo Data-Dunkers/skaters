@@ -39,7 +39,7 @@
             <div class="section-label extracted-style-2">Background Removal</div>
             <div class="form-grid">
                 <label class="checkbox-row" for="remove-bg">
-                    <input type="checkbox" id="remove-bg" checked>
+                    <input type="checkbox" id="remove-bg">
                     Remove solid background
                 </label>
 
@@ -73,7 +73,7 @@
             <form id="upload-form" class="form-grid" novalidate>
                 <div class="field">
                     <label for="nickname">Nickname</label>
-                    <input type="text" id="nickname" name="nickname" placeholder="PS43" required oninput="this.value=this.value.toUpperCase().replace(/\s/g,'')">
+                    <input type="text" id="nickname" name="nickname" placeholder="PS43" required maxlength="4" pattern="[A-Z]{2}[0-9]{2}" autocomplete="off">
                 </div>
 
                 <div class="field">
@@ -85,7 +85,7 @@
                 <button type="submit" class="btn btn-primary" id="upload-btn" disabled>Upload Photo</button>
             </form>
             <div id="status" class="status">Start camera to begin.</div>
-        </div>
+                        <div id="todays-nicknames" class="status">Today's nicknames: loading...</div>        </div>
     </div>
 
     <div class="home-link-wrap"><a class="home-link" href="../index.html">Home</a></div>
@@ -131,6 +131,76 @@
                 statusEl.classList.add(type);
             }
         }
+
+        const todaysNicknamesEl = document.getElementById('todays-nicknames');
+        let todaysNicknames = [];
+
+        function sanitizeNickname(value) {
+            const cleaned = value.toUpperCase().replace(/[^A-Z0-9]/g, '');
+            let result = '';
+            for (const ch of cleaned) {
+                const isLetter = /[A-Z]/.test(ch);
+                if (result.length < 2 ? isLetter : (result.length < 4 && !isLetter)) {
+                    result += ch;
+                }
+            }
+            return result;
+        }
+
+        function validateNickname() {
+            const value = nicknameInput.value;
+            let message = '';
+            if (value && !/^[A-Z]{2}[0-9]{2}$/.test(value)) {
+                message = 'Nickname must be two letters followed by two numbers.';
+            } else if (todaysNicknames.includes(value)) {
+                message = 'That nickname is already used.';
+            }
+            nicknameInput.setCustomValidity(message);
+            return message;
+        }
+
+        function renderTodaysNicknames() {
+            todaysNicknamesEl.textContent = todaysNicknames.length
+                ? `Today's nicknames: ${todaysNicknames.join(', ')}`
+                : "Today's nicknames: none yet.";
+        }
+
+        async function loadTodaysNicknames() {
+            const start = new Date();
+            start.setHours(0, 0, 0, 0);
+            const end = new Date(start);
+            end.setDate(end.getDate() + 1);
+            const fmt = (d) => d.toISOString().replace('T', ' ');
+            const params = new URLSearchParams({
+                filter: `created >= "${fmt(start)}" && created < "${fmt(end)}"`,
+                fields: 'nickname',
+                perPage: '500',
+                sort: 'created'
+            });
+
+            try {
+                const response = await fetch(`${POCKETBASE_URL}/api/collections/${COLLECTION_NAME}/records?${params}`);
+                if (!response.ok) {
+                    throw new Error(`status ${response.status}`);
+                }
+                const data = await response.json();
+                todaysNicknames = (data.items || []).map((item) => String(item.nickname || '').toUpperCase());
+                renderTodaysNicknames();
+            } catch (error) {
+                todaysNicknamesEl.textContent = `Today's nicknames: could not load (${error.message}).`;
+            }
+            validateNickname();
+        }
+
+        nicknameInput.addEventListener('input', () => {
+            nicknameInput.value = sanitizeNickname(nicknameInput.value);
+            const message = validateNickname();
+            if (message) {
+                setStatus(message, 'error');
+            } else if (statusEl.classList.contains('error')) {
+                setStatus('');
+            }
+        });
 
         function setCaptureState(isCaptured) {
             if (isCaptured) {
@@ -469,6 +539,14 @@
                 return;
             }
 
+            await loadTodaysNicknames();
+            const nicknameError = validateNickname();
+            if (nicknameError) {
+                setStatus(nicknameError, 'error');
+                nicknameInput.focus();
+                return;
+            }
+
             if (!photoBlob) {
                 setStatus('Capture a photo before uploading.', 'error');
                 return;
@@ -501,6 +579,7 @@
                 setStatus(`Upload complete. Record saved: ${record.id}`, 'success');
                 nicknameInput.value = '';
                 realNameInput.value = '';
+                await loadTodaysNicknames();
                 photoBlob = null;
                 setCaptureState(false);
             } catch (error) {
@@ -562,6 +641,7 @@
         });
 
         refreshControlLabels();
+        loadTodaysNicknames();
 
         window.addEventListener('beforeunload', () => {
             stopCurrentStream();
