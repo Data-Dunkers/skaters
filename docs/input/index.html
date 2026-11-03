@@ -26,7 +26,7 @@
             </div>
             <div class="form-group">
                 <label for="nickname">Nickname</label>
-                <input type="text" id="nickname" name="nickname" placeholder="PS43" required oninput="validateNickname()" maxlength="4" autocomplete="off">
+                <input type="text" id="nickname" name="nickname" placeholder="PS43" required oninput="validateNickname()" onblur="updateStats(this.value.trim())" maxlength="4" autocomplete="off">
             </div>
         </div>
     </div>
@@ -36,10 +36,10 @@
         <div class="form-group">
             <label>Select Distance</label>
             <div class="option-group">
-                <button type="button" class="option-btn" onclick="selectOption('distance', 2, this)">2 ft</button>
-                <button type="button" class="option-btn" onclick="selectOption('distance', 5, this)">5 ft</button>
-                <button type="button" class="option-btn" onclick="selectOption('distance', 7, this)">7 ft</button>
-                <button type="button" class="option-btn" onclick="selectOption('distance', 10, this)">10 ft</button>
+                <button type="button" class="option-btn" data-distance="2" onclick="selectOption('distance', 2, this)">2 ft</button>
+                <button type="button" class="option-btn" data-distance="5" onclick="selectOption('distance', 5, this)">5 ft</button>
+                <button type="button" class="option-btn" data-distance="7" onclick="selectOption('distance', 7, this)">7 ft</button>
+                <button type="button" class="option-btn" data-distance="10" onclick="selectOption('distance', 10, this)">10 ft</button>
             </div>
             <input type="hidden" id="distance" name="distance">
         </div>
@@ -194,8 +194,10 @@ async function updateStats(nick) {
         const tbody = document.getElementById('statsBody');
         const table = document.getElementById('statsTable');
         const empty = document.getElementById('emptyState');
+        const distanceButtons = document.querySelectorAll('[data-distance]');
 
         tbody.innerHTML = '';
+        distanceButtons.forEach(button => button.disabled = false);
 
         if (!data.items || data.items.length === 0) {
             table.style.display = 'none';
@@ -205,6 +207,11 @@ async function updateStats(nick) {
 
         table.style.display = 'table';
         empty.style.display = 'none';
+
+        const recordedDistances = new Set(data.items.map(record => String(record.distance)));
+        distanceButtons.forEach(button => {
+            button.disabled = recordedDistances.has(button.dataset.distance);
+        });
 
         data.items.forEach((r) => {
             tbody.innerHTML += `<tr>

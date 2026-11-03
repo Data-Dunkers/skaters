@@ -1941,6 +1941,7 @@ html[data-page="input-index"]{
             text-align: center;
         }
         html[data-page="input-index"] .option-btn:hover{ border-color: #555; color: #fff; }
+        html[data-page="input-index"] .option-btn:disabled{ background: var(--bg-card); cursor: not-allowed; }
         html[data-page="input-index"] .option-btn.active{
             background: var(--primary-dim);
             border-color: var(--primary);
