@@ -24,7 +24,7 @@
         <div id="tables-container">
             <div id="filter-container" class="filter-container extracted-style-3">
                 <label class="status-text autorefresh-label">
-                    <input type="checkbox" id="autorefresh-toggle"> Auto-refresh (1 min)
+                    <input type="checkbox" id="autorefresh-toggle"> Auto-refresh every minute
                 </label>
                 <label for="date-select" class="status-text">Filter by Date:</label>
                 <select id="date-select">
@@ -72,7 +72,7 @@
             while (true) {
                 updateStatus(`Fetching ${collectionId} (page ${page})...`);
                 const filterStr = eventKey ? `&filter=(event_key='${eventKey}')` : '';
-                const response = await fetch(`${BASE_URL}/api/collections/${collectionId}/records?page=${page}&perPage=${perPage}${filterStr}`);
+                const response = await fetch(`${BASE_URL}/api/collections/${collectionId}/records?page=${page}&perPage=${perPage}${filterStr}`, { cache: 'no-store' });
                 if (!response.ok) {
                     throw new Error(`Failed to fetch ${collectionId}`);
                 }
@@ -341,7 +341,7 @@
             const toggle = document.getElementById("autorefresh-toggle");
             const apply = () => {
                 clearInterval(refreshTimer);
-                refreshTimer = toggle.checked ? setInterval(refreshData, 60000) : null;
+                refreshTimer = toggle.checked ? setInterval(refreshData, 30000) : null; // refresh every 30 seconds
                 localStorage.setItem('collected_autorefresh', toggle.checked ? '1' : '0');
             };
             toggle.checked = localStorage.getItem('collected_autorefresh') === '1';
