@@ -27,8 +27,9 @@ migrate((db) => {
         new SchemaField({ name: "event_key", type: "text" }),
         new SchemaField({ name: "nickname",  type: "text" }),
         new SchemaField({ name: "real_name", type: "text" }),
+        new SchemaField({ name: "group",     type: "number" }),
         new SchemaField({ 
-            name: "photo",     
+            name: "photo", 
             type: "file", 
             options: { maxSelect: 1, maxSize: 5242880, mimeTypes: ["image/jpeg", "image/png", "image/webp"] } 
         })

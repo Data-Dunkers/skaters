@@ -71,9 +71,15 @@
         <div class="card">
             <div class="section-label">Upload Details</div>
             <form id="upload-form" class="form-grid" novalidate>
-                <div class="field">
-                    <label for="nickname">Nickname</label>
-                    <input type="text" id="nickname" name="nickname" placeholder="PS43" required oninput="validateNickname()" maxlength="4" autocomplete="off">
+                <div class="field-row">
+                    <div class="field">
+                        <label for="nickname">Nickname</label>
+                        <input type="text" id="nickname" name="nickname" placeholder="PS43" required oninput="validateNickname()" maxlength="4" autocomplete="off">
+                    </div>
+                    <div class="field">
+                        <label for="group">Group</label>
+                        <input type="text" id="group" name="group" placeholder="1" inputmode="numeric" pattern="[0-9]*" maxlength="3" autocomplete="off">
+                    </div>
                 </div>
 
                 <div class="field">
@@ -104,6 +110,10 @@
         const uploadForm = document.getElementById('upload-form');
         const nicknameInput = document.getElementById('nickname');
         const realNameInput = document.getElementById('real-name');
+        const groupInput = document.getElementById('group');
+        groupInput.addEventListener('input', () => {
+            groupInput.value = groupInput.value.replace(/\D/g, '');
+        });
         const statusEl = document.getElementById('status');
         const removeBgInput = document.getElementById('remove-bg');
         const keyColorInput = document.getElementById('key-color');
@@ -548,6 +558,7 @@
 
             const nickname = nicknameInput.value.trim();
             const realName = realNameInput.value.trim();
+            const group = groupInput.value.trim();
 
             if (!nickname) {
                 setStatus('Nickname is required.', 'error');
@@ -574,6 +585,7 @@
             const formData = new FormData();
             formData.append('nickname', nickname);
             formData.append('real_name', realName);
+            if (group) formData.append('group', group);
             formData.append('photo', photoFile);
             formData.append('event_key', eventKey);
 

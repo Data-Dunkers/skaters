@@ -92,6 +92,21 @@
             return records;
         }
 
+        function getGroupForNickname(nickname, traits, photos, shots) {
+            const normalizedNickname = nickname.trim().toLowerCase();
+            for (const records of [photos, traits, shots]) {
+                const record = records.find(r =>
+                    r.nickname &&
+                    r.nickname.trim().toLowerCase() === normalizedNickname &&
+                    r.group !== undefined &&
+                    r.group !== null &&
+                    String(r.group).trim() !== ""
+                );
+                if (record) return record.group;
+            }
+            return null;
+        }
+
         function renderAllTables() {
             const dateFilter = document.getElementById("date-select").value;
             const groupFilter = document.getElementById("group-select").value;
@@ -105,11 +120,16 @@
             let fPhotos = globalPhotos.filter(filterFn);
             let fShots = globalShots.filter(filterFn);
 
-            // Group membership is defined by the Shots records
+            // Photo groups take precedence over group values in other collections.
             if (groupFilter !== "All Groups") {
-                const members = new Set(fShots
-                    .filter(s => s.nickname && String(s.group).trim() === groupFilter)
-                    .map(s => s.nickname.trim().toLowerCase()));
+                const members = new Set();
+                [...fTraits, ...fPhotos, ...fShots].forEach(record => {
+                    if (!record.nickname) return;
+                    const group = getGroupForNickname(record.nickname, fTraits, fPhotos, fShots);
+                    if (group !== null && String(group).trim() === groupFilter) {
+                        members.add(record.nickname.trim().toLowerCase());
+                    }
+                });
                 const inGroup = r => r.nickname && members.has(r.nickname.trim().toLowerCase());
                 fTraits = fTraits.filter(inGroup);
                 fPhotos = fPhotos.filter(inGroup);
@@ -180,11 +200,8 @@
                 tr.appendChild(tdNick);
 
                 let group = "-";
-                const allUserRecords = [...fTraits, ...fPhotos, ...fShots].filter(r => r.nickname && r.nickname.trim().toLowerCase() === nick.toLowerCase());
-                const recWithGroup = allUserRecords.find(r => r.group !== undefined && r.group !== null);
-                if (recWithGroup) {
-                    group = recWithGroup.group;
-                }
+                const userGroup = getGroupForNickname(nick, fTraits, fPhotos, fShots);
+                if (userGroup !== null) group = userGroup;
 
                 const tdGroup = document.createElement('td');
                 tdGroup.style.textAlign = 'center';
@@ -293,10 +310,13 @@
             if (dates.has(prevDate)) select.value = prevDate;
 
             const groups = new Set();
-            globalShots.forEach(s => {
-                if (s.group !== undefined && s.group !== null && String(s.group).trim() !== "") {
-                    groups.add(String(s.group).trim());
-                }
+            const nicknames = new Set();
+            [...globalTraits, ...globalPhotos, ...globalShots].forEach(record => {
+                if (record.nickname) nicknames.add(record.nickname.trim());
+            });
+            nicknames.forEach(nickname => {
+                const group = getGroupForNickname(nickname, globalTraits, globalPhotos, globalShots);
+                if (group !== null) groups.add(String(group).trim());
             });
             const groupSelect = document.getElementById("group-select");
             const prevGroup = groupSelect.value !== "All Groups" ? groupSelect.value : localStorage.getItem('collected_group_filter');
