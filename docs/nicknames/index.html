@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nicknames</title>
+    <script src="../event-key-bg.js"></script>
+    <style>
+        body { font-family: sans-serif; margin: 0; padding: 1rem; background: #111; color: #fff; }
+        #status { margin-bottom: 1rem; opacity: 0.8; }
+        #buttons { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1rem; }
+        #buttons button { font-size: 1.2rem; padding: 0.5rem 1rem; border: 2px solid #888; border-radius: 6px;
+            background: #222; color: #fff; cursor: pointer; }
+        #buttons button.on { background: #2a7; border-color: #2a7; }
+        #photos { display: flex; flex-wrap: wrap; gap: 1rem; }
+        figure { margin: 0; text-align: center; }
+        figure img { max-width: 300px; max-height: 300px; display: block; border-radius: 6px; }
+    </style>
+</head>
+<body>
+    <div id="status">Loading...</div>
+    <div id="buttons"></div>
+    <div id="photos"></div>
+
+    <script>
+        const POCKETBASE_URL = 'https://api.datadunkers.ca';
+        const COLLECTION_NAME = 'data_skaters_photos';
+        const eventKey = localStorage.getItem('event_key');
+        const statusEl = document.getElementById('status');
+        const buttonsEl = document.getElementById('buttons');
+        const photosEl = document.getElementById('photos');
+
+        async function fetchAllRecords() {
+            const records = [];
+            for (let page = 1; ; page++) {
+                const params = new URLSearchParams({
+                    filter: `event_key = "${eventKey.replace(/["\\]/g, '')}"`,
+                    perPage: '200',
+                    page: String(page),
+                    sort: 'nickname'
+                });
+                const response = await fetch(`${POCKETBASE_URL}/api/collections/${COLLECTION_NAME}/records?${params}`);
+                if (!response.ok) throw new Error(`status ${response.status}`);
+                const data = await response.json();
+                records.push(...(data.items || []));
+                if (page >= data.totalPages) break;
+            }
+            return records;
+        }
+
+        async function downloadPhoto(record) {
+            const url = `${POCKETBASE_URL}/api/files/${COLLECTION_NAME}/${record.id}/${encodeURIComponent(record.photo)}`;
+            const response = await fetch(url);
+            if (!response.ok) throw new Error(`status ${response.status}`);
+            return URL.createObjectURL(await response.blob());
+        }
+
+        function addToggle(record) {
+            const figure = document.createElement('figure');
+            figure.hidden = true;
+            const img = document.createElement('img');
+            img.src = record._src;
+            img.alt = record.nickname;
+            const caption = document.createElement('figcaption');
+            caption.textContent = record.nickname;
+            figure.append(img, caption);
+            photosEl.append(figure);
+
+            const button = document.createElement('button');
+            button.textContent = record.nickname;
+            button.addEventListener('click', () => {
+                figure.hidden = !figure.hidden;
+                button.classList.toggle('on', !figure.hidden);
+            });
+            buttonsEl.append(button);
+        }
+
+        async function init() {
+            if (!eventKey) {
+                statusEl.textContent = 'No event key set. Set one on the home page first.';
+                return;
+            }
+            try {
+                const records = (await fetchAllRecords()).filter((r) => r.photo);
+                let failed = 0;
+                let done = 0;
+                await Promise.all(records.map(async (record) => {
+                    try {
+                        record._src = await downloadPhoto(record);
+                    } catch (e) {
+                        failed++;
+                    }
+                    statusEl.textContent = `Downloading photos... ${++done}/${records.length}`;
+                }));
+                records.filter((r) => r._src).forEach(addToggle);
+                statusEl.textContent = `Event ${eventKey}: ${records.length - failed} nicknames` +
+                    (failed ? ` (${failed} photos failed to download)` : '') + '. Tap a nickname to show its photo.';
+            } catch (error) {
+                statusEl.textContent = `Could not load photos (${error.message}).`;
+            }
+        }
+
+        init();
+    </script>
+</body>
+</html>
