@@ -136,6 +136,17 @@
 <script>
 const PB_URL = 'https://api.datadunkers.ca/api/collections/data_skaters_traits/records';
 
+document.getElementById('height_cm').addEventListener('blur', function () {
+    if (this.value) document.getElementById('wingspan_cm').placeholder = this.value;
+});
+document.getElementById('wingspan_cm').addEventListener('blur', function () {
+    const height = parseFloat(document.getElementById('height_cm').value);
+    const wingspan = parseFloat(this.value);
+    if (!Number.isNaN(height) && !Number.isNaN(wingspan) && wingspan <= height * 0.55) {
+        alert('Wingspan should be approximately equal to height.');
+    }
+});
+
 let reactionTrials = [];
 let reactionState = 'idle';
 let reactionTrialStartMs = 0;
