@@ -135,6 +135,27 @@
             return sel;
         }
 
+        function buildCheckboxControl(panelId, id, label, onChange) {
+            const panel = document.getElementById(panelId);
+            const group = document.createElement('div');
+            group.className = 'control-group';
+
+            const lbl = document.createElement('label');
+            lbl.className = 'checkbox-control-label';
+            lbl.htmlFor = id;
+            lbl.append(document.createTextNode(label));
+
+            const checkbox = document.createElement('input');
+            checkbox.id = id;
+            checkbox.type = 'checkbox';
+            checkbox.addEventListener('change', onChange);
+            lbl.prepend(checkbox);
+
+            group.appendChild(lbl);
+            panel.appendChild(group);
+            return checkbox;
+        }
+
         function updateCodeAndHighlight(blockId, codeStr) {
             const block = document.getElementById(blockId);
             block.textContent = codeStr;
@@ -160,6 +181,38 @@
             const denominator = Math.sqrt((n * sumX2 - sumX * sumX) * (n * sumY2 - sumY * sumY));
             if (denominator === 0) return 0;
             return numerator / denominator;
+        }
+
+        function createOlsTrendline(trace, color) {
+            const points = trace.x.reduce((validPoints, x, index) => {
+                const y = trace.y[index];
+                if (Number.isFinite(x) && Number.isFinite(y)) validPoints.push({x, y});
+                return validPoints;
+            }, []);
+            if (points.length < 2) return null;
+
+            const meanX = points.reduce((sum, point) => sum + point.x, 0) / points.length;
+            const meanY = points.reduce((sum, point) => sum + point.y, 0) / points.length;
+            const sumXX = points.reduce((sum, point) => sum + (point.x - meanX) ** 2, 0);
+            if (sumXX === 0) return null;
+
+            const sumXY = points.reduce((sum, point) => sum + (point.x - meanX) * (point.y - meanY), 0);
+            const slope = sumXY / sumXX;
+            const intercept = meanY - slope * meanX;
+            const minX = Math.min(...points.map(point => point.x));
+            const maxX = Math.max(...points.map(point => point.x));
+
+            return {
+                x: [minX, maxX],
+                y: [slope * minX + intercept, slope * maxX + intercept],
+                mode: 'lines',
+                type: 'scatter',
+                name: trace.name ? `OLS trendline (${trace.name})` : 'OLS trendline',
+                legendgroup: trace.name,
+                showlegend: false,
+                hoverinfo: 'skip',
+                line: {color, dash: 'dash', width: 2}
+            };
         }
 
         // ---------- Graphing Functions ----------
@@ -205,10 +258,12 @@
             const yCol = document.getElementById('scatter-y').value;
             const colorCol = document.getElementById('scatter-color').value;
             const hoverCol = document.getElementById('scatter-hover').value;
+            const showTrendline = document.getElementById('scatter-trendline').checked;
 
             const xLabel = columnDefs.find(c => c.key === xCol)?.label || xCol;
             const yLabel = columnDefs.find(c => c.key === yCol)?.label || yCol;
 
+            const scatterColorway = ['#636efa', '#EF553B', '#00cc96', '#ab63fa', '#FFA15A', '#19d3f3', '#FF6692', '#B6E880', '#FF97FF', '#FECB52'];
             let data = [];
             if (colorCol === 'None') {
                 data = [{
@@ -223,12 +278,20 @@
                 const grouped = {};
                 df.forEach(row => {
                     const c = row[colorCol] || 'Unknown';
-                    if(!grouped[c]) grouped[c] = {x:[], y:[], text:[], mode:'markers', type:'scatter', name: c, marker:{size:10, line:{color:'#111',width:1}}};
+                    if(!grouped[c]) {
+                        const color = scatterColorway[Object.keys(grouped).length % scatterColorway.length];
+                        grouped[c] = {x:[], y:[], text:[], mode:'markers', type:'scatter', name: c, marker:{size:10, color, line:{color:'#111',width:1}}};
+                    }
                     grouped[c].x.push(row[xCol]);
                     grouped[c].y.push(row[yCol]);
                     grouped[c].text.push(row[hoverCol]);
                 });
                 data = Object.values(grouped);
+            }
+
+            if (showTrendline) {
+                const trendlines = data.map(trace => createOlsTrendline(trace, trace.marker.color || '#FF6600')).filter(Boolean);
+                data.push(...trendlines);
             }
 
             const layout = { ...PLOTLY_LAYOUT_TEMPLATE, title: {text: `${yLabel} vs ${xLabel}`, x: 0}, xaxis: { ...PLOTLY_LAYOUT_TEMPLATE.xaxis, title: xLabel }, yaxis: { ...PLOTLY_LAYOUT_TEMPLATE.yaxis, title: yLabel } };
@@ -237,6 +300,7 @@
             let code = `import plotly.express as px\npx.scatter(df, x='${xCol}', y='${yCol}', title='${yLabel} vs ${xLabel}'`;
             if (colorCol !== 'None') code += `, color='${colorCol}'`;
             if (hoverCol !== 'None') code += `, hover_name='${hoverCol}'`;
+            if (showTrendline) code += `, trendline='ols'`;
             code += `)`;
             updateCodeAndHighlight('scatter-code', code);
         }
@@ -357,8 +421,9 @@
             // Scatter controls
             buildControl('scatter-controls', 'scatter-x', 'X Axis', numCols, 'height_cm', drawScatter);
             buildControl('scatter-controls', 'scatter-y', 'Y Axis', numCols, 'wingspan_cm', drawScatter);
-            buildControl('scatter-controls', 'scatter-color', 'Color', colorOpts, 'group', drawScatter);
+            buildControl('scatter-controls', 'scatter-color', 'Color', colorOpts, 'None', drawScatter);
             buildControl('scatter-controls', 'scatter-hover', 'Hover Text', hoverOpts, 'nickname', drawScatter);
+            buildCheckboxControl('scatter-controls', 'scatter-trendline', 'Trendline', drawScatter);
 
             // Pie controls
             const pieNameOpts = colsList.filter(c => !c.value.includes('Shot Percentage'));

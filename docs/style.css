@@ -3284,6 +3284,15 @@ html[data-page="visualizations-index"]{
             font-family: 'Barlow Condensed', sans-serif;
             letter-spacing: 0.05em;
         }
+        html[data-page="visualizations-index"] .checkbox-control-label{
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            cursor: pointer;
+        }
+        html[data-page="visualizations-index"] .checkbox-control-label input{
+            accent-color: #FF6600;
+        }
 
         html[data-page="visualizations-index"] pre[class*="language-"]{
             border-radius: 8px !important;
