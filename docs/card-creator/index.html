@@ -127,8 +127,8 @@ const ROW_LOGO_SRCS = ['ps43-foundation-logo.png', 'dell-logo-black.png', 'lotus
 let rowLogoData = null; // loaded once as data URLs so html2canvas can render them
 
 // Shot % = made / attempted. If your shot records have an attempts field, it is used
-// (shots_attempted, shots_taken or attempts). Otherwise each record is assumed to be this many attempts.
-const ATTEMPTS_PER_RECORD = 10;
+// (shots_attempted, shots_taken or attempts). Otherwise each record represents six attempts.
+const ATTEMPTS_PER_RECORD = 6;
 
 const AXES = ['Sniper', 'Speed Winger', 'Playmaker', 'Defenseman', 'Power Forward', 'Two-way Forward'];
 const HEAT_KEYS = ['height_cm', 'reaction_time_ms', 'resting_heart_rate', 'skate_size', 'wingspan_cm'];
