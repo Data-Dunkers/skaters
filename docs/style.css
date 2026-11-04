@@ -934,8 +934,11 @@ html[data-page="collected-index"]{
         }
 
         html[data-page="collected-index"] .page-header{
+            position: relative;
+            width: 100%;
             text-align: center;
             margin-bottom: 1.4rem;
+            padding-top: 3.5rem;
         }
 
         html[data-page="collected-index"] .page-header .eyebrow{
@@ -1116,6 +1119,11 @@ html[data-page="visualizations-index"] .home-button{
     text-decoration: none;
     transition: border-color 0.2s, color 0.2s, transform 0.1s;
 }
+html[data-page="collected-index"] .home-button{
+    position: absolute;
+    top: 0;
+    left: 0;
+}
 html[data-page="collected-index"] .home-button:hover,
 html[data-page="visualizations-index"] .home-button:hover{
     border-color: var(--primary);
@@ -1123,6 +1131,21 @@ html[data-page="visualizations-index"] .home-button:hover{
 }
 html[data-page="collected-index"] .home-button:active,
 html[data-page="visualizations-index"] .home-button:active{ transform: scale(0.98); }
+
+html:not([data-page="home"]) .home-link-wrap{
+    position: fixed;
+    top: 1rem;
+    left: 1rem;
+    z-index: 1000;
+    margin: 0;
+    text-align: left;
+}
+
+html[data-page="visualizations-index"] .home-button{
+    position: absolute;
+    top: 0;
+    left: 0;
+}
 
 html[data-page="collected-index"] .extracted-style-2{ border: none; }
 
@@ -3132,8 +3155,11 @@ html[data-page="visualizations-index"]{
         }
 
         html[data-page="visualizations-index"] .page-header{
+            position: relative;
+            width: 100%;
             text-align: center;
             margin-bottom: 1.4rem;
+            padding-top: 3.5rem;
         }
 
         html[data-page="visualizations-index"] .page-header .eyebrow{

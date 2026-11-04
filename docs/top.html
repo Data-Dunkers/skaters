@@ -26,8 +26,10 @@
             font-family: Barlow, sans-serif;
         }
         html[data-page="top"] .top-header {
+            position: relative;
             text-align: center;
             margin-bottom: 1.5rem;
+            padding-top: 3.5rem;
         }
         html[data-page="top"] .top-header a {
             color: var(--top-muted);
@@ -35,6 +37,9 @@
         }
         html[data-page="top"] .top-header a:hover { color: var(--top-accent); }
         html[data-page="top"] .top-header .home-button {
+            position: absolute;
+            top: 0;
+            left: 0;
             display: inline-flex;
             align-items: center;
             justify-content: center;
