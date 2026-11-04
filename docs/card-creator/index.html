@@ -413,7 +413,7 @@ async function renderCard(p, t, esportScore, container) {
     node.querySelector('#tpl-reaction').textContent = has(t.reaction_time_ms) ? `${t.reaction_time_ms} ms` : 'N/A';
     node.querySelector('#tpl-hr').textContent = has(t.resting_heart_rate) ? `${t.resting_heart_rate} bpm` : 'N/A';
     node.querySelector('#tpl-skate').textContent = has(t.skate_size) ? t.skate_size : 'N/A';
-    node.querySelector('#tpl-hand').textContent = t.handedness || 'N/A';
+    node.querySelector('#tpl-hand').textContent = /^ambidextrous$/i.test((t.handedness || '').trim()) ? 'ambidex' : (t.handedness || 'N/A');
     node.querySelector('#tpl-month').textContent = t.birth_month || 'N/A';
     node.querySelector('#tpl-shotpct').textContent = has(t.shotPct) ? t.shotPct : 'N/A';
     const esportStat = node.querySelector('#tpl-esport').closest('.stat');
@@ -521,7 +521,10 @@ async function start() {
         const shots = await fetchAll('data_skaters_shots');
 
         document.getElementById('status').textContent = 'Fetching Rocket League scores...';
+
         const esportRecords = await fetchAll('data_skaters_rocket_league');
+
+
         const esportScores = new Map();
         for (const record of esportRecords) {
             const nickname = (record.nickname || '').trim().toUpperCase();
@@ -556,7 +559,7 @@ async function start() {
             document.getElementById('status').textContent = `Generating card ${i + 1} of ${photoList.length} (${p.nickname})...`;
 
             const t = traitMap[p.nickname.toUpperCase()] || {};
-            const esportScore = esportScores.get(p.nickname.trim().toUpperCase())?.score;
+            const esportScore = esportScores.get(p.nickname.trim().toUpperCase());
             await renderCard(p, t, esportScore, container);
         }
 
