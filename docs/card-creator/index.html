@@ -148,9 +148,15 @@ async function fetchAll(collection) {
     let results = [];
     let page = 1;
     const eventKey = localStorage.getItem('event_key');
-    const filterStr = eventKey ? `&filter=(event_key='${eventKey}')` : '';
+    if (!eventKey) throw new Error('Missing event key; cannot fetch event records.');
+
     while (true) {
-        const res = await fetch(`${BASE_URL}/api/collections/${collection}/records?perPage=500&page=${page}${filterStr}`);
+        const params = new URLSearchParams({
+            perPage: '500',
+            page: String(page),
+            filter: `(event_key='${eventKey.replace(/\\/g, "\\\\").replace(/'/g, "\\'")}')`
+        });
+        const res = await fetch(`${BASE_URL}/api/collections/${collection}/records?${params}`);
         if (!res.ok) throw new Error(`HTTP Error ${res.status}`);
         const data = await res.json();
         results = results.concat(data.items || []);
