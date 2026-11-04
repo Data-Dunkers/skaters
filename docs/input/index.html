@@ -33,33 +33,60 @@
     </div>
 
     <div class="form-section">
-        <div class="section-label">Distance</div>
-        <div class="form-group">
-            <label>Select Distance</label>
-            <div class="option-group">
-                <button type="button" class="option-btn" data-distance="2" onclick="selectOption('distance', 2, this)">2 ft</button>
-                <button type="button" class="option-btn" data-distance="5" onclick="selectOption('distance', 5, this)">5 ft</button>
-                <button type="button" class="option-btn" data-distance="7" onclick="selectOption('distance', 7, this)">7 ft</button>
-                <button type="button" class="option-btn" data-distance="10" onclick="selectOption('distance', 10, this)">10 ft</button>
+        <div class="section-label">Shots Made (out of 6)</div>
+        <div class="distance-rows">
+            <div class="distance-row" data-distance="2">
+                <span class="distance-label">2 ft</span>
+                <div class="option-group" role="group" aria-label="Shots made at 2 feet">
+                    <button type="button" class="option-btn" aria-pressed="false" onclick="selectDistanceShots(this, 0)">0</button>
+                    <button type="button" class="option-btn" aria-pressed="false" onclick="selectDistanceShots(this, 1)">1</button>
+                    <button type="button" class="option-btn" aria-pressed="false" onclick="selectDistanceShots(this, 2)">2</button>
+                    <button type="button" class="option-btn" aria-pressed="false" onclick="selectDistanceShots(this, 3)">3</button>
+                    <button type="button" class="option-btn" aria-pressed="false" onclick="selectDistanceShots(this, 4)">4</button>
+                    <button type="button" class="option-btn" aria-pressed="false" onclick="selectDistanceShots(this, 5)">5</button>
+                    <button type="button" class="option-btn" aria-pressed="false" onclick="selectDistanceShots(this, 6)">6</button>
+                </div>
+                <input type="hidden" class="shots-made-value">
             </div>
-            <input type="hidden" id="distance" name="distance">
-        </div>
-    </div>
-
-    <div class="form-section">
-        <div class="section-label">Shots Made</div>
-        <div class="form-group">
-            <label>Out of 6</label>
-            <div class="option-group">
-                <button type="button" class="option-btn" onclick="selectOption('shots_made', 0, this)">0</button>
-                <button type="button" class="option-btn" onclick="selectOption('shots_made', 1, this)">1</button>
-                <button type="button" class="option-btn" onclick="selectOption('shots_made', 2, this)">2</button>
-                <button type="button" class="option-btn" onclick="selectOption('shots_made', 3, this)">3</button>
-                <button type="button" class="option-btn" onclick="selectOption('shots_made', 4, this)">4</button>
-                <button type="button" class="option-btn" onclick="selectOption('shots_made', 5, this)">5</button>
-                <button type="button" class="option-btn" onclick="selectOption('shots_made', 6, this)">6</button>
+            <div class="distance-row" data-distance="5">
+                <span class="distance-label">5 ft</span>
+                <div class="option-group" role="group" aria-label="Shots made at 5 feet">
+                    <button type="button" class="option-btn" aria-pressed="false" onclick="selectDistanceShots(this, 0)">0</button>
+                    <button type="button" class="option-btn" aria-pressed="false" onclick="selectDistanceShots(this, 1)">1</button>
+                    <button type="button" class="option-btn" aria-pressed="false" onclick="selectDistanceShots(this, 2)">2</button>
+                    <button type="button" class="option-btn" aria-pressed="false" onclick="selectDistanceShots(this, 3)">3</button>
+                    <button type="button" class="option-btn" aria-pressed="false" onclick="selectDistanceShots(this, 4)">4</button>
+                    <button type="button" class="option-btn" aria-pressed="false" onclick="selectDistanceShots(this, 5)">5</button>
+                    <button type="button" class="option-btn" aria-pressed="false" onclick="selectDistanceShots(this, 6)">6</button>
+                </div>
+                <input type="hidden" class="shots-made-value">
             </div>
-            <input type="hidden" id="shots_made" name="shots_made">
+            <div class="distance-row" data-distance="7">
+                <span class="distance-label">7 ft</span>
+                <div class="option-group" role="group" aria-label="Shots made at 7 feet">
+                    <button type="button" class="option-btn" aria-pressed="false" onclick="selectDistanceShots(this, 0)">0</button>
+                    <button type="button" class="option-btn" aria-pressed="false" onclick="selectDistanceShots(this, 1)">1</button>
+                    <button type="button" class="option-btn" aria-pressed="false" onclick="selectDistanceShots(this, 2)">2</button>
+                    <button type="button" class="option-btn" aria-pressed="false" onclick="selectDistanceShots(this, 3)">3</button>
+                    <button type="button" class="option-btn" aria-pressed="false" onclick="selectDistanceShots(this, 4)">4</button>
+                    <button type="button" class="option-btn" aria-pressed="false" onclick="selectDistanceShots(this, 5)">5</button>
+                    <button type="button" class="option-btn" aria-pressed="false" onclick="selectDistanceShots(this, 6)">6</button>
+                </div>
+                <input type="hidden" class="shots-made-value">
+            </div>
+            <div class="distance-row" data-distance="10">
+                <span class="distance-label">10 ft</span>
+                <div class="option-group" role="group" aria-label="Shots made at 10 feet">
+                    <button type="button" class="option-btn" aria-pressed="false" onclick="selectDistanceShots(this, 0)">0</button>
+                    <button type="button" class="option-btn" aria-pressed="false" onclick="selectDistanceShots(this, 1)">1</button>
+                    <button type="button" class="option-btn" aria-pressed="false" onclick="selectDistanceShots(this, 2)">2</button>
+                    <button type="button" class="option-btn" aria-pressed="false" onclick="selectDistanceShots(this, 3)">3</button>
+                    <button type="button" class="option-btn" aria-pressed="false" onclick="selectDistanceShots(this, 4)">4</button>
+                    <button type="button" class="option-btn" aria-pressed="false" onclick="selectDistanceShots(this, 5)">5</button>
+                    <button type="button" class="option-btn" aria-pressed="false" onclick="selectDistanceShots(this, 6)">6</button>
+                </div>
+                <input type="hidden" class="shots-made-value">
+            </div>
         </div>
     </div>
 
@@ -123,22 +150,26 @@ function validateNickname() {
 }
 
 
-// ── OPTION BUTTON SELECTION ────────────────────────────────────
-function selectOption(fieldId, value, btn) {
-    document.getElementById(fieldId).value = value;
-    btn.closest('.option-group').querySelectorAll('.option-btn').forEach(b => b.classList.remove('active'));
+// ── SHOTS-MADE BUTTON SELECTION ────────────────────────────────
+function selectDistanceShots(btn, value) {
+    const row = btn.closest('.distance-row');
+    row.querySelector('.shots-made-value').value = value;
+    row.querySelectorAll('.option-btn').forEach(button => {
+        button.classList.remove('active');
+        button.setAttribute('aria-pressed', 'false');
+    });
     btn.classList.add('active');
+    btn.setAttribute('aria-pressed', 'true');
 }
 
 // ── SUBMIT ───────────────────────────────────────────────────────
 async function handleSubmit() {
-    // Basic validation
     const group    = document.getElementById('group').value.trim();
     const nick     = document.getElementById('nickname').value.trim();
-    const distance = document.getElementById('distance').value;
-    const shots_made  = document.getElementById('shots_made').value;
+    const selectedRows = Array.from(document.querySelectorAll('.distance-row'))
+        .filter(row => row.querySelector('.shots-made-value').value !== '');
     
-    if (!group || !nick || !distance || shots_made === '') {
+    if (!group || !nick || selectedRows.length === 0) {
         showStatus('Please fill in all required fields.', 'error'); return;
     }
 
@@ -146,30 +177,43 @@ async function handleSubmit() {
     btn.disabled = true;
     btn.textContent = 'Logging data…';
 
-    const payload = {
-        group:          parseInt(group, 10),
-        nickname:       nick,
-        distance:       parseInt(distance, 10),
-        shots_made:     parseInt(shots_made, 10),
-        event_key:      localStorage.getItem('event_key'),
-    };
-
-    //localStorage.setItem('lastNickname', nick);
-    localStorage.setItem('lastGroup', group);
-
     try {
-        const res = await fetch(PB_URL, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload),
-        });
-        if (!res.ok) throw new Error(`Server error ${res.status}`);
+        localStorage.setItem('lastGroup', group);
 
-        showStatus('Data logged! ✓', 'success');
-        updateStats(nick);
+        let loggedCount = 0;
+        const failures = [];
+        for (const row of selectedRows) {
+            const distance = row.dataset.distance;
+            const payload = {
+                group: parseInt(group, 10),
+                nickname: nick,
+                distance: parseInt(distance, 10),
+                shots_made: parseInt(row.querySelector('.shots-made-value').value, 10),
+                event_key: localStorage.getItem('event_key'),
+            };
 
-    } catch (err) {
-        showStatus(`Error: ${err.message}`, 'error');
+            try {
+                const res = await fetch(PB_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload),
+                });
+                if (!res.ok) throw new Error(`Server error ${res.status}`);
+                loggedCount++;
+            } catch (err) {
+                failures.push(`${distance} ft (${err.message})`);
+            }
+        }
+
+        await updateStats(nick);
+        if (failures.length > 0) {
+            const loggedLabel = loggedCount === 1 ? 'distance' : 'distances';
+            const loggedMessage = loggedCount ? `${loggedCount} ${loggedLabel} logged. ` : '';
+            showStatus(`${loggedMessage}Failed: ${failures.join(', ')}`, 'error');
+        } else {
+            const distanceLabel = loggedCount === 1 ? 'distance' : 'distances';
+            showStatus(`${loggedCount} ${distanceLabel} logged! ✓`, 'success');
+        }
     } finally {
         btn.disabled = false;
         btn.textContent = 'Log Data';
@@ -195,10 +239,10 @@ async function updateStats(nick) {
         const tbody = document.getElementById('statsBody');
         const table = document.getElementById('statsTable');
         const empty = document.getElementById('emptyState');
-        const distanceButtons = document.querySelectorAll('[data-distance]');
+        const distanceRows = document.querySelectorAll('.distance-row');
 
         tbody.innerHTML = '';
-        distanceButtons.forEach(button => button.disabled = false);
+        distanceRows.forEach(row => row.querySelectorAll('.option-btn').forEach(button => button.disabled = false));
 
         if (!data.items || data.items.length === 0) {
             table.style.display = 'none';
@@ -210,8 +254,14 @@ async function updateStats(nick) {
         empty.style.display = 'none';
 
         const recordedDistances = new Set(data.items.map(record => String(record.distance)));
-        distanceButtons.forEach(button => {
-            button.disabled = recordedDistances.has(button.dataset.distance);
+        distanceRows.forEach(row => {
+            if (!recordedDistances.has(row.dataset.distance)) return;
+            row.querySelectorAll('.option-btn').forEach(button => {
+                button.disabled = true;
+                button.classList.remove('active');
+                button.setAttribute('aria-pressed', 'false');
+            });
+            row.querySelector('.shots-made-value').value = '';
         });
 
         data.items.forEach((r) => {

@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<!-- saved from url=(0069)file:///C:/Users/miste/Documents/GitHub/skaters/docs/input/index.html -->
+<html lang="en" data-page="input-index"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Skaters Form</title>
+    <link href="./shots-input_files/css2" rel="stylesheet">
+
+    <link rel="stylesheet" href="./shots-input_files/style.css">
+    <script src="./shots-input_files/event-key-bg.js"></script>
+</head>
+<body><div id="event-key-bg" aria-hidden="true" style="position: fixed; inset: 0px; z-index: 0; pointer-events: none; background-image: url(&quot;data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22260%22%20height%3D%2290%22%3E%3Cg%20font-family%3D%22Barlow%20Condensed%2C%20sans-serif%22%20font-weight%3D%22800%22%20font-size%3D%2230%22%20fill%3D%22%23fff%22%20fill-opacity%3D%220.09%22%20text-anchor%3D%22middle%22%3E%3Ctext%20x%3D%22130%22%20y%3D%2235%22%20transform%3D%22rotate(-12%20130%2035)%22%3EMS%3C%2Ftext%3E%3Ctext%20x%3D%220%22%20y%3D%2285%22%20transform%3D%22rotate(-12%200%2085)%22%3EMS%3C%2Ftext%3E%3Ctext%20x%3D%22260%22%20y%3D%2285%22%20transform%3D%22rotate(-12%20260%2085)%22%3EMS%3C%2Ftext%3E%3C%2Fg%3E%3C%2Fsvg%3E&quot;); background-size: 260px 90px;"></div>
+
+<div class="page-header" style="position: relative; z-index: 1;">
+    <div class="eyebrow">Data Science × Hockey</div>
+    <h1>Data <span>Skaters</span></h1>
+</div>
+
+<!-- ── FORM CARD ── -->
+<div class="card extracted-style-1" style="position: relative; z-index: 1;">
+
+    <div class="form-section">
+        <div class="form-row cols-2">
+            <div class="form-group">
+                <label for="group">Group #</label>
+                <input type="number" id="group" name="group" placeholder="e.g. 3" min="1" required="">
+            </div>
+            <div class="form-group">
+                <label for="nickname">Nickname</label>
+                <input type="text" id="nickname" name="nickname" placeholder="PS43" required="" oninput="validateNickname()" onblur="updateStats(this.value.trim())" maxlength="4" autocomplete="off">
+            </div>
+        </div>
+    </div>
+
+    <div class="form-section">
+        <div class="section-label">Distance</div>
+        <div class="form-group">
+            <label>Select Distance</label>
+            <div class="option-group">
+                <button type="button" class="option-btn" data-distance="2" onclick="selectOption('distance', 2, this)">2 ft</button>
+                <button type="button" class="option-btn" data-distance="5" onclick="selectOption('distance', 5, this)">5 ft</button>
+                <button type="button" class="option-btn" data-distance="7" onclick="selectOption('distance', 7, this)">7 ft</button>
+                <button type="button" class="option-btn" data-distance="10" onclick="selectOption('distance', 10, this)">10 ft</button>
+            </div>
+            <input type="hidden" id="distance" name="distance">
+        </div>
+    </div>
+
+    <div class="form-section">
+        <div class="section-label">Shots Made</div>
+        <div class="form-group">
+            <label>Out of 6</label>
+            <div class="option-group">
+                <button type="button" class="option-btn" onclick="selectOption('shots_made', 0, this)">0</button>
+                <button type="button" class="option-btn" onclick="selectOption('shots_made', 1, this)">1</button>
+                <button type="button" class="option-btn" onclick="selectOption('shots_made', 2, this)">2</button>
+                <button type="button" class="option-btn" onclick="selectOption('shots_made', 3, this)">3</button>
+                <button type="button" class="option-btn" onclick="selectOption('shots_made', 4, this)">4</button>
+                <button type="button" class="option-btn" onclick="selectOption('shots_made', 5, this)">5</button>
+                <button type="button" class="option-btn" onclick="selectOption('shots_made', 6, this)">6</button>
+            </div>
+            <input type="hidden" id="shots_made" name="shots_made">
+        </div>
+    </div>
+
+    <button type="button" class="submit-btn" id="submitBtn" onclick="handleSubmit()">Log Data</button>
+    <div id="statusMessage"></div>
+</div>
+
+<!-- ── HISTORY CARD ── -->
+<div class="history-card" style="position: relative; z-index: 1;">
+    <div class="history-header">
+        <h2>Shot History</h2>
+        <span id="statsFor">—</span>
+    </div>
+    <div id="emptyState">No shots logged yet.</div>
+    <table id="statsTable" class="extracted-style-2">
+        <thead>
+            <tr>
+                <th>Distance</th>
+                <th>Shots Made</th>
+            </tr>
+        </thead>
+        <tbody id="statsBody"></tbody>
+    </table>
+</div>
+
+<div class="home-link-wrap" style="z-index: 1;"><a class="home-link" href="file:///C:/Users/miste/Documents/GitHub/skaters/docs/index.html">Home</a></div>
+
+<script>
+// ── CONFIG ──────────────────────────────────────────────────────
+const PB_URL = 'https://api.datadunkers.ca/api/collections/data_skaters_shots/records';
+
+// ── ON LOAD ─────────────────────────────────────────────────────
+window.onload = () => {
+    const eventKey = localStorage.getItem('event_key');
+    if (!eventKey) {
+        window.location.href = '../index.html';
+        return;
+    }
+
+    //const savedNick  = localStorage.getItem('lastNickname');
+    const savedGroup = localStorage.getItem('lastGroup');
+    //if (savedNick)  document.getElementById('nickname').value = savedNick;
+    if (savedGroup) document.getElementById('group').value = savedGroup;
+    //if (savedNick)  updateStats(savedNick);
+};
+
+// ── NICKNAME VALIDATION ───────────────────────────────────────
+function validateNickname() {
+    let val = document.getElementById('nickname').value.toUpperCase();
+    let result = '';
+    
+    for (let i = 0; i < val.length && i < 4; i++) {
+        let char = val[i];
+        if (i < 2 && /[A-Z]/.test(char)) {
+            result += char; // First 2 characters must be letters
+        } else if (i >= 2 && /[0-9]/.test(char)) {
+            result += char; // Last 2 characters must be numbers
+        }
+    }
+    document.getElementById('nickname').value = result;
+}
+
+
+// ── OPTION BUTTON SELECTION ────────────────────────────────────
+function selectOption(fieldId, value, btn) {
+    document.getElementById(fieldId).value = value;
+    btn.closest('.option-group').querySelectorAll('.option-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+}
+
+// ── SUBMIT ───────────────────────────────────────────────────────
+async function handleSubmit() {
+    // Basic validation
+    const group    = document.getElementById('group').value.trim();
+    const nick     = document.getElementById('nickname').value.trim();
+    const distance = document.getElementById('distance').value;
+    const shots_made  = document.getElementById('shots_made').value;
+    
+    if (!group || !nick || !distance || shots_made === '') {
+        showStatus('Please fill in all required fields.', 'error'); return;
+    }
+
+    const btn = document.getElementById('submitBtn');
+    btn.disabled = true;
+    btn.textContent = 'Logging data…';
+
+    const payload = {
+        group:          parseInt(group, 10),
+        nickname:       nick,
+        distance:       parseInt(distance, 10),
+        shots_made:     parseInt(shots_made, 10),
+        event_key:      localStorage.getItem('event_key'),
+    };
+
+    //localStorage.setItem('lastNickname', nick);
+    localStorage.setItem('lastGroup', group);
+
+    try {
+        const res = await fetch(PB_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload),
+        });
+        if (!res.ok) throw new Error(`Server error ${res.status}`);
+
+        showStatus('Data logged! ✓', 'success');
+        updateStats(nick);
+
+    } catch (err) {
+        showStatus(`Error: ${err.message}`, 'error');
+    } finally {
+        btn.disabled = false;
+        btn.textContent = 'Log Data';
+    }
+}
+
+// ── STATUS MESSAGE ───────────────────────────────────────────────
+function showStatus(msg, type) {
+    const el = document.getElementById('statusMessage');
+    el.textContent = msg;
+    el.className = type === 'success' ? 'status-success' : 'status-error';
+    el.style.display = 'block';
+    setTimeout(() => el.style.display = 'none', 4000);
+}
+
+// ── HISTORY TABLE ────────────────────────────────────────────────
+async function updateStats(nick) {
+    document.getElementById('statsFor').textContent = nick;
+    try {
+        const key = localStorage.getItem('event_key');
+        const res  = await fetch(`${PB_URL}?filter=(nickname='${nick}'%20%26%26%20event_key='${key}')&sort=-created&perPage=50`);
+        const data = await res.json();
+        const tbody = document.getElementById('statsBody');
+        const table = document.getElementById('statsTable');
+        const empty = document.getElementById('emptyState');
+        const distanceButtons = document.querySelectorAll('[data-distance]');
+
+        tbody.innerHTML = '';
+        distanceButtons.forEach(button => button.disabled = false);
+
+        if (!data.items || data.items.length === 0) {
+            table.style.display = 'none';
+            empty.style.display = 'block';
+            return;
+        }
+
+        table.style.display = 'table';
+        empty.style.display = 'none';
+
+        const recordedDistances = new Set(data.items.map(record => String(record.distance)));
+        distanceButtons.forEach(button => {
+            button.disabled = recordedDistances.has(button.dataset.distance);
+        });
+
+        data.items.forEach((r) => {
+            tbody.innerHTML += `<tr>
+                <td>${r.distance}</td>
+                <td>${r.shots_made}</td>
+            </tr>`;
+        });
+    } catch (err) {
+        console.error('Stats fetch failed:', err);
+    }
+}
+</script>
+
+
+</body></html>
