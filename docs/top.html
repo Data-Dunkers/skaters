@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="en" data-page="top">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Skaters - Today's Top Ten</title>
+    <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="./style.css">
+    <script src="./event-key-bg.js"></script>
+    <style>
+        html[data-page="top"] {
+            --top-bg: #101116;
+            --top-panel: #191b22;
+            --top-border: #2b2e38;
+            --top-text: #f3f4f8;
+            --top-muted: #a4a8b5;
+            --top-accent: #ff6b1a;
+            background: var(--top-bg);
+            color: var(--top-text);
+            min-height: 100%;
+        }
+        html[data-page="top"] body {
+            max-width: 1180px;
+            margin: 0 auto;
+            padding: 2rem 1rem 3rem;
+            font-family: Barlow, sans-serif;
+        }
+        html[data-page="top"] .top-header {
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+        html[data-page="top"] .top-header a {
+            color: var(--top-muted);
+            text-decoration: none;
+        }
+        html[data-page="top"] .top-header a:hover { color: var(--top-accent); }
+        html[data-page="top"] .top-header .home-button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: .55rem .95rem;
+            border: 1px solid var(--top-border);
+            border-radius: 8px;
+            background: var(--top-panel);
+            color: var(--top-text);
+            font-family: "Barlow Condensed", sans-serif;
+            font-size: .95rem;
+            font-weight: 700;
+            letter-spacing: .08em;
+            text-transform: uppercase;
+            transition: border-color .2s, color .2s, transform .1s;
+        }
+        html[data-page="top"] .top-header .home-button:hover {
+            border-color: var(--top-accent);
+            color: var(--top-accent);
+        }
+        html[data-page="top"] .top-header .home-button:active { transform: scale(.98); }
+        html[data-page="top"] .eyebrow {
+            margin-top: 1.4rem;
+            color: var(--top-accent);
+            font-size: .75rem;
+            font-weight: 700;
+            letter-spacing: .18em;
+            text-transform: uppercase;
+        }
+        html[data-page="top"] h1 {
+            margin: .25rem 0;
+            font-family: "Barlow Condensed", sans-serif;
+            font-size: clamp(2.5rem, 8vw, 4rem);
+            font-weight: 800;
+            text-transform: uppercase;
+        }
+        html[data-page="top"] h1 span { color: var(--top-accent); }
+        html[data-page="top"] #load-status {
+            min-height: 1.5rem;
+            color: var(--top-muted);
+            text-align: center;
+        }
+        html[data-page="top"] #load-status.error { color: #ff7b83; }
+        html[data-page="top"] .top-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(min(100%, 480px), 1fr));
+            gap: 1rem;
+        }
+        html[data-page="top"] .leaderboard {
+            min-width: 0;
+            padding: 1.2rem;
+            border: 1px solid var(--top-border);
+            border-radius: 12px;
+            background: var(--top-panel);
+        }
+        html[data-page="top"] .leaderboard h2 {
+            margin: 0;
+            font-family: "Barlow Condensed", sans-serif;
+            font-size: 1.65rem;
+            text-transform: uppercase;
+        }
+        html[data-page="top"] .leaderboard p {
+            margin: .2rem 0 1rem;
+            color: var(--top-muted);
+            font-size: .9rem;
+        }
+        html[data-page="top"] .table-wrap { overflow-x: auto; }
+        html[data-page="top"] table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            white-space: nowrap;
+        }
+        html[data-page="top"] th,
+        html[data-page="top"] td {
+            padding: .65rem .5rem;
+            border-bottom: 1px solid var(--top-border);
+        }
+        html[data-page="top"] th {
+            color: var(--top-muted);
+            font-size: .75rem;
+            letter-spacing: .06em;
+            text-transform: uppercase;
+        }
+        html[data-page="top"] td:first-child { font-weight: 700; }
+        html[data-page="top"] .rank {
+            width: 2.4rem;
+            color: var(--top-accent);
+            font-family: "Barlow Condensed", sans-serif;
+            font-size: 1.2rem;
+        }
+        html[data-page="top"] .empty {
+            padding: 1rem .5rem;
+            color: var(--top-muted);
+            text-align: center;
+        }
+        @media (max-width: 520px) {
+            html[data-page="top"] body { padding: 1rem .65rem 2rem; }
+            html[data-page="top"] .leaderboard { padding: .9rem; }
+        }
+    </style>
+</head>
+<body>
+    <header class="top-header">
+        <a href="./index.html" class="home-button">Home</a>
+        <div class="eyebrow">Data Skaters</div>
+        <h1>Today's <span>Top Ten</span></h1>
+        <div id="today-label"></div>
+    </header>
+
+    <div id="load-status" role="status" aria-live="polite">Loading today's data...</div>
+
+    <main class="top-grid" aria-label="Today's leaderboards">
+        <section class="leaderboard">
+            <h2>Rocket League</h2>
+            <p>Highest score per player</p>
+            <div class="table-wrap">
+                <table id="rocket-league-table">
+                    <thead><tr><th>Rank</th><th>Player</th><th>Score</th></tr></thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </section>
+
+        <section class="leaderboard">
+            <h2>Top Shooters</h2>
+            <p>Average shots made across the 2, 5, 7, and 10 ft distances</p>
+            <div class="table-wrap">
+                <table id="shooters-table">
+                    <thead><tr><th>Rank</th><th>Player</th><th>Avg.</th><th>2 ft</th><th>5 ft</th><th>7 ft</th><th>10 ft</th></tr></thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </section>
+
+        <section class="leaderboard">
+            <h2>Quickest Reaction</h2>
+            <p>Lowest reaction time per player</p>
+            <div class="table-wrap">
+                <table id="reaction-table">
+                    <thead><tr><th>Rank</th><th>Player</th><th>Reaction (ms)</th></tr></thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </section>
+
+        <section class="leaderboard">
+            <h2>First to Finish</h2>
+            <p>First students today to submit traits, a photo, Rocket League, and all four distances</p>
+            <div class="table-wrap">
+                <table id="finish-table">
+                    <thead><tr><th>Rank</th><th>Player</th><th>Finished</th></tr></thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        const BASE_URL = "https://api.datadunkers.ca";
+        const PER_PAGE = 500;
+        const DISTANCES = [2, 5, 7, 10];
+        const COLLECTIONS = {
+            traits: "data_skaters_traits",
+            photos: "data_skaters_photos",
+            shots: "data_skaters_shots",
+            rocketLeague: "data_skaters_rocket_league"
+        };
+
+        function normalizeNickname(nickname) {
+            return typeof nickname === "string" ? nickname.trim().toLowerCase() : "";
+        }
+
+        function finiteNumber(value) {
+            if (value === null || value === undefined || value === "") return null;
+            const number = Number(value);
+            return Number.isFinite(number) ? number : null;
+        }
+
+        function getRecordTime(record) {
+            if (typeof record.created !== "string") return NaN;
+            return Date.parse(record.created.replace(" ", "T"));
+        }
+
+        function localDateKey(date) {
+            return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
+        }
+
+        function isToday(record, today) {
+            const timestamp = getRecordTime(record);
+            return Number.isFinite(timestamp) && localDateKey(new Date(timestamp)) === today;
+        }
+
+        async function fetchAllRecords(collectionId, eventKey) {
+            const records = [];
+            let page = 1;
+            while (true) {
+                const params = new URLSearchParams({
+                    page: String(page),
+                    perPage: String(PER_PAGE),
+                    filter: `event_key='${eventKey.replace(/\\/g, "\\\\").replace(/'/g, "\\'")}'`
+                });
+                const response = await fetch(`${BASE_URL}/api/collections/${collectionId}/records?${params}`, { cache: "no-store" });
+                if (!response.ok) {
+                    throw new Error(`Failed to fetch ${collectionId} (HTTP ${response.status})`);
+                }
+                const data = await response.json();
+                records.push(...(data.items || []));
+                if (page >= (data.totalPages || 1)) break;
+                page++;
+            }
+            return records;
+        }
+
+        function nicknameFor(records) {
+            const names = new Map();
+            records.forEach(record => {
+                const key = normalizeNickname(record.nickname);
+                if (key && !names.has(key)) names.set(key, record.nickname.trim());
+            });
+            return names;
+        }
+
+        function topRocketLeague(records, names) {
+            const bestScores = new Map();
+            records.forEach(record => {
+                const key = normalizeNickname(record.nickname);
+                const score = finiteNumber(record.score);
+                if (!key || score === null) return;
+                if (!bestScores.has(key) || score > bestScores.get(key)) bestScores.set(key, score);
+            });
+            return [...bestScores.entries()]
+                .map(([key, score]) => ({ nickname: names.get(key) || key, score }))
+                .sort((a, b) => b.score - a.score || a.nickname.localeCompare(b.nickname))
+                .slice(0, 10)
+                .map(player => [player.nickname, player.score]);
+        }
+
+        function topShooters(records, names) {
+            const scores = new Map();
+            records.forEach(record => {
+                const key = normalizeNickname(record.nickname);
+                const distance = Number(record.distance);
+                const made = finiteNumber(record.shots_made);
+                if (!key || !DISTANCES.includes(distance) || made === null) return;
+                if (!scores.has(key)) scores.set(key, new Map());
+                const byDistance = scores.get(key);
+                if (!byDistance.has(distance)) byDistance.set(distance, []);
+                byDistance.get(distance).push(made);
+            });
+
+            return [...scores.entries()]
+                .filter(([, byDistance]) => DISTANCES.every(distance => byDistance.has(distance)))
+                .map(([key, byDistance]) => {
+                    const averages = DISTANCES.map(distance => {
+                        const values = byDistance.get(distance);
+                        return values.reduce((sum, value) => sum + value, 0) / values.length;
+                    });
+                    return {
+                        nickname: names.get(key) || key,
+                        averages,
+                        average: averages.reduce((sum, value) => sum + value, 0) / averages.length
+                    };
+                })
+                .sort((a, b) => b.average - a.average || a.nickname.localeCompare(b.nickname))
+                .slice(0, 10)
+                .map(player => [player.nickname, player.average.toFixed(2), ...player.averages.map(value => value.toFixed(2))]);
+        }
+
+        function topReactions(records, names) {
+            const fastestTimes = new Map();
+            records.forEach(record => {
+                const key = normalizeNickname(record.nickname);
+                const reactionTime = finiteNumber(record.reaction_time_ms);
+                if (!key || reactionTime === null) return;
+                if (!fastestTimes.has(key) || reactionTime < fastestTimes.get(key)) fastestTimes.set(key, reactionTime);
+            });
+            return [...fastestTimes.entries()]
+                .map(([key, reactionTime]) => ({ nickname: names.get(key) || key, reactionTime }))
+                .sort((a, b) => a.reactionTime - b.reactionTime || a.nickname.localeCompare(b.nickname))
+                .slice(0, 10)
+                .map(player => [player.nickname, player.reactionTime]);
+        }
+
+        function firstFinishers(recordsByType, names) {
+            const milestones = new Map();
+            const remember = (record, milestone) => {
+                const key = normalizeNickname(record.nickname);
+                const timestamp = getRecordTime(record);
+                if (!key || !Number.isFinite(timestamp)) return;
+                if (!milestones.has(key)) milestones.set(key, new Map());
+                const byMilestone = milestones.get(key);
+                if (!byMilestone.has(milestone) || timestamp < byMilestone.get(milestone)) {
+                    byMilestone.set(milestone, timestamp);
+                }
+            };
+
+            recordsByType.traits.forEach(record => remember(record, "traits"));
+            recordsByType.photos.forEach(record => remember(record, "photo"));
+            recordsByType.rocketLeague.forEach(record => remember(record, "rocketLeague"));
+            recordsByType.shots.forEach(record => {
+                const distance = Number(record.distance);
+                if (DISTANCES.includes(distance)) remember(record, `distance-${distance}`);
+            });
+
+            const required = ["traits", "photo", "rocketLeague", ...DISTANCES.map(distance => `distance-${distance}`)];
+            return [...milestones.entries()]
+                .filter(([, byMilestone]) => required.every(milestone => byMilestone.has(milestone)))
+                .map(([key, byMilestone]) => ({
+                    nickname: names.get(key) || key,
+                    finishedAt: Math.max(...required.map(milestone => byMilestone.get(milestone)))
+                }))
+                .sort((a, b) => a.finishedAt - b.finishedAt || a.nickname.localeCompare(b.nickname))
+                .slice(0, 10)
+                .map(player => [player.nickname, new Date(player.finishedAt).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })]);
+        }
+
+        function renderTable(tableId, rows) {
+            const tbody = document.querySelector(`#${tableId} tbody`);
+            tbody.replaceChildren();
+            if (rows.length === 0) {
+                const row = document.createElement("tr");
+                const cell = document.createElement("td");
+                cell.colSpan = document.querySelectorAll(`#${tableId} thead th`).length;
+                cell.className = "empty";
+                cell.textContent = "No eligible players today.";
+                row.appendChild(cell);
+                tbody.appendChild(row);
+                return;
+            }
+            rows.forEach((values, index) => {
+                const row = document.createElement("tr");
+                const rank = document.createElement("td");
+                rank.className = "rank";
+                rank.textContent = String(index + 1);
+                row.appendChild(rank);
+                values.forEach(value => {
+                    const cell = document.createElement("td");
+                    cell.textContent = String(value);
+                    row.appendChild(cell);
+                });
+                tbody.appendChild(row);
+            });
+        }
+
+        async function loadLeaderboards() {
+            const status = document.getElementById("load-status");
+            const eventKey = localStorage.getItem("event_key");
+            if (!eventKey) {
+                window.location.href = "./index.html";
+                return;
+            }
+
+            const today = localDateKey(new Date());
+            document.getElementById("today-label").textContent = `Showing submissions for ${new Date().toLocaleDateString()}`;
+            try {
+                const fetched = await Promise.all(Object.entries(COLLECTIONS).map(async ([type, collectionId]) => [
+                    type,
+                    await fetchAllRecords(collectionId, eventKey)
+                ]));
+                const allRecords = Object.fromEntries(fetched);
+                const todayRecords = Object.fromEntries(
+                    Object.entries(allRecords).map(([type, records]) => [type, records.filter(record => isToday(record, today))])
+                );
+                const names = nicknameFor(Object.values(todayRecords).flat());
+
+                renderTable("rocket-league-table", topRocketLeague(todayRecords.rocketLeague, names));
+                renderTable("shooters-table", topShooters(todayRecords.shots, names));
+                renderTable("reaction-table", topReactions(todayRecords.traits, names));
+                renderTable("finish-table", firstFinishers(todayRecords, names));
+                const count = Object.values(todayRecords).reduce((total, records) => total + records.length, 0);
+                status.textContent = `Loaded ${count} submissions from today.`;
+            } catch (error) {
+                console.error(error);
+                status.textContent = `Unable to load today's data: ${error.message}`;
+                status.classList.add("error");
+            }
+        }
+
+        window.addEventListener("DOMContentLoaded", loadLeaderboards);
+    </script>
+</body>
+</html>
