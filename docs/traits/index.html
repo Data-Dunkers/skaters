@@ -94,7 +94,7 @@
                     <input type="number" id="beats_15s" min="0" max="120" step="1" placeholder="e.g. 16">
                 </div>
                 <div class="form-group extracted-style-4">
-                    <button type="button" class="btn" onclick="calculateHeartRateFromBeats()">Set BPM (x4)</button>
+                    <button type="button" id="setBpmBtn" class="btn" onclick="calculateHeartRateFromBeats()">Set BPM (x4)</button>
                 </div>
             </div>
 
@@ -335,7 +335,7 @@ function resetHeartTools() {
 
 function calculateHeartRateFromBeats() {
     const beats = parseInt(document.getElementById('beats_15s').value, 10);
-    if (Number.isNaN(beats) || beats < 0) {
+    if (Number.isNaN(beats) || beats <= 0) {
         showStatus('Enter a valid 15-second beat count first.', 'error');
         return;
     }
@@ -346,6 +346,10 @@ async function handleSubmit() {
     if (heartTimerRunning) {
         showStatus('Wait for the 15-second timer to finish before submitting.', 'error');
         return;
+    }
+
+    if (!document.getElementById('resting_heart_rate').value.trim()) {
+        document.getElementById('setBpmBtn').click();
     }
 
     const nickname = document.getElementById('nickname').value.trim();
@@ -359,6 +363,11 @@ async function handleSubmit() {
 
     if (!nickname || Number.isNaN(heightCm) || Number.isNaN(wingspanCm) || Number.isNaN(skateSize) || !handedness || !birthMonth || Number.isNaN(restingHeartRate)) {
         showStatus('Please complete all required fields.', 'error');
+        return;
+    }
+
+    if (restingHeartRate < 20 || restingHeartRate > 220) {
+        showStatus('Resting heart rate must be between 20 and 220 bpm. Check your beat count.', 'error');
         return;
     }
 
