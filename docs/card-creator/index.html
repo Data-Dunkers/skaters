@@ -102,7 +102,7 @@
         <div class="stat"><span class="lbl">Handedness</span><span class="val" id="tpl-hand">Right</span></div>
         <div class="stat"><span class="lbl">Birth Month</span><span class="val" id="tpl-month">October</span></div>
         <div class="stat"><span class="lbl">Shot %</span><span class="val" id="tpl-shotpct">75</span></div>
-        <div class="stat"><span class="lbl">Esport Score</span><span class="val" id="tpl-esport">N/A</span></div>
+        <div class="stat"><span class="lbl">Esport Shots</span><span class="val" id="tpl-esport-shots">N/A</span></div>
       </div>
 
       <div class="panel radar-panel" id="tpl-radar"></div>
@@ -126,8 +126,7 @@ const EVENT_LOGO_SRC = 'ocap-logo.png';
 const ROW_LOGO_SRCS = ['ps43-foundation-logo.png', 'dell-logo-black.png', 'lotus-8-esports-logo.png', 'mfnerc-logo.png'];
 let rowLogoData = null; // loaded once as data URLs so html2canvas can render them
 
-// Shot % = made / attempted. If your shot records have an attempts field, it is used
-// (shots_attempted, shots_taken or attempts). Otherwise each record represents six attempts.
+// Shot % = made / attempted. Each record represents six attempts.
 const ATTEMPTS_PER_RECORD = 6;
 
 const AXES = ['Sniper', 'Speed Winger', 'Playmaker', 'Defenseman', 'Power Forward', 'Two-way Forward'];
@@ -387,7 +386,7 @@ function splitName(full) {
 
 /* ------------------------------ render ------------------------------ */
 
-async function renderCard(p, t, esportScore, container) {
+async function renderCard(p, t, esportShots, container) {
     const node = document.getElementById('card-template').cloneNode(true);
     node.id = '';
 
@@ -422,11 +421,11 @@ async function renderCard(p, t, esportScore, container) {
     node.querySelector('#tpl-hand').textContent = /^ambidextrous$/i.test((t.handedness || '').trim()) ? 'ambidex' : (t.handedness || 'N/A');
     node.querySelector('#tpl-month').textContent = t.birth_month || 'N/A';
     node.querySelector('#tpl-shotpct').textContent = has(t.shotPct) ? t.shotPct : 'N/A';
-    const esportStat = node.querySelector('#tpl-esport').closest('.stat');
-    if (!has(esportScore) || (typeof esportScore === 'string' && !esportScore.trim())) {
+    const esportStat = node.querySelector('#tpl-esport-shots').closest('.stat');
+    if (!has(esportShots)) {
         esportStat.style.display = 'none';
     } else {
-        node.querySelector('#tpl-esport').textContent = esportScore;
+        node.querySelector('#tpl-esport-shots').textContent = esportShots;
     }
 
     buildRadar(node.querySelector('#tpl-radar'), t.radar || [0, 0, 0, 0, 0, 0].map(() => 0.1));
@@ -526,26 +525,34 @@ async function start() {
         document.getElementById('status').textContent = 'Fetching shots...';
         const shots = await fetchAll('data_skaters_shots');
 
-        document.getElementById('status').textContent = 'Fetching Rocket League scores...';
+        document.getElementById('status').textContent = 'Fetching Rocket League stats...';
 
         const esportRecords = await fetchAll('data_skaters_rocket_league');
 
 
-        const esportScores = new Map();
+        const esportShotTotals = new Map();
         for (const record of esportRecords) {
             const nickname = (record.nickname || '').trim().toUpperCase();
-            const score = Number(record.score);
-            if (!nickname || record.score === null || record.score === '' || !Number.isFinite(score)) continue;
-            const current = esportScores.get(nickname);
+            const goals = Number(record.goals);
+            const shots = Number(record.shots);
+            if (!nickname || record.goals === null || record.goals === '' ||
+                record.shots === null || record.shots === '' ||
+                !Number.isFinite(goals) || !Number.isFinite(shots)) continue;
+            const current = esportShotTotals.get(nickname);
             if (current) {
-                current.total += score;
-                current.count++;
+                current.goals += goals;
+                current.shots += shots;
             } else {
-                esportScores.set(nickname, { total: score, count: 1 });
+                esportShotTotals.set(nickname, { goals, shots });
             }
         }
-        for (const [nickname, scores] of esportScores) {
-            esportScores.set(nickname, scores.total / scores.count);
+        for (const [nickname, totals] of esportShotTotals) {
+            const displayValue = totals.goals === 0
+                ? String(totals.shots)
+                : totals.shots > 0
+                    ? `${Math.round((totals.goals / totals.shots) * 100)}%`
+                    : null;
+            esportShotTotals.set(nickname, displayValue);
         }
 
         document.getElementById('status').textContent = 'Computing archetypes...';
@@ -565,8 +572,8 @@ async function start() {
             document.getElementById('status').textContent = `Generating card ${i + 1} of ${photoList.length} (${p.nickname})...`;
 
             const t = traitMap[p.nickname.toUpperCase()] || {};
-            const esportScore = esportScores.get(p.nickname.trim().toUpperCase());
-            await renderCard(p, t, esportScore, container);
+            const esportShots = esportShotTotals.get(p.nickname.trim().toUpperCase());
+            await renderCard(p, t, esportShots, container);
         }
 
         //document.getElementById('status').textContent = 'All cards generated successfully.';
