@@ -9,6 +9,9 @@
         body { font-family: sans-serif; margin: 0; padding: 1rem; background: #111; color: #fff; }
         .home-link { display: inline-block; margin-bottom: 1rem; padding: 0.5rem 1rem; border: 2px solid #888;
             border-radius: 6px; background: #222; color: #fff; text-decoration: none; font-size: 1.2rem; }
+        .top-bar { display: flex; justify-content: space-between; align-items: flex-start; }
+        #clear-btn { margin-bottom: 1rem; padding: 0.5rem 1rem; border: 2px solid #888; border-radius: 6px;
+            background: #222; color: #fff; font-size: 1.2rem; cursor: pointer; }
         #status { margin-bottom: 1rem; opacity: 0.8; }
         #buttons { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1rem; }
         #buttons button { font-size: 1.2rem; padding: 0.5rem 1rem; border: 2px solid #888; border-radius: 6px;
@@ -20,7 +23,10 @@
     </style>
 </head>
 <body>
-    <div><a class="home-link" href="../index.html">Home</a></div>
+    <div class="top-bar">
+        <a class="home-link" href="../index.html">Home</a>
+        <button id="clear-btn" type="button">Clear Selections</button>
+    </div>
     <div id="status">Loading...</div>
     <div id="buttons"></div>
     <div id="photos"></div>
@@ -102,6 +108,10 @@
                 statusEl.textContent = `Could not load photos (${error.message}).`;
             }
         }
+
+        document.getElementById('clear-btn').addEventListener('click', () => {
+            buttonsEl.querySelectorAll('button.on').forEach((b) => b.click());
+        });
 
         init();
     </script>
