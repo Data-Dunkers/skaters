@@ -188,6 +188,50 @@
             });
             thead.appendChild(trHead);
 
+            // Add summary row showing count of data points for each column
+            const trSummary = document.createElement('tr');
+            trSummary.style.backgroundColor = '#000000';
+            trSummary.style.fontWeight = 'bold';
+            trSummary.style.borderTop = '2px solid #ccc';
+            
+            const tdSummaryLabel = document.createElement('td');
+            tdSummaryLabel.textContent = 'Data Points';
+            tdSummaryLabel.style.fontWeight = 'bold';
+            trSummary.appendChild(tdSummaryLabel);
+
+            const tdGroupCount = document.createElement('td');
+            tdGroupCount.style.textAlign = 'center';
+            const groupCount = new Set(fTraits.concat(fPhotos).concat(fShots).concat(fRocketLeague)
+                .map(r => getGroupForNickname(r.nickname, fTraits, fPhotos, fShots, fRocketLeague))
+                .filter(g => g !== null)).size;
+            tdGroupCount.textContent = groupCount;
+            trSummary.appendChild(tdGroupCount);
+
+            const tdTraitsCount = document.createElement('td');
+            tdTraitsCount.style.textAlign = 'center';
+            tdTraitsCount.textContent = fTraits.length;
+            trSummary.appendChild(tdTraitsCount);
+
+            const tdPhotoCount = document.createElement('td');
+            tdPhotoCount.style.textAlign = 'center';
+            tdPhotoCount.textContent = fPhotos.length;
+            trSummary.appendChild(tdPhotoCount);
+
+            const tdRocketLeagueCount = document.createElement('td');
+            tdRocketLeagueCount.style.textAlign = 'center';
+            tdRocketLeagueCount.textContent = fRocketLeague.length;
+            trSummary.appendChild(tdRocketLeagueCount);
+
+            sortedDistances.forEach(d => {
+                const tdShotCount = document.createElement('td');
+                tdShotCount.style.textAlign = 'center';
+                const shotCount = fShots.filter(s => String(s.distance).trim() === d).length;
+                tdShotCount.textContent = shotCount;
+                trSummary.appendChild(tdShotCount);
+            });
+
+            thead.appendChild(trSummary);
+
             // Get all unique nicknames from filtered data
             const nicknames = new Set();
             fTraits.forEach(t => { if(t.nickname) nicknames.add(t.nickname.trim()); });
