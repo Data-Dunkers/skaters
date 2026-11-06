@@ -554,6 +554,43 @@
             setStatus('Retake ready. Capture a new photo.');
         }
 
+        async function compressImage(blob) {
+            return new Promise((resolve) => {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const img = new Image();
+                    img.onload = () => {
+                        const maxWidth = 840;
+                        const maxHeight = 848;
+                        let width = img.width;
+                        let height = img.height;
+
+                        if (width > height) {
+                            if (width > maxWidth) {
+                                height = Math.round((height * maxWidth) / width);
+                                width = maxWidth;
+                            }
+                        } else {
+                            if (height > maxHeight) {
+                                width = Math.round((width * maxHeight) / height);
+                                height = maxHeight;
+                            }
+                        }
+
+                        const compressCanvas = document.createElement('canvas');
+                        compressCanvas.width = width;
+                        compressCanvas.height = height;
+                        const ctx = compressCanvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0, width, height);
+
+                        compressCanvas.toBlob(resolve, 'image/jpeg', 0.85);
+                    };
+                    img.src = e.target.result;
+                };
+                reader.readAsDataURL(blob);
+            });
+        }
+
         async function uploadRecord(event) {
             event.preventDefault();
 
@@ -580,20 +617,23 @@
                 return;
             }
 
-            const fileName = `${nickname.replace(/[^a-zA-Z0-9_-]/g, '_')}_${Date.now()}.png`;
-            const photoFile = new File([photoBlob], fileName, { type: 'image/png' });
-
-            const formData = new FormData();
-            formData.append('nickname', nickname);
-            formData.append('real_name', realName);
-            if (group) formData.append('group', group);
-            formData.append('photo', photoFile);
-            formData.append('event_key', eventKey);
-
             uploadBtn.disabled = true;
-            setStatus('Uploading to PocketBase...');
+            setStatus('Compressing image...');
 
             try {
+                const compressedBlob = await compressImage(photoBlob);
+                const fileName = `${nickname.replace(/[^a-zA-Z0-9_-]/g, '_')}_${Date.now()}.jpg`;
+                const photoFile = new File([compressedBlob], fileName, { type: 'image/jpeg' });
+
+                const formData = new FormData();
+                formData.append('nickname', nickname);
+                formData.append('real_name', realName);
+                if (group) formData.append('group', group);
+                formData.append('photo', photoFile);
+                formData.append('event_key', eventKey);
+
+                setStatus('Uploading to PocketBase...');
+
                 const response = await fetch(`${POCKETBASE_URL}/api/collections/${COLLECTION_NAME}/records`, {
                     method: 'POST',
                     body: formData
