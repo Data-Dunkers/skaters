@@ -560,9 +560,16 @@ async function start() {
         cohortCorr = computeCorrelations(traits);
 
         const isTesting = new URLSearchParams(window.location.search).get('testing');
-        const photoList = isTesting ? latestPhotos.slice(0, 8) : latestPhotos;
+        const nicknameFilter = new URLSearchParams(window.location.search).get('nickname');
+        let photoList = isTesting ? latestPhotos.slice(0, 8) : latestPhotos;
+        
+        if (nicknameFilter) {
+            const filterUpper = nicknameFilter.toUpperCase();
+            photoList = photoList.filter(p => p.nickname && p.nickname.toUpperCase() === filterUpper);
+        }
 
-        document.getElementById('status').textContent = `Generating ${photoList.length} cards${isTesting ? ' (testing mode)' : ''}...`;
+        const statusSuffix = nicknameFilter ? ` for ${nicknameFilter}` : (isTesting ? ' (testing mode)' : '');
+        document.getElementById('status').textContent = `Generating ${photoList.length} card${photoList.length !== 1 ? 's' : ''}${statusSuffix}...`;
         const container = document.getElementById('cards-container');
 
         for (let i = 0; i < photoList.length; i++) {
