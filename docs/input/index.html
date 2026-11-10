@@ -27,7 +27,7 @@
             </div>
             <div class="form-group">
                 <label for="nickname">Nickname</label>
-                <input type="text" id="nickname" name="nickname" placeholder="PS43" required oninput="validateNickname()" onblur="updateStats(this.value.trim())" maxlength="4" autocomplete="off">
+                <input type="text" id="nickname" name="nickname" placeholder="PS43" required oninput="this.value = sanitizeNickname(this.value)" onblur="updateStats(this.value.trim())" maxlength="4" autocomplete="off">
             </div>
         </div>
     </div>
@@ -133,20 +133,16 @@ window.onload = () => {
     //if (savedNick)  updateStats(savedNick);
 };
 
-// ── NICKNAME VALIDATION ───────────────────────────────────────
-function validateNickname() {
-    let val = document.getElementById('nickname').value.toUpperCase();
+function sanitizeNickname(value) {
+    const cleaned = value.toUpperCase().replace(/[^A-Z0-9]/g, '');
     let result = '';
-    
-    for (let i = 0; i < val.length && i < 4; i++) {
-        let char = val[i];
-        if (i < 2 && /[A-Z]/.test(char)) {
-            result += char; // First 2 characters must be letters
-        } else if (i >= 2 && /[0-9]/.test(char)) {
-            result += char; // Last 2 characters must be numbers
+    for (const ch of cleaned) {
+        const isLetter = /[A-Z]/.test(ch);
+        if (result.length < 2 ? isLetter : (result.length < 4 && !isLetter)) {
+            result += ch;
         }
     }
-    document.getElementById('nickname').value = result;
+    return result;
 }
 
 

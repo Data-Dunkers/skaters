@@ -27,7 +27,7 @@
             </div>
             <div class="form-group">
                 <label for="nickname">Nickname</label>
-                <input type="text" id="nickname" name="nickname" placeholder="e.g. PS43" required oninput="this.value=this.value.toUpperCase().replace(/\s/g,'')">
+                <input type="text" id="nickname" name="nickname" placeholder="e.g. PS43" required oninput="this.value = sanitizeNickname(this.value)" maxlength="4" autocomplete="off">
             </div>
         </div>
     </div>
@@ -136,6 +136,18 @@
 <script>
 // ── CONFIG ──────────────────────────────────────────────────────
 const PB_URL = 'https://api.datadunkers.ca/api/collections/data_skaters_activities/records';
+
+function sanitizeNickname(value) {
+    const cleaned = value.toUpperCase().replace(/[^A-Z0-9]/g, '');
+    let result = '';
+    for (const ch of cleaned) {
+        const isLetter = /[A-Z]/.test(ch);
+        if (result.length < 2 ? isLetter : (result.length < 4 && !isLetter)) {
+            result += ch;
+        }
+    }
+    return result;
+}
 
 // Which fields each activity needs
 // target_zone: true = show, false = hide
