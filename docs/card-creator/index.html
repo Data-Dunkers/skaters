@@ -118,6 +118,10 @@
 const allCardImages = [];
 
 const BASE_URL = "https://api.datadunkers.ca";
+const urlParams = new URLSearchParams(window.location.search);
+const isDemo = urlParams.get('demo') === 'true';
+const isTesting = urlParams.get('testing') === 'true';
+const nicknameFilter = urlParams.get('nickname');
 
 // OCAP logo shown top-right of the header.
 const EVENT_LOGO_SRC = 'ocap-logo.png';
@@ -559,8 +563,6 @@ async function start() {
         const traitMap = computeArchetypes(traits, shots);
         cohortCorr = computeCorrelations(traits);
 
-        const isTesting = new URLSearchParams(window.location.search).get('testing');
-        const nicknameFilter = new URLSearchParams(window.location.search).get('nickname');
         let photoList = isTesting ? latestPhotos.slice(0, 8) : latestPhotos;
         
         if (nicknameFilter) {
@@ -568,7 +570,11 @@ async function start() {
             photoList = photoList.filter(p => p.nickname && p.nickname.toUpperCase() === filterUpper);
         }
 
-        const statusSuffix = nicknameFilter ? ` for ${nicknameFilter}` : (isTesting ? ' (testing mode)' : '');
+        if (isDemo) {
+            photoList = photoList.slice(0, 1);
+        }
+
+        const statusSuffix = nicknameFilter ? ` for ${nicknameFilter}` : (isDemo ? ' (demo mode)' : (isTesting ? ' (testing mode)' : ''));
         document.getElementById('status').textContent = `Generating ${photoList.length} card${photoList.length !== 1 ? 's' : ''}${statusSuffix}...`;
         const container = document.getElementById('cards-container');
 
@@ -697,6 +703,9 @@ async function downloadAllAs4x6Pdf() {
 
 // Ensure fonts and images are fully loaded before capturing
 window.onload = () => {
+    if (isDemo) {
+        localStorage.setItem('event_key', 'demo');
+    }
     const eventKey = localStorage.getItem('event_key');
     if (!eventKey) {
         window.location.href = '../index.html';
