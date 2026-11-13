@@ -14,10 +14,10 @@ Data Skaters is led by Dell Canada and The PS43 Foundation, with ongoing learnin
 
 ### Table of Contents
 
-1. Introduction
-2. Set-Up
-3. Data Entry and Collection
-4. Data Analysis and AI Visualizations
+1. Set-Up
+2. Introduction
+3. Data Collection
+4. Data Analysis Visualizations
 5. Player Archetypes
 6. Student Critique
 7. Student Data Player Card Creation
@@ -35,6 +35,42 @@ Data Skaters is flexible and adaptable to any schedule, space, or resource setup
 What responsibilities come with collecting data about people?
 Who should benefit from the collected data?
 
+## Set-Up
+
+This works best in a large space such as a gymnasium, or outdoors if weather permits.
+
+Students should be in groups of six or fewer. Each group will need:
+
+* an internet-connected device with a camera, such as a laptop or tablet
+* a hockey net (mini, full-size with part blocked off, or a target on the wall)
+* a mini stick or full-size stick
+* a foam ball or soft puck
+* masking tape or painter's tape and a marker
+* distance markings in front of the net at approximately 2 feet, 5 feet, 7 feet, and 10 feet
+* measuring tape
+  * (optional) vertical tape on the wall with markings at 10 cm increments for measuring height
+  * (optional) horizontal tape on the wall with markings at 10 cm increments for measuring wingspan
+* (optional) pulse oximeter or similar device for measuring heart rate
+* (optional) paper and pencils for recording data before entering it into the digital forms
+
+As well, you will need:
+
+* reliable internet access
+  * ensure that the [Data Skaters Website](https://datadunkers.ca/skaters) is not blocked, also test that [card creator](https://datadunkers.ca/skaters/card-creator/index.html?testing=true) renders correctly
+* projector or screen for displaying slides and data visualizations
+* supplies for creating player cards
+  * colour printer
+  * scissors or paper cutters
+  * card protectors (hard plastic or soft)
+  * tables for assembling and displaying the cards
+* (optional) for esports data collection:
+  * laptops or computer lab with [Rocket League](https://www.rocketleague.com) installed
+  * gaming controllers (two per station for 1v1 games)
+  * [Epic Games](https://store.epicgames.com) accounts logged in on the computers
+* signed media consent forms if you are sharing photos of the event
+
+Decide on an *event key* (e.g. MFNSS) and input it into each of the laptops to ensure that all of the collected data is going to the same database.
+
 ## Introduction
 
 Starting with the end in mind, show students a [player card](https://datadunkers.ca/skaters/card-creator/index.html?demo=true) as an example of how their data will be used.
@@ -46,14 +82,13 @@ Starting with the end in mind, show students a [player card](https://datadunkers
 
 The steps for the day are:
 
-1. Create a player ID (nickname) with two letters and a two-digit number (e.g. PS43).
-2. Take a player photo at their data collection station (hockey net) using the [photo booth](https://datadunkers.ca/skaters/photobooth).
-3. Record their [traits](https://datadunkers.ca/skaters/traits) (measurements) such as height, wingspan, resting heart rate, and reaction time.
-4. Take [shots](https://datadunkers.ca/skaters/shots) on a hockey net from four different distances and record their success rate.
-5. (Optional) Play a round of Rocket League and record their individual [esports results](https://datadunkers.ca/skaters/rocketleague) such as goals and assists.
-6. Play at least one game on "fair teams" as determined by AI from their collected data.
-7. Visualize and analyze the group data and their own data.
-8. Get a unique player card with their data.
+1. Take a player photo at their data collection station (hockey net) using the [photo booth](https://datadunkers.ca/skaters/photobooth).
+2. Record their [traits](https://datadunkers.ca/skaters/traits) (measurements) such as height, wingspan, resting heart rate, and reaction time.
+3. Take [shots](https://datadunkers.ca/skaters/shots) on a hockey net from four different distances and record their success rate.
+4. (Optional) Play a round of Rocket League and record their individual [esports results](https://datadunkers.ca/skaters/rocketleague) such as goals and assists.
+5. Play at least one game on "fair teams" as determined by AI from their collected data.
+6. Visualize and analyze the group data and their own data.
+7. Discuss the archetypes and get a unique player card with their data.
 
 ### Team Norms
 
@@ -80,39 +115,9 @@ In Data Skaters, OCAP® principles are directly integrated:
 
 The term [data sovereignty](https://en.wikipedia.org/wiki/Data_sovereignty) relates to a nation's regulations and control over data generated within its borders. It can be related to transnational data flow or the relationship of Indigenous groups to post-colonial states.
 
-## Set-Up
+## Data Collection
 
-This works best in a large space such as a gymnasium, or outdoors if weather permits.
+Each student should decide on a player ID (nickname) with two letters and a two-digit number (e.g. PS43). Students will be using the same nickname all day, so consider writing it on a piece of masking tape for them to use like a nametag.
 
-Students should be in groups of six or fewer. Each group will need:
-* an internet-connected device with a camera, such as a laptop or tablet
-* a hockey net (mini, full-size with part blocked off, or a target on the wall)
-* a mini stick or full-size stick
-* a foam ball or soft puck
-* masking tape or painter's tape and a marker
-* distance markings in front of the net at approximately 2 feet, 5 feet, 7 feet, and 10 feet
-* measuring tape
-  * (optional) vertical tape on the wall with markings at 10 cm increments for measuring height
-  * (optional) horizontal tape on the wall with markings at 10 cm increments for measuring wingspan
-* (optional) pulse oximeter or similar device for measuring heart rate
-* (optional) paper and pencils for recording data before entering it into the digital forms
 
-As well, you will need:
-* reliable internet access
-  * ensure that the [Data Skaters Website](https://datadunkers.ca/skaters) is not blocked
-* projector or screen for displaying slides and data visualizations
-* supplies for creating player cards
-  * colour printer
-  * scissors or paper cutters
-  * card protectors (hard plastic or soft)
-  * tables for assembling and displaying the cards
-* (optional) for esports data collection:
-  * laptops or computer lab with [Rocket League](https://www.rocketleague.com) installed
-  * gaming controllers (two per station for 1v1 games)
-  * [Epic Games](https://store.epicgames.com) accounts logged in on the computers
-* signed media consent forms if you are sharing photos of the event
-
-Decide on an *event key* (e.g. MFNSS) and input it into each of the laptops to ensure that all of the collected data is going to the same database.
-
-Students will be using the same nickname all day, so consider writing it on a piece of masking tape for them to use like a nametag.
 
