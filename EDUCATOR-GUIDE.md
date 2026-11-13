@@ -69,7 +69,7 @@ As well, you will need:
   * [Epic Games](https://store.epicgames.com) accounts logged in on the computers
 * signed media consent forms if you are sharing photos of the event
 
-Decide on an *event key* (e.g. MFNSS) and input it into each of the laptops to ensure that all of the collected data is going to the same database.
+**Important**: Decide on an *event key* (e.g. MFNSS) and input it into each of the laptops to ensure that all of the collected data is going to the same database.
 
 ## Introduction
 
@@ -82,13 +82,14 @@ Starting with the end in mind, show students a [player card](https://datadunkers
 
 The steps for the day are:
 
-1. Take a player photo at their data collection station (hockey net) using the [photo booth](https://datadunkers.ca/skaters/photobooth).
-2. Record their [traits](https://datadunkers.ca/skaters/traits) (measurements) such as height, wingspan, resting heart rate, and reaction time.
-3. Take [shots](https://datadunkers.ca/skaters/shots) on a hockey net from four different distances and record their success rate.
-4. (Optional) Play a round of Rocket League and record their individual [esports results](https://datadunkers.ca/skaters/rocketleague) such as goals and assists.
-5. Play at least one game on "fair teams" as determined by AI from their collected data.
-6. Visualize and analyze the group data and their own data.
-7. Discuss the archetypes and get a unique player card with their data.
+1. Introduce the supporters, the purpose of the day, and how data science, data sovereignty, and artificial intelligence are related.
+2. Take a player photo at their data collection station (hockey net) using the [photo booth](https://datadunkers.ca/skaters/photobooth).
+3. Record their [traits](https://datadunkers.ca/skaters/traits) (measurements) such as height, wingspan, resting heart rate, and reaction time.
+4. Take [shots](https://datadunkers.ca/skaters/shots) on a hockey net from four different distances and record their success rate.
+5. (Optional) Play a round of Rocket League and record their individual [esports results](https://datadunkers.ca/skaters/rocketleague) such as goals and assists.
+6. Play at least one game on "fair teams" as determined by AI from their collected data.
+7. Visualize and analyze the group data and their own data.
+8. Discuss the archetypes and get a unique player card with their data.
 
 ### Team Norms
 
@@ -103,7 +104,9 @@ The steps for the day are:
 
 Introduce students to [Lotus 8 Esports Performance Mindset Mindfulness](https://lotus8esports.com/performance-mindset-mindfulness).
 
-### OCAP® and Indigenous Data Sovereignty
+If you have other adult helpers, this may be a good time to talk with them about their roles during the data collection process.
+
+### OCAP® and Data Sovereignty
 
 Developed in 1998 by the First Nations Information Governance Centre (FNIGC), OCAP® is a set of foundational principles that establishes First Nations data sovereignty—the right of First Nations communities to own, control, access, and possess data collected about their people, culture, and lands.
 
@@ -115,9 +118,36 @@ In Data Skaters, OCAP® principles are directly integrated:
 
 The term [data sovereignty](https://en.wikipedia.org/wiki/Data_sovereignty) relates to a nation's regulations and control over data generated within its borders. It can be related to transnational data flow or the relationship of Indigenous groups to post-colonial states.
 
+All of the data collected is either stored locally or on a Canadian server managed by the Data Skaters team. Participant data will not be retained.
+
 ## Data Collection
 
 Each student should decide on a player ID (nickname) with two letters and a two-digit number (e.g. PS43). Students will be using the same nickname all day, so consider writing it on a piece of masking tape for them to use like a nametag.
 
+Divide students into groups, and ensure they know their group number (e.g. tape label on the hockey net).
 
+### Photo Booth
 
+Using the [photo booth](https://datadunkers.ca/skaters/photobooth), students are introduced to the data collection process and using their nicknames.
+
+### Traits Form
+
+The [traits form](https://datadunkers.ca/skaters/traits) requres students to make various measurements and record their data.
+
+### Shot Input Form
+
+Students take on a hockey net from four different distances and record their success rate in the [shots form](https://datadunkers.ca/skaters/shots).
+
+### Rocket League
+
+If you are able to set up computers for students to play 1v1 Rocket League Snow Day, they can record their individual [esports results](https://datadunkers.ca/skaters/rocketleague).
+
+**TODO: Add more detail about setup and matches**
+
+### Tracking The Data Collection
+
+To help ensure that students are collecting all the data they need for their player card, the following pages are available:
+
+* [Collected Data](https://datadunkers.ca/skaters/collected) - show which students have completed which sections
+* [Nicknames](https://datadunkers.ca/skaters/nicknames) - view player nicknames and photos
+* [Today's Top Ten](https://datadunkers.ca/skaters/top) - leading scores, shooting, reaction times, and finishers
