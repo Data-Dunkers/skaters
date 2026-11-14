@@ -51,6 +51,12 @@
             <div class="section-label" id="incomplete-label">Incomplete</div>
             <div class="status-text" id="incomplete"></div>
         </div>
+
+        <div style="margin-top: 2rem; padding-top: 2rem; border-top: 1px solid #ddd; text-align: center;">
+            <button id="download-csv-link" type="button" disabled style="display: inline-block; padding: 0.75rem 1.5rem; background-color: #007bff; color: white; border: 0; border-radius: 4px; font-weight: 600;">
+                Download Filtered Data
+            </button>
+        </div>
     </div>
 
     <script>
@@ -110,7 +116,7 @@
             return null;
         }
 
-        function renderAllTables() {
+        function getFilteredRecords() {
             const dateFilter = document.getElementById("date-select").value;
             const groupFilter = document.getElementById("group-select").value;
             const filterFn = rec => {
@@ -141,6 +147,11 @@
                 fRocketLeague = fRocketLeague.filter(inGroup);
             }
 
+            return [fTraits, fPhotos, fShots, fRocketLeague];
+        }
+
+        function renderAllTables() {
+            const [fTraits, fPhotos, fShots, fRocketLeague] = getFilteredRecords();
             const submissionContainer = document.getElementById('submission-container');
             const submissionLabel = document.getElementById('submission-label');
             const table = document.getElementById('submission-table');
@@ -481,6 +492,7 @@
                     progressContainer.style.display = 'none';
                     setupDateFilter();
                     renderAllTables();
+                    document.getElementById("download-csv-link").disabled = false;
                 }, 500);
 
             } catch (error) {
@@ -490,7 +502,52 @@
             }
         }
 
+        function generateCSV() {
+            const allRecords = [globalTraits, globalPhotos, globalShots, globalRocketLeague];
+            const keys = new Set(["collectionName"]);
+            allRecords.forEach(records => records.forEach(record => {
+                Object.keys(record).forEach(key => keys.add(key));
+            }));
+            const columns = Array.from(keys);
+            const escapeCell = value => {
+                if (value === null || value === undefined) return "";
+                const text = typeof value === "object" ? JSON.stringify(value) : String(value);
+                return /[",\r\n]/.test(text) ? `"${text.replace(/"/g, '""')}"` : text;
+            };
+            const rows = [columns.map(escapeCell).join(",")];
+            getFilteredRecords().forEach((records, index) => {
+                records.forEach(record => {
+                    rows.push(columns.map(key => escapeCell(
+                        key === "collectionName" && !record[key] ? COLLECTIONS[index].id : record[key]
+                    )).join(","));
+                });
+            });
+            return rows.join("\r\n") + "\r\n";
+        }
+
+        function downloadCSV() {
+            const csv = generateCSV();
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            const url = URL.createObjectURL(blob);
+            const timestamp = new Date().toISOString().split('T')[0];
+
+            link.setAttribute('href', url);
+            link.setAttribute('download', `skaters-data-${timestamp}.csv`);
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            setTimeout(() => URL.revokeObjectURL(url), 0);
+        }
+
+        document.addEventListener("DOMContentLoaded", () => {
+            const downloadLink = document.getElementById("download-csv-link");
+            downloadLink.addEventListener("click", downloadCSV);
+        });
+
         // Start automatically
+
         window.addEventListener("DOMContentLoaded", () => {
             const eventKey = localStorage.getItem('event_key');
             if (!eventKey) {
