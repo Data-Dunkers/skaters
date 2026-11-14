@@ -18,8 +18,8 @@ Data Skaters is led by Dell Canada and The PS43 Foundation, with ongoing learnin
 2. Introduction
 3. Data Collection
 4. Data Analysis and Visualizations
-5. Player Archetypes
-6. Student Critique
+5. AI-Mediated Team Creation
+6. Player Archetypes and Student Critique
 7. Student Data Player Card Creation
 8. Data Ownership
 9. Appendices and Printable Templates
@@ -165,13 +165,37 @@ To help ensure that students are collecting all the data they need for their pla
 
 Once the students have collected all of their data, the [visualizations page](https://datadunkers.ca/skaters/visualizations) will allow you to show them various data visualizations for their data.
 
-**TODO: Add more detail**
+**TODO: Add more detail, including AI analysis**
 
-## Player Archetypes
+### AI Analysis
 
 
 
-## Student Critique
+### Jupyter Notebook
+
+Jupyter is a browser-based coding environment that lets students analyze data using Python without installing software or creating user accounts. In Data Skaters, students can use a notebook on JupyterLite, which doesn't requie a server, to import their collected data and create visualizations using pre-written code.
+
+## AI-Mediated Team Creation
+
+
+## Player Archetypes and Student Critique
+
+### Sniper
+
+
+### Speed Winger
+
+
+### Playmaker
+
+
+### Defenseman
+
+
+### Power Forward
+
+
+### Two-Way Forward
 
 
 
