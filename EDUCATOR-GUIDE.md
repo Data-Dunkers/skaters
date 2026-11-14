@@ -17,7 +17,7 @@ Data Skaters is led by Dell Canada and The PS43 Foundation, with ongoing learnin
 1. Set-Up
 2. Introduction
 3. Data Collection
-4. Data Analysis Visualizations
+4. Data Analysis and Visualizations
 5. Player Archetypes
 6. Student Critique
 7. Student Data Player Card Creation
@@ -78,18 +78,21 @@ Starting with the end in mind, show students a [player card](https://datadunkers
 * They will be taking their own photo and deciding on a four-character nickname.
 * The card will include the data the collect about their traits and shot accuracy.
 * There will also be visualizations on the back about how their archetype was determined, and correlations in some of the data that will be collected today.
-  * The player archetype is a data-informed profile that describes a pattern in a student's results. It is based only on the activities and attributes included in the Data Skaters data set, so it should be used for reflection and discussion rather than as a complete description of the student. The archetypes are Sniper, Speed Winger, Playmaker, Defenseman, Power Forward, and Two-way Forward.
+  * The player archetype is a data-informed profile that describes a pattern in a student's results.
+  * Archetypes are based only on the activities and attributes included in the Data Skaters data set, so it should be used for reflection and discussion rather than as a complete description of the student.
+  * The archetypes are Sniper, Speed Winger, Playmaker, Defenseman, Power Forward, and Two-way Forward.
 
 The steps for the day are:
 
 1. Introduce the supporters, the purpose of the day, and how data science, data sovereignty, and artificial intelligence are related.
 2. Take a player photo at their data collection station (hockey net) using the [photo booth](https://datadunkers.ca/skaters/photobooth).
 3. Record their [traits](https://datadunkers.ca/skaters/traits) (measurements) such as height, wingspan, resting heart rate, and reaction time.
-4. Take [shots](https://datadunkers.ca/skaters/shots) on a hockey net from four different distances and record their success rate.
-5. (Optional) Play a round of Rocket League and record their individual [esports results](https://datadunkers.ca/skaters/rocketleague) such as goals and assists.
-6. Play at least one game on "fair teams" as determined by AI from their collected data.
+4. Discuss data soverignty and data science.
+5. Take [shots](https://datadunkers.ca/skaters/shots) on a hockey net from four different distances and record their success rate.
+6. (Optional) Play a round of Rocket League and record their individual [esports results](https://datadunkers.ca/skaters/rocketleague) such as goals and assists.
 7. Visualize and analyze the group data and their own data.
-8. Discuss the archetypes and get a unique player card with their data.
+8. Play at least one game on "fair teams" as determined by AI from their collected data.
+9. Discuss the archetypes and get a unique player card with their data.
 
 ### Team Norms
 
@@ -126,6 +129,8 @@ Each student should decide on a player ID (nickname) with two letters and a two-
 
 Divide students into groups, and ensure they know their group number (e.g. tape label on the hockey net).
 
+We recommend getting students actively collecting data as quickly as possible, with minimal preamble.
+
 ### Photo Booth
 
 Using the [photo booth](https://datadunkers.ca/skaters/photobooth), students are introduced to the data collection process and using their nicknames.
@@ -134,6 +139,8 @@ Using the [photo booth](https://datadunkers.ca/skaters/photobooth), students are
 
 The [traits form](https://datadunkers.ca/skaters/traits) requres students to make various measurements and record their data.
 
+*After this it would be good to gather the students back together to talk about data soverignty and data science, and remind them of the purpose of the activities.*
+
 ### Shot Input Form
 
 Students take on a hockey net from four different distances and record their success rate in the [shots form](https://datadunkers.ca/skaters/shots).
@@ -141,6 +148,8 @@ Students take on a hockey net from four different distances and record their suc
 ### Rocket League
 
 If you are able to set up computers for students to play 1v1 Rocket League Snow Day, they can record their individual [esports results](https://datadunkers.ca/skaters/rocketleague).
+
+It may be possible run this concurrently with the other data collection processes.
 
 **TODO: Add more detail about setup and matches**
 
@@ -151,3 +160,29 @@ To help ensure that students are collecting all the data they need for their pla
 * [Collected Data](https://datadunkers.ca/skaters/collected) - show which students have completed which sections
 * [Nicknames](https://datadunkers.ca/skaters/nicknames) - view player nicknames and photos
 * [Today's Top Ten](https://datadunkers.ca/skaters/top) - leading scores, shooting, reaction times, and finishers
+
+## Data Analysis and Visualizations
+
+Once the students have collected all of their data, the [visualizations page](https://datadunkers.ca/skaters/visualizations) will allow you to show them various data visualizations for their data.
+
+**TODO: Add more detail**
+
+## Player Archetypes
+
+
+
+## Student Critique
+
+
+
+## Student Data Player Card Creation
+
+
+
+## Data Ownership
+
+
+
+## Appendices and Printable Templates
+
+
