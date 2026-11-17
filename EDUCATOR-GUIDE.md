@@ -165,18 +165,39 @@ To help ensure that students are collecting all the data they need for their pla
 
 Once the students have collected all of their data, the [visualizations page](https://datadunkers.ca/skaters/visualizations) will allow you to show them various data visualizations for their data.
 
-**TODO: Add more detail, including AI analysis**
-
-### AI Analysis
-
-
+**TODO: Add more detail**
 
 ### Jupyter Notebook
 
 Jupyter is a browser-based coding environment that lets students analyze data using Python without installing software or creating user accounts. In Data Skaters, students can use a notebook on JupyterLite, which doesn't requie a server, to import their collected data and create visualizations using pre-written code.
 
+Participants can run their own copy of a JupyterLite notebook by clicking on the [data analysis link](https://datadunkers.ca/jupyterlite/tree/?path=data-skaters%2Fdata-skaters.ipynb) on the Data Skaters page.
+
+**TODO: Add more detail**
+
+### AI Analysis
+
+To begin analysing the data using AI, download the data file from the [collected data page](https://datadunkers.ca/skaters/collected).
+
+Using a local AI model (preferred) or an online AI tool approved by your school, add the downloaded data file and use prompts such as:
+
+* `Who is the tallest in the dataset?`
+* `Who has the fastest reaction time?`
+* `Who are the top 5 overall shooters across all distances combined?`
+* `Which traits seem to be correlated?`
+* `Create a scatterplot showing how wingspan relates to shooting performance.`
+* `Does faster reaction time translate into more saves or higher scores in Rocket League?`
+* `Do skaters with lower resting heart rates maintain more consistent shooting accuracy as distance increases?`
+* `Plot the average shots_made across distances.`
+* `Do students born in earlier months have better performance?`
+* `Compare right-handed, left-handed, and ambidextrous skaters across reaction time, total shots made, and Rocket League goals.`
+* `Rank the groups based on their shooting performance.`
+
 ## AI-Mediated Team Creation
 
+Continuing the AI analysis, give the tool a prompt such as:
+
+`We would like to play 
 
 ## Player Archetypes and Student Critique
 
