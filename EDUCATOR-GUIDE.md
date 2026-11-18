@@ -275,7 +275,7 @@ Continuing the AI analysis, give the tool a prompt such as:
 
 `We would like to play some 4 vs 4 ball hockey scrimmage matches, generate fair teams based on the data.`
 
-Then set up and play some matches, and discuss with students if they thought those were fair teams and why or why not. You can also talk about other factors that go into team play that were not collected in the data set.
+Then set up and play some matches, and discuss with students if they thought those were fair teams and why or why not. You can also talk about other factors that go into team play that were not collected in the data set (e.g. friendships, leadership skills, effor and attitude, communication and teamwork). This highlights the importance of "data-informed decision making", combining data analysis with human insight and judgment.
 
 ## Player Archetypes and Student Critique
 
@@ -304,7 +304,15 @@ Then set up and play some matches, and discuss with students if they thought tho
 
 ## Data Ownership
 
+Possible discussion questions:
 
+1. Who owns the data collected during Data Skaters, and who should decide how it is used?
+2. How is collecting information about people similar to collecting information about Indigenous communities?
+3. Why is control of your own data important?
+4. Should students have the right to see, correct, or remove their data after it has been collected? Why or why not?
+5. What are the benefits and risks of sharing data with others, including AI systems, to make decisions or predictions?
+6. What important things about a person cannot be captured by data, and why should these missing pieces matter when making decisions?
+7. How can these ideas affect how we use other digital systems?
 
 ## Differentiation and Accessibility
 
