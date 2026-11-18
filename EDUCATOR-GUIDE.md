@@ -105,9 +105,54 @@ The steps for the day are:
 
 ### Performance Mindset Mindfulness
 
-Introduce students to [Lotus 8 Esports Performance Mindset Mindfulness](https://lotus8esports.com/performance-mindset-mindfulness).
+*If you have other adult helpers, this may be a good time to have a facilitator talk with them about their roles during the data collection process.*
 
-If you have other adult helpers, this may be a good time to talk with them about their roles during the data collection process.
+Introduce students to [Lotus 8 Esports Performance Mindset Mindfulness](https://lotus8esports.com/performance-mindset-mindfulness). These exercises are designed to settle the body, regulate breathing, bring attention to the present moment, and prepare students mentally for performance.
+
+Have students sit comfortably on the ground or in a chair. If seated on the ground, students may use a relaxed Lotus or cross-legged position with their palms facing upward.
+Ask students to close their eyes, if comfortable.
+
+Guide them through relaxing the body:
+Lower and soften the shoulders. Relax the hips, legs and feet. Bring attention to the face and relax the forehead, eyebrows and jaw.
+Before beginning the count, ask students to slowly breathe in through their nose while silently saying "Breathing in calmness."
+
+1. Relax the body: 
+
+* Unclench the jaw and drop the tongue from the roof of the mouth.
+* Drop the shoulders and sit tall.
+* Feel the ground supporting you.
+
+2. 3-Count Breath:
+
+* Slowly inhale through the nose — 1… 2… 3.
+* Gently hold for 2 seconds.
+* Slowly exhale — 3… 2… 1.
+
+3. Controlled head rolls:
+
+* Drop your chin straight down to your chest to release the back of your neck.
+* Slowly roll your right ear toward your right shoulder and hold it there for a breath.
+* Do three half-circle rolls through the center between your shoulders.
+
+4. 4-Count Breath:
+
+* Slowly inhale — 1… 2… 3… 4.
+* Gently hold for 2 seconds.
+* Slowly exhale — 4… 3… 2… 1.
+
+5. Wrist, Forearm, and Finger Mobility:
+
+* Gently apply pressure with your palm on each finger of the opposite hand, one at a time. Breathe in and out with each gentle push.
+* Extend both arms straight out in front of the chest at shoulder height with your fingers splayed out.
+* Roll your wrists slowly out and down, then back up. Repeat three times.
+
+6. 5-Count Breath:
+
+* Slowly inhale — 1… 2… 3… 4… 5.
+* Gently hold for 2 seconds.
+* Slowly exhale — 5… 4… 3… 2… 1.
+
+Explain that today will include successful attempts, missed shots, and moments of pressure. The goal is to remain present and focus on the next opportunity.
 
 ### OCAP® and Data Sovereignty
 
@@ -187,17 +232,20 @@ Using a local AI model (preferred) or an online AI tool approved by your school,
 * `Which traits seem to be correlated?`
 * `Create a scatterplot showing how wingspan relates to shooting performance.`
 * `Does faster reaction time translate into more saves or higher scores in Rocket League?`
+* `Rank the groups based on their shooting performance.`
 * `Do skaters with lower resting heart rates maintain more consistent shooting accuracy as distance increases?`
 * `Plot the average shots_made across distances.`
 * `Do students born in earlier months have better performance?`
 * `Compare right-handed, left-handed, and ambidextrous skaters across reaction time, total shots made, and Rocket League goals.`
-* `Rank the groups based on their shooting performance.`
+* `How would a team of these students do when playing against the Winnipeg Jets?`
 
 ## AI-Mediated Team Creation
 
 Continuing the AI analysis, give the tool a prompt such as:
 
-`We would like to play 
+`We would like to play some 4 vs 4 ball hockey scrimmage matches, generate fair teams based on the data.`
+
+Then set up and play some matches, and discuss with students if they thought those were fair teams and why or why not. You can also talk about other factors that go into team play that were not collected in the data set.
 
 ## Player Archetypes and Student Critique
 
