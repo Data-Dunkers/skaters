@@ -73,6 +73,8 @@ As well, you will need:
 
 ## Introduction
 
+### Player Card
+
 Starting with the end in mind, show students a [player card](https://datadunkers.ca/skaters/card-creator/index.html?demo=true) as an example of how their data will be used.
 
 * They will be taking their own photo and deciding on a four-character nickname.
@@ -82,7 +84,7 @@ Starting with the end in mind, show students a [player card](https://datadunkers
   * Archetypes are based only on the activities and attributes included in the Data Skaters data set, so it should be used for reflection and discussion rather than as a complete description of the student.
   * The archetypes are Sniper, Speed Winger, Playmaker, Defenseman, Power Forward, and Two-way Forward.
 
-The steps for the day are:
+### Overview of the Day
 
 1. Introduce the supporters, the purpose of the day, and how data science, data sovereignty, and artificial intelligence are related.
 2. Take a player photo at their data collection station (hockey net) using the [photo booth](https://datadunkers.ca/skaters/photobooth).
@@ -93,6 +95,34 @@ The steps for the day are:
 7. Visualize and analyze the group data and their own data.
 8. Play at least one game on "fair teams" as determined by AI from their collected data.
 9. Discuss the archetypes and get a unique player card with their data.
+
+### Math Connections
+
+#### Data and Number Sense
+
+* measurement of length, time, counting successful shots
+* first-hand versus second-hand data: differentiate between data they collect themselves and NHL statistics or open data
+* number operations (e.g. doubling chest to fingertip distance to find wingspan, multiplying beats in 15 seconds by four to get beats per minute for heart rate)
+* converting fractions to percents (e.g. successful shots out of six converted to shot percentage)
+* measures of central tendancy (e.g. averaging three trials of reaction time, average shot percentages)
+
+#### Graphing and Relationships
+
+* comparing different types of data visualizations
+* interpreting bar graphs, pie charts, scatter plots, correlation matricies, and radar plots
+* how a trendline can show the correlation between two variables
+* differentiating between positive and negative correlations, strong and weak correlations
+* how outliers or errors in the data can affect averages
+* predicting the likelihood of outcomes
+
+#### Possible Extensions
+
+* interpolating and extrapolating trends
+* representing functional relationships algebraically
+* standard deviation and z-scores
+* regression analysis
+* algorithmic and computational thinking
+
 
 ### Team Norms
 
@@ -275,6 +305,16 @@ Then set up and play some matches, and discuss with students if they thought tho
 ## Data Ownership
 
 
+
+## Differentiation and Accessibility
+
+Differentiation and accessibility ensure that all students can engage with core data science concepts, regardless of their math background, reading level, or coding experience. By adjusting task complexity, leveraging visual sports analogies, and scaffolding the coding elements, teachers can ensure every learner can analyze data, understand player archetypes, and participate in evidence-based team building. For example:
+
+|Need|Support|
+|-|-|
+|Physical accessibility|Offer seated or short-distance stations, recorder roles, larger targets, and low-movement alternatives|
+|Data-entry|Use paired entry, printed tracking sheets, or adult helpers|
+|Language|Post vocabulary with icons, model sentence stems, and allow oral responses before writing|
 
 ## Appendices and Printable Templates
 
