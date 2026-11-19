@@ -77,7 +77,7 @@ As well, you will need:
 
 Starting with the end in mind, show students a [player card](https://datadunkers.ca/skaters/card-creator/index.html?demo=true) as an example of how their data will be used.
 
-* They will be taking their own photo and deciding on a four-character nickname.
+* They will be taking their own photo and creating a four-character player ID from their actual initials and two digits. Although the forms call it a nickname, the initials must be the student's real initials for reliable error checking.
 * The card will include the data the collect about their traits and shot accuracy.
 * There will also be visualizations on the back about how their archetype was determined, and correlations in some of the data that will be collected today.
   * The player archetype is a data-informed profile that describes a pattern in a student's results.
@@ -199,7 +199,7 @@ All of the data collected is either stored locally or on a Canadian server manag
 
 ## Data Collection
 
-Each student should decide on a player ID (nickname) with two letters and a two-digit number (e.g. PS43). Students will be using the same nickname all day, so consider writing it on a piece of masking tape for them to use like a nametag.
+Each student should create a player ID using their actual initials and a two-digit number (e.g. PS43). Students must use the same ID all day. Although the forms call it a nickname, the initials must be the student's real initials so mistakes can be identified and corrected. Consider writing the ID on a piece of masking tape for students to use like a nametag.
 
 Divide students into groups, and ensure they know their group number (e.g. tape label on the hockey net).
 
