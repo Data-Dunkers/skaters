@@ -1,3 +1,13 @@
+## 2026-11-19T10:55:30-0500
+
+Goal: Make facilitator-guide slide images visible on the site.
+
+Prompt summary: Copy the full-resolution guide images into the published `docs/images/` directory and update `docs/fg.html` to use site-local image paths.
+
+Hostname: m4-mini
+Active agent: Codex
+Technical context: The site publishes from `docs/`, so assets outside that directory were not reachable by the web page.
+
 ## 2026-11-19T10:54:30-0500
 
 Goal: Document the facilitator-guide source-of-truth workflow.
