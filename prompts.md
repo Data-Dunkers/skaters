@@ -1,3 +1,13 @@
+## 2026-11-19T10:56:30-0500
+
+Goal: Remove unnecessary source attribution from the facilitator guide.
+
+Prompt summary: Keep the confirmed explanation of 43 but remove the citation references from both the Markdown guide and the web page.
+
+Hostname: m4-mini
+Active agent: Codex
+Technical context: Updated `facilitators-guide/facilitators-guide.md` and `docs/fg.html`.
+
 ## 2026-11-19T10:55:30-0500
 
 Goal: Make facilitator-guide slide images visible on the site.

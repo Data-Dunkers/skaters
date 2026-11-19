@@ -24,7 +24,7 @@ Introduce Data Skaters as a program inspired by Pascal Siakam. Keep this brief b
 
 Introduce the PS43 Foundation, MFNERC, and Lotus 8 Esports. Karl can speak to MFNERC, and Steve can speak to Lotus 8.
 
-Explain that PS refers to Pascal Siakam. The 4 represents Pascal's father and three brothers, while the 3 represents his mother and two sisters. This explanation is documented by Indiana University and Red Bull.
+Explain that PS refers to Pascal Siakam. The 4 represents Pascal's father and three brothers, while the 3 represents his mother and two sisters.
 
 ## Slide 4: The player card
 
