@@ -291,9 +291,15 @@ For each player, the app calculates z-scores (how far a value is above or below 
 
 ## Student Data Player Card Creation
 
+The [card creator page](https://datadunkers.ca/skaters/card-creator) renders cards for all players that have recorded data using your event key.
 
+Once all cards have finished rendering, PDF download buttons are displayed. These buttons can be used to download printable versions to be then cut, folded, and put inside plastic card protectors.
+
+You can also use a URL parameter to render just a single card, for example [datadunkers.ca/skaters/card-creator?nickname=PI67](https://datadunkers.ca/skaters/card-creator?nickname=PI67).
 
 ## Data Ownership
+
+Before distributing the printed player cards, remind students that they retain ownership, control, access, and possession of their data. It will only be on the card, after the event the data will be deleted from the Data Skaters server.
 
 Possible discussion questions:
 
