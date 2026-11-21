@@ -2,6 +2,10 @@
 
 Quick notes for running the Data Skaters AI Performance Lab. Use the slide image and notes together as you present.
 
+**Slide numbering note:** The numbers follow the original presentation. Only slides with facilitator notes are included here, so the sequence intentionally skips slides that are not covered.
+
+The facilitator's guide is also available as a [Google Doc](https://docs.google.com/document/d/1eQhOTKNXgyPvMAJD5-H-GGr_0pUKW2I2LgFlm0jR6-w/edit).
+
 ## Before students arrive
 
 - Choose a school-based event key, such as `MS` for Miskooseepi School, and enter it on every device.
