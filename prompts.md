@@ -1,3 +1,83 @@
+## 2026-11-21T11:18:30-0500
+
+Goal: Document facilitator-guide locations and links.
+
+Prompt summary: Add a README to the facilitator-guide folder that records the Google Doc URL, Markdown and Word sources, the published HTML filename, and the docs-folder rendering location.
+
+Hostname: m4-mini
+Active agent: Codex
+Technical context: Added `facilitators-guide/README.md`.
+
+## 2026-11-21T11:30:30-0500
+
+Goal: Link the maintained Google Doc from the local guide surfaces.
+
+Prompt summary: Add a short note and Google Doc URL to the master Markdown guide and facilitator-guide web page.
+
+Hostname: m4-mini
+Active agent: Codex
+Technical context: Updated `facilitators-guide/facilitators-guide.md` and `docs/fg.html`.
+
+## 2026-11-21T11:29:30-0500
+
+Goal: Clarify slide numbering and retire the Word copy.
+
+Prompt summary: Add a note to the Google Doc, Markdown guide, and web page explaining that slide numbers follow the original presentation and intentionally skip slides without facilitator notes. Remove the Word document because the Google Doc is now maintained directly.
+
+Hostname: m4-mini
+Active agent: Codex
+Technical context: Updated the three guide surfaces and folder README; removed `facilitators-guide/facilitators-guide.docx`.
+
+## 2026-11-21T11:28:31-0500
+
+Goal: Add slide dividers to the Google Doc.
+
+Prompt summary: Place a horizontal divider before each slide section in the facilitator guide Google Doc.
+
+Hostname: m4-mini
+Active agent: Codex
+Technical context: Added 15 editable paragraph-border dividers before the slide headings.
+
+## 2026-11-21T11:27:16-0500
+
+Goal: Correct the Google Doc slide-image order.
+
+Prompt summary: Rebuild the inline image placement by matching each slide image to its corresponding slide heading, while preserving the 75% size and text-below-image layout.
+
+Hostname: m4-mini
+Active agent: Codex
+Technical context: Reinserted 17 images in heading order and verified 17 image-only paragraphs in the Google Doc.
+
+## 2026-11-21T11:20:28-0500
+
+Goal: Improve Google Doc image layout.
+
+Prompt summary: Resize the embedded facilitator-guide slide images to approximately 75% of their previous size and place each note below its image rather than beside it.
+
+Hostname: m4-mini
+Active agent: Codex
+Technical context: Replaced 17 inline images in the supplied Google Doc at 253.8 x 142.8 points and inserted paragraph breaks after each image.
+
+## 2026-11-21T11:17:11-0500
+
+Goal: Add the facilitator-guide slide images to a Google Doc.
+
+Prompt summary: Edit the supplied native Google Doc in place and insert the 17 slide images at the corresponding guide sections so the images are retained in the Google document.
+
+Hostname: m4-mini
+Active agent: Codex
+Technical context: Inserted 17 inline image objects into the Google Doc. PDF export verification returned a connector 403, but native document readback confirmed all 17 images.
+
+## 2026-11-21T11:08:46-0500
+
+Goal: Create a Word version of the facilitator guide.
+
+Prompt summary: Build a `.docx` copy of the facilitator guide in the facilitator-guide folder so it can be manually copied into Google Docs without changing a URL.
+
+Hostname: m4-mini
+Active agent: Codex
+Technical context: Created `facilitators-guide/facilitators-guide.docx` with 17 embedded slide images. Visual rendering could not run because LibreOffice, Poppler, and the `pdf2image` dependency are unavailable in the environment.
+
 ## 2026-11-20T11:17:47-0500
 
 Goal: Match slide 5's background to the existing deck.
