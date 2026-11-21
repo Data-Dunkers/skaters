@@ -244,17 +244,44 @@ To help ensure that students are collecting all the data they need for their pla
 
 ## Data Analysis and Visualizations
 
-Once the students have collected all of their data, the [visualizations page](https://datadunkers.ca/skaters/visualizations) will allow you to show them various data visualizations for their data.
+Once the students have collected all of their data, the [visualizations page](https://datadunkers.ca/skaters/visualizations) will allow you to show them various data visualizations for their data. Show the page on the big screen, and walk through the charts together.
 
-**TODO: Add more detail**
+### Outliers
+
+Ask students to spot obviously incorrect numbers (e.g. a wingspan that is half of a player's height). Emphasize that input accuracy matters, and that the forms were morstly designed to prevent the input of impossible values (e.g. resting heart rate of 5 bpm). Correcting incorrect values is called *data cleaning*, and is where data scientists spend significant amounts of time.
+
+### Explore Relationships
+
+#### Bar Chart
+
+* Look at the shooting accuracy across the four distances and ask students for possible explanations of the patterns you see.
+* Demonstrate changing the values displayed on each axis and exploring possible 
+
+#### Pie Chart
+
+* Show how 
+* Pie charts are not often used in data science, but can be popular for media and marketing visuals. Humans are much better at comparing lengths on a bar chart than angles in a circle.
+
+#### Scatter Plot
+
+* As you show different values on the axes, ask students whether they see a positive or negative correlations, and how strong they think the correlation is.
+* The "hover text" shows up when you hover you mouse curson over a point.
+* Demonstrate how you can add a trendline to help visualize relationships. If you have a data column selected under "color" then each will get its own trendline.
+
+#### Correlation Matrix
+
+* Numbers close to 1 (bright blue) show a strong positive relationship. Numbers close to -1 (bright orange) show a strong negative relationship (as one goes up, the other goes down).
+* The diagonal line is because each variable has a perfect (1.00) correlation with itself. Values are alos mirrored across this line.
+* Body measurements tend to be correlated (e.g. height, wingspan, and skate size). There likely isn't a strong correlation between physical characteristics and shot percentages.
+* A similar visualization will be printed on their player card.
 
 ### Jupyter Notebook
 
-Jupyter is a browser-based coding environment that lets students analyse data using Python without installing software or creating user accounts. In Data Skaters, students can use a notebook on JupyterLite, which doesn't require a server, to import their collected data and create visualizations using pre-written code.
+Jupyter is a browser-based coding environment that lets students analyse data using Python without installing software or creating user accounts. In Data Skaters, students can use a notebook on JupyterLite, which doesn't require a server or login, to import their collected data and create visualizations using pre-written code.
 
 Participants can run their own copy of a JupyterLite notebook by clicking on the [data analysis link](https://datadunkers.ca/jupyterlite/tree/?path=data-skaters%2Fdata-skaters.ipynb) on the Data Skaters page.
 
-**TODO: Add more detail**
+Guide students step-by-step through the pre-written cells to import data and generate summary statistics and custom charts. Encourage them to change variable names inside the plotting code to test their own hypotheses.
 
 ### AI Analysis
 
