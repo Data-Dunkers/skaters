@@ -1,3 +1,23 @@
+## 2026-11-21T11:46:00-0500
+
+Goal: Improve facilitator-guide web-page link visibility.
+
+Prompt summary: Increase the contrast of the Google Doc link in the facilitator's guide web page.
+
+Hostname: m4-mini
+Active agent: Codex
+Technical context: Styled links in the guide header with white, bold, underlined text against the blue header background.
+
+## 2026-11-21T11:44:38-0500
+
+Goal: Document the player-card creation workflow.
+
+Prompt summary: Add instructions to the main README explaining how event data is used to create and download player cards.
+
+Hostname: m4-mini
+Active agent: Codex
+Technical context: Documented event-key setup, player IDs, data sources, card calculations, testing, and export formats.
+
 ## 2026-11-21T11:18:30-0500
 
 Goal: Document facilitator-guide locations and links.
@@ -7,6 +27,16 @@ Prompt summary: Add a README to the facilitator-guide folder that records the Go
 Hostname: m4-mini
 Active agent: Codex
 Technical context: Added `facilitators-guide/README.md`.
+
+## 2026-11-21T11:37:50-0500
+
+Goal: Reduce excess spacing above Google Doc slide dividers.
+
+Prompt summary: Tighten the paragraph spacing on the horizontal divider lines without changing the slide heading styles.
+
+Hostname: m4-mini
+Active agent: Codex
+Technical context: Set divider paragraph spacing above and below to zero and line spacing to 100% for all 15 slide separators.
 
 ## 2026-11-21T11:30:30-0500
 
