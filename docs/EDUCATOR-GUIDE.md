@@ -73,7 +73,7 @@ As well, you will need:
 
 Starting with the end in mind, show students a [player card](https://datadunkers.ca/skaters/card-creator/index.html?demo=true) as an example of how their data will be used.
 
-* They will be taking their own photo and creating a four-character player ID from their actual initials and two digits. Although the forms call it a nickname, the initials must be the student's real initials for reliable error checking.
+* They will be taking their own photo and creating a four-character nickname from their actual initials and two digits. Although the forms call it a nickname, the letters should be the student's real initials for reliable error checking.
 * The card will include the data they collect about their traits and shot accuracy.
 * There will also be visualizations on the back about how their archetype was determined, and correlations in some of the data that will be collected today.
   * The player archetype is a data-informed profile that describes a pattern in a student's results.
@@ -179,7 +179,7 @@ Before beginning the count, ask students to slowly breathe in through their nose
 
 Explain that today will include successful attempts, missed shots, and moments of pressure. The goal is to remain present and focus on the next opportunity.
 
-### OCAP® and Data sovereignty
+### OCAP® and Data Sovereignty
 
 Developed in 1998 by the First Nations Information Governance Centre (FNIGC), OCAP® is a set of foundational principles that establishes First Nations data sovereignty - the right of First Nations communities to own, control, access, and possess data collected about their people, culture, and lands.
 
@@ -196,7 +196,7 @@ All of the data collected is either stored locally or on a Canadian server manag
 
 ## Data Collection
 
-Each student should create a player ID using their actual initials and a two-digit number (e.g. PS43). Students must use the same ID all day. Although the forms call it a nickname, the initials must be the student's real initials so mistakes can be identified and corrected. Consider writing the ID on a piece of masking tape for students to use like a nametag.
+Each student should create a nickname using their actual initials and a two-digit number (e.g. PS43). Students must use the same ID all day. Although the forms call it a nickname, the initials must be the student's real initials so mistakes can be identified and corrected. Consider writing the ID on a piece of masking tape for students to use like a nametag.
 
 Divide students into groups, and ensure they know their group number (e.g. tape label on the hockey net).
 
@@ -248,30 +248,31 @@ Once the students have collected all of their data, the [visualizations page](ht
 
 ### Outliers
 
-Ask students to spot obviously incorrect numbers (e.g. a wingspan that is half of a player's height). Emphasize that input accuracy matters, and that the forms were morstly designed to prevent the input of impossible values (e.g. resting heart rate of 5 bpm). Correcting incorrect values is called *data cleaning*, and is where data scientists spend significant amounts of time.
+Ask students to spot obviously incorrect numbers (e.g. a wingspan that is half of a player's height). Emphasize that input accuracy matters, and that the forms were mostly designed to prevent the input of impossible values (e.g. resting heart rate of 5 bpm). Correcting incorrect values is called *data cleaning*, and is where data scientists spend significant amounts of time.
 
 ### Explore Relationships
 
 #### Bar Chart
 
 * Look at the shooting accuracy across the four distances and ask students for possible explanations of the patterns you see.
-* Demonstrate changing the values displayed on each axis and exploring possible 
+* Demonstrate changing the values displayed on each axis and exploring possible comparisons.
+* Not all axis pairings will result in usable graphs, but that's okay.
 
 #### Pie Chart
 
-* Show how 
-* Pie charts are not often used in data science, but can be popular for media and marketing visuals. Humans are much better at comparing lengths on a bar chart than angles in a circle.
+* Show charts such as handedness and birth month, keeping values set to `Count`.
+* Pie charts are not often used in data science, since humans are much better at comparing lengths on a bar chart than angles in a circle. However they can be popular for media and marketing visuals
 
 #### Scatter Plot
 
-* As you show different values on the axes, ask students whether they see a positive or negative correlations, and how strong they think the correlation is.
-* The "hover text" shows up when you hover you mouse curson over a point.
+* As you show different values on the axes, ask students whether they see a positive or negative correlation, and how strong they think the correlation is.
+* The "hover text" shows up when you hover your mouse curson over a point.
 * Demonstrate how you can add a trendline to help visualize relationships. If you have a data column selected under "color" then each will get its own trendline.
 
 #### Correlation Matrix
 
 * Numbers close to 1 (bright blue) show a strong positive relationship. Numbers close to -1 (bright orange) show a strong negative relationship (as one goes up, the other goes down).
-* The diagonal line is because each variable has a perfect (1.00) correlation with itself. Values are alos mirrored across this line.
+* The diagonal line is because each variable has a perfect (1.00) correlation with itself. Values are also mirrored across this line.
 * Body measurements tend to be correlated (e.g. height, wingspan, and skate size). There likely isn't a strong correlation between physical characteristics and shot percentages.
 * A similar visualization will be printed on their player card.
 
