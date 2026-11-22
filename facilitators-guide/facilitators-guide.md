@@ -9,11 +9,12 @@ The facilitator's guide is also available as a [Google Doc](https://docs.google.
 ## Before students arrive
 
 - Choose a school-based event key, such as `MS` for Miskooseepi School, and enter it on every device.
-- Test the [Data Skaters site](https://datadunkers.ca/skaters), [photo booth](https://datadunkers.ca/skaters/photobooth), [traits form](https://datadunkers.ca/skaters/traits), [shots form](https://datadunkers.ca/skaters/shots), and [card creator](https://datadunkers.ca/skaters/card-creator/index.html?testing=true).
+- Test the [Data Skaters site](https://datadunkers.ca/skaters), [photo booth](https://datadunkers.ca/skaters/photobooth), [traits form](https://datadunkers.ca/skaters/traits), [shots form](https://datadunkers.ca/skaters/shots), and [card creator](https://datadunkers.ca/skaters/card-creator/index.html?testing=true) on the school network.
 - Arrange groups of six or fewer. Label each net with its group number and mark distances at 2, 5, 7, and 10 feet.
 - Prepare camera-enabled devices, nets or targets, sticks, soft pucks or balls, measuring tape, tape, and markers.
 - If Rocket League is included, prepare the computers, controllers, accounts, and matches.
-- Set up a screen or projector and have card-printing supplies ready.
+- Set up a screen or projector
+- Have card-printing supplies ready.
 - Confirm media consent if photos will be shared.
 
 ## Slide 1: Program introduction
