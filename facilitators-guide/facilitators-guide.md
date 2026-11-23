@@ -6,6 +6,8 @@ Quick notes for running the Data Skaters AI Performance Lab. Use the slide image
 
 The facilitator's guide is also available as a [Google Doc](https://docs.google.com/document/d/1eQhOTKNXgyPvMAJD5-H-GGr_0pUKW2I2LgFlm0jR6-w/edit).
 
+Open the Data Skaters slideshow at [https://bit.ly/dataskaters](https://bit.ly/dataskaters).
+
 ## Before students arrive
 
 - Choose a school-based event key, such as `MS` for Miskooseepi School, and enter it on every device.
