@@ -8,7 +8,7 @@ Play Hard. Track Smart. Own Your Story.
 
 Data Skaters acknowledges the support of the Manitoba First Nations Education Resource Centre (MFNERC) and Lotus 8 Esports in helping us build and pilot this program.
 
-We appreciate MFNERC’s openness to having Data Skaters tested with its students and educators, and the feedback and learning this experience has provided. Their participation has helped us better understand how the program can be improved. Lotus 8 Esports is responsible for the esports components and helps ensure that wellness and physical movement remain central to the experience.
+We appreciate MFNERC's openness to having Data Skaters tested with its students and educators, and the feedback and learning this experience has provided. Their participation has helped us better understand how the program can be improved. Lotus 8 Esports is responsible for the esports components and helps ensure that wellness and physical movement remain central to the experience.
 
 Data Skaters is led by Dell Canada and The PS43 Foundation, with ongoing learning from the communities and educators who engage with the program.
 
