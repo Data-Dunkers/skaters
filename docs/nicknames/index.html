@@ -43,22 +43,26 @@
         const buttonsEl = document.getElementById('buttons');
         const photosEl = document.getElementById('photos');
 
-        async function fetchAllRecords() {
-            const records = [];
+        async function fetchLatestPhotoRecords() {
+            const recordsByNickname = new Map();
             for (let page = 1; ; page++) {
                 const params = new URLSearchParams({
                     filter: `event_key = "${eventKey.replace(/["\\]/g, '')}"`,
                     perPage: '200',
                     page: String(page),
-                    sort: 'nickname'
+                    sort: 'nickname,-created,-id'
                 });
                 const response = await fetch(`${POCKETBASE_URL}/api/collections/${COLLECTION_NAME}/records?${params}`);
                 if (!response.ok) throw new Error(`status ${response.status}`);
                 const data = await response.json();
-                records.push(...(data.items || []));
+                for (const record of data.items || []) {
+                    if (record.photo && !recordsByNickname.has(record.nickname)) {
+                        recordsByNickname.set(record.nickname, record);
+                    }
+                }
                 if (page >= data.totalPages) break;
             }
-            return records;
+            return [...recordsByNickname.values()];
         }
 
         async function downloadPhoto(record) {
@@ -94,7 +98,7 @@
                 return;
             }
             try {
-                const records = (await fetchAllRecords()).filter((r) => r.photo);
+                const records = await fetchLatestPhotoRecords();
                 let failed = 0;
                 let done = 0;
                 await Promise.all(records.map(async (record) => {
