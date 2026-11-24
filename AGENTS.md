@@ -1,5 +1,11 @@
 # Project Instructions
 
+## Changelog
+
+- Update [CHANGELOG.md](CHANGELOG.md) when you make a significant change, such as a feature, bug fix, or documentation update that affects how people use or maintain the project.
+- Group entries by date using `YYYY-MM-DD` in the America/Winnipeg time zone, with the newest date first. Add to the existing heading for that date when one is present.
+- Use concise bullets that name the affected page or feature and describe what changed for users or maintainers.
+
 ## Facilitator guide source of truth
 
 - `facilitators-guide/facilitators-guide.md` is the source of truth for the facilitator guide.
