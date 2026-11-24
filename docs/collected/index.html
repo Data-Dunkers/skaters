@@ -61,6 +61,7 @@
 
     <script>
         const BASE_URL = "https://api.datadunkers.ca";
+        const SORT_KEY = 'collected_table_sort';
         let globalTraits = [];
         let globalPhotos = [];
         let globalShots = [];
@@ -311,54 +312,50 @@
         }
 
         function makeTableSortable(table) {
-            const headers = table.querySelectorAll('th');
+            const headers = Array.from(table.querySelectorAll('th'));
+            const columns = headers.map(header => header.textContent.trim());
             const tbody = table.querySelector('tbody');
-            
+
+            function sortByColumn(index, direction) {
+                const rows = Array.from(tbody.querySelectorAll('tr'));
+                const multiplier = direction === 'desc' ? -1 : 1;
+
+                headers.forEach((header, headerIndex) => {
+                    header.classList.remove('sort-asc', 'sort-desc');
+                    header.textContent = columns[headerIndex];
+                });
+                headers[index].classList.add(`sort-${direction}`);
+                headers[index].textContent += direction === 'desc' ? ' ▼' : ' ▲';
+
+                rows.sort((a, b) => {
+                    const aText = a.children[index].textContent.trim();
+                    const bText = b.children[index].textContent.trim();
+                    const aNum = parseFloat(aText);
+                    const bNum = parseFloat(bText);
+                    const comparison = !isNaN(aNum) && !isNaN(bNum)
+                        ? aNum - bNum
+                        : aText.localeCompare(bText);
+                    return comparison * multiplier;
+                });
+
+                tbody.append(...rows);
+            }
+
+            const savedSort = localStorage.getItem(SORT_KEY);
             headers.forEach((header, index) => {
                 header.style.cursor = 'pointer';
                 header.style.userSelect = 'none';
                 header.title = "Click to sort";
-                
+                const column = columns[index];
+
                 header.addEventListener('click', () => {
-                    const isAscending = header.classList.contains('sort-asc');
-                    const rows = Array.from(tbody.querySelectorAll('tr'));
-                    
-                    // Clear all sort classes and indicators
-                    headers.forEach(h => {
-                        h.classList.remove('sort-asc', 'sort-desc');
-                        h.textContent = h.textContent.replace(' ▲', '').replace(' ▼', '');
-                    });
-                    
-                    let sortMultiplier = 1;
-                    if (isAscending) {
-                        header.classList.add('sort-desc');
-                        header.textContent += ' ▼';
-                        sortMultiplier = -1;
-                    } else {
-                        header.classList.add('sort-asc');
-                        header.textContent += ' ▲';
-                        sortMultiplier = 1;
-                    }
-                    
-                    rows.sort((a, b) => {
-                        const aText = a.children[index].textContent.trim();
-                        const bText = b.children[index].textContent.trim();
-                        
-                        const aNum = parseFloat(aText);
-                        const bNum = parseFloat(bText);
-                        
-                        let comparison = 0;
-                        if (aText !== "" && bText !== "" && !isNaN(aNum) && !isNaN(bNum)) {
-                            comparison = aNum - bNum;
-                        } else {
-                            comparison = aText.localeCompare(bText);
-                        }
-                        
-                        return comparison * sortMultiplier;
-                    });
-                    
-                    tbody.append(...rows);
+                    const direction = header.classList.contains('sort-asc') ? 'desc' : 'asc';
+                    sortByColumn(index, direction);
+                    localStorage.setItem(SORT_KEY, `${direction}:${column}`);
                 });
+
+                if (savedSort === `asc:${column}`) sortByColumn(index, 'asc');
+                if (savedSort === `desc:${column}`) sortByColumn(index, 'desc');
             });
         }
         function populateFilterOptions() {
