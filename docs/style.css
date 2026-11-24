@@ -3321,6 +3321,18 @@ html[data-page="visualizations-index"]{
             accent-color: #FF6600;
         }
 
+        html[data-page="visualizations-index"] .chart-code summary{
+            width: fit-content;
+            padding: 0.25rem 0;
+            color: var(--text-muted);
+            cursor: pointer;
+        }
+
+        html[data-page="visualizations-index"] .chart-code summary:hover,
+        html[data-page="visualizations-index"] .chart-code summary:focus-visible{
+            color: var(--text-main);
+        }
+
         html[data-page="visualizations-index"] pre[class*="language-"]{
             border-radius: 8px !important;
             margin: 1rem 0 1.5rem !important;

@@ -2,6 +2,7 @@
 
 ## 2026-11-24
 
+- **Visualizations** collapses each chart’s Python example by default. Open **Python code** to view it.
 - **Visualizations** averages player shot percentages for each bar and displays them on a 0–100% axis.
 - **Collected Data** and **Nicknames** show a small countdown bar while auto-refresh is on. The Collected Data checkbox now displays its existing 30-second interval.
 - **Collected Data** remembers the last sort column and direction and restores them after page reloads, auto-refreshes, and filter changes.
