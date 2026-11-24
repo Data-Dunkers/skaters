@@ -224,32 +224,78 @@
 
             const xLabel = columnDefs.find(c => c.key === xCol)?.label || xCol;
             const yLabel = columnDefs.find(c => c.key === yCol)?.label || yCol;
-            
+            const isPercentage = yCol.includes('Shot Percentage');
+            const hasColor = colorCol !== 'None';
+            const displayYLabel = isPercentage ? `Average ${yLabel}` : yLabel;
+            const title = `${displayYLabel} vs ${xLabel}`;
+            let plotRows = df;
+
+            if (isPercentage) {
+                const buckets = new Map();
+                for (const row of df) {
+                    if (row[xCol] == null || !Number.isFinite(row[yCol])) continue;
+                    const color = hasColor ? String(row[colorCol] ?? '') || 'Unknown' : null;
+                    const key = JSON.stringify([row[xCol], color]);
+                    if (!buckets.has(key)) buckets.set(key, { row, color, total: 0, count: 0 });
+                    const bucket = buckets.get(key);
+                    bucket.total += row[yCol];
+                    bucket.count++;
+                }
+                plotRows = Array.from(buckets.values(), ({ row, color, total, count }) => ({
+                    ...row,
+                    ...(hasColor && colorCol !== xCol ? { [colorCol]: color } : {}),
+                    [yCol]: total / count
+                }));
+            }
+
             const trace = {
-                x: df.map(row => row[xCol]),
-                y: df.map(row => row[yCol]),
+                x: plotRows.map(row => row[xCol]),
+                y: plotRows.map(row => row[yCol]),
                 type: 'bar',
                 marker: { color: '#FF6600' }
             };
             
             let data = [trace];
-            if (colorCol !== 'None') {
-                const grouped = {};
-                df.forEach(row => {
-                    const c = row[colorCol] || 'Unknown';
-                    if(!grouped[c]) grouped[c] = {x:[], y:[], type:'bar', name: c};
-                    grouped[c].x.push(row[xCol]);
-                    grouped[c].y.push(row[yCol]);
+            if (hasColor) {
+                const grouped = new Map();
+                plotRows.forEach(row => {
+                    const color = isPercentage ? String(row[colorCol] ?? '') || 'Unknown' : row[colorCol] || 'Unknown';
+                    if (!grouped.has(color)) grouped.set(color, { x: [], y: [], type: 'bar', name: String(color) });
+                    const series = grouped.get(color);
+                    series.x.push(row[xCol]);
+                    series.y.push(row[yCol]);
                 });
-                data = Object.values(grouped);
+                data = Array.from(grouped.values());
             }
 
-            const layout = { ...PLOTLY_LAYOUT_TEMPLATE, title: {text: `${yLabel} vs ${xLabel}`, x: 0}, xaxis: { ...PLOTLY_LAYOUT_TEMPLATE.xaxis, title: xLabel }, yaxis: { ...PLOTLY_LAYOUT_TEMPLATE.yaxis, title: yLabel } };
+            const layout = { ...PLOTLY_LAYOUT_TEMPLATE, title: {text: title, x: 0}, xaxis: { ...PLOTLY_LAYOUT_TEMPLATE.xaxis, title: xLabel }, yaxis: { ...PLOTLY_LAYOUT_TEMPLATE.yaxis, title: displayYLabel } };
+            if (isPercentage) {
+                layout.barmode = 'group';
+                Object.assign(layout.yaxis, { range: [0, 100], ticksuffix: '%' });
+                data.forEach(series => {
+                    series.hovertemplate = '%{x}<br>%{y:.1f}%';
+                });
+            }
             Plotly.newPlot('bar-plot', data, layout);
 
-            let code = `import plotly.express as px\npx.bar(df, x='${xCol}', y='${yCol}', title='${yLabel} vs ${xLabel}'`;
-            if (colorCol !== 'None') code += `, color='${colorCol}'`;
-            code += `)`;
+            let code = 'import plotly.express as px\n';
+            if (isPercentage) {
+                const groupColumns = [...new Set(hasColor ? [xCol, colorCol] : [xCol])];
+                code += `plot_df = df.dropna(subset=${JSON.stringify([...new Set([xCol, yCol])])}).copy()\n`;
+                if (hasColor) {
+                    const color = `plot_df[${JSON.stringify(colorCol)}]`;
+                    code += `${color} = ${color}.astype("string").fillna("Unknown").replace("", "Unknown")\n`;
+                }
+                const by = JSON.stringify(groupColumns);
+                code += groupColumns.includes(yCol)
+                    ? `plot_df = plot_df.drop_duplicates(subset=${by})\n`
+                    : `plot_df = plot_df.groupby(${by}, sort=False, as_index=False)[${JSON.stringify(yCol)}].mean()\n`;
+            }
+            code += `px.bar(${isPercentage ? 'plot_df' : 'df'}, x=${JSON.stringify(xCol)}, y=${JSON.stringify(yCol)}, title=${JSON.stringify(title)}`;
+            if (hasColor) code += `, color=${JSON.stringify(colorCol)}`;
+            if (isPercentage) code += ', barmode="group", range_y=[0, 100]';
+            code += ')';
+            if (isPercentage) code += `.update_yaxes(title_text=${JSON.stringify(displayYLabel)}, ticksuffix="%")`;
             updateCodeAndHighlight('bar-code', code);
         }
 
