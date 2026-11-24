@@ -2,6 +2,7 @@
 
 ## 2026-11-24
 
+- **Collected Data** and **Nicknames** show a small countdown bar while auto-refresh is on. The Collected Data checkbox now displays its existing 30-second interval.
 - **Collected Data** remembers the last sort column and direction and restores them after page reloads, auto-refreshes, and filter changes.
 - **Nicknames** now remembers the last **Select All** or **Clear All** choice in the browser. Photos are shown by default, and the on-page hint explains that tapping a nickname shows or hides its photo.
 - **Nicknames** has an optional one-minute auto-refresh. The browser remembers whether it is enabled, and every refresh reapplies the saved photo selection to the latest records.

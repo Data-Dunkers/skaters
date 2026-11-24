@@ -6,7 +6,9 @@
     <title>Data Skaters - Collected Data</title>
     <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../style.css">
+    <link rel="stylesheet" href="../auto-refresh.css">
     <script src="../event-key-bg.js"></script>
+    <script src="../auto-refresh.js"></script>
 </head>
 <body>
     <div class="page-header">
@@ -25,7 +27,8 @@
         <div id="tables-container">
             <div id="filter-container" class="filter-container extracted-style-3">
                 <label class="status-text autorefresh-label">
-                    <input type="checkbox" id="autorefresh-toggle"> Auto-refresh every minute
+                    <input type="checkbox" id="autorefresh-toggle"> Auto-refresh every 30 seconds
+                    <span id="autorefresh-countdown" class="autorefresh-countdown" aria-hidden="true" hidden><span></span></span>
                 </label>
                 <label for="date-select" class="status-text">Filter by Date:</label>
                 <select id="date-select">
@@ -400,7 +403,7 @@
             if (prevGroup && groups.has(prevGroup)) groupSelect.value = prevGroup;
         }
 
-        let refreshTimer = null;
+        const REFRESH_INTERVAL_MS = 30_000;
         let refreshing = false;
 
         async function refreshData() {
@@ -423,18 +426,6 @@
             }
         }
 
-        function setupAutoRefresh() {
-            const toggle = document.getElementById("autorefresh-toggle");
-            const apply = () => {
-                clearInterval(refreshTimer);
-                refreshTimer = toggle.checked ? setInterval(refreshData, 30000) : null; // refresh every 30 seconds
-                localStorage.setItem('collected_autorefresh', toggle.checked ? '1' : '0');
-            };
-            toggle.checked = localStorage.getItem('collected_autorefresh') === '1';
-            toggle.addEventListener("change", apply);
-            apply();
-        }
-
         function setupDateFilter() {
             populateFilterOptions();
             document.getElementById("filter-container").style.display = "flex";
@@ -443,7 +434,7 @@
                 localStorage.setItem('collected_group_filter', e.target.value);
                 renderAllTables();
             });
-            setupAutoRefresh();
+            setupAutoRefresh({ storageKey: 'collected_autorefresh', interval: REFRESH_INTERVAL_MS, refresh: refreshData });
         }
 
         async function downloadAll() {

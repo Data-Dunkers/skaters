@@ -4,13 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Nicknames</title>
+    <link rel="stylesheet" href="../auto-refresh.css">
     <script src="../event-key-bg.js"></script>
+    <script src="../auto-refresh.js"></script>
     <style>
         body { font-family: sans-serif; margin: 0; padding: 1rem; background: #111; color: #fff; }
         .home-link { display: inline-block; margin-bottom: 1rem; padding: 0.5rem 1rem; border: 2px solid #888;
             border-radius: 6px; background: #222; color: #fff; text-decoration: none; font-size: 1.2rem; }
         .top-bar { display: flex; flex-wrap: wrap; column-gap: 0.5rem; align-items: flex-start; }
-        .autorefresh-label { padding: 0.5rem 0; margin-bottom: 1rem; }
+        .autorefresh-label { display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem 0; margin-bottom: 1rem; }
         .selection-actions { display: flex; gap: 0.5rem; margin: 0 0 1rem auto; }
         .selection-actions button { padding: 0.5rem 1rem; border: 2px solid #888; border-radius: 6px;
             background: #222; color: #fff; font-size: 1.2rem; cursor: pointer; }
@@ -29,6 +31,7 @@
         <a class="home-link" href="../index.html">Home</a>
         <label class="autorefresh-label">
             <input type="checkbox" id="autorefresh-toggle"> Auto-refresh every minute
+            <span id="autorefresh-countdown" class="autorefresh-countdown" aria-hidden="true" hidden><span></span></span>
         </label>
         <div class="selection-actions">
             <button id="select-all-btn" type="button">Select All</button>
@@ -148,25 +151,9 @@
             buttonsEl.querySelectorAll('button.on').forEach((b) => b.click());
         });
 
-        const autoRefreshToggle = document.getElementById('autorefresh-toggle');
-        autoRefreshToggle.disabled = !eventKey;
-        autoRefreshToggle.checked = localStorage.getItem(AUTOREFRESH_KEY) === '1';
-        let refreshTimer = null;
-
-        function updateRefreshTimer() {
-            clearInterval(refreshTimer);
-            refreshTimer = eventKey && autoRefreshToggle.checked
-                ? setInterval(loadPhotos, REFRESH_INTERVAL_MS)
-                : null;
-        }
-
-        autoRefreshToggle.addEventListener('change', () => {
-            localStorage.setItem(AUTOREFRESH_KEY, autoRefreshToggle.checked ? '1' : '0');
-            updateRefreshTimer();
-        });
-
+        document.getElementById('autorefresh-toggle').disabled = !eventKey;
         loadPhotos();
-        updateRefreshTimer();
+        setupAutoRefresh({ storageKey: AUTOREFRESH_KEY, interval: REFRESH_INTERVAL_MS, refresh: loadPhotos });
     </script>
 </body>
 </html>
