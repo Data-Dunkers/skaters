@@ -930,15 +930,22 @@ html[data-page="collected-index"]{
             display: flex;
             flex-direction: column;
             align-items: center;
-            padding: 2rem 1rem 3rem;
+            padding: 1rem 1rem 3rem;
         }
 
-        html[data-page="collected-index"] .page-header{
+        html[data-page="collected-index"] .page-header,
+        html[data-page="visualizations-index"] .page-header{
             position: relative;
             width: 100%;
             text-align: center;
             margin-bottom: 1.4rem;
-            padding-top: 3.5rem;
+        }
+
+        @media (max-width: 600px){
+            html[data-page="collected-index"] .page-header,
+            html[data-page="visualizations-index"] .page-header{
+                padding-top: 3rem;
+            }
         }
 
         html[data-page="collected-index"] .page-header .eyebrow{
@@ -3178,15 +3185,7 @@ html[data-page="visualizations-index"]{
             display: flex;
             flex-direction: column;
             align-items: center;
-            padding: 2rem 1rem 3rem;
-        }
-
-        html[data-page="visualizations-index"] .page-header{
-            position: relative;
-            width: 100%;
-            text-align: center;
-            margin-bottom: 1.4rem;
-            padding-top: 3.5rem;
+            padding: 1rem 1rem 3rem;
         }
 
         html[data-page="visualizations-index"] .page-header .eyebrow{

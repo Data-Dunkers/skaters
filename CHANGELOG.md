@@ -1,5 +1,9 @@
 # Changelog
 
+## 2026-11-25
+
+- **Collected Data** and **Visualizations** move their headings and content higher on the page while keeping the Home button clear on narrow screens.
+
 ## 2026-11-24
 
 - **Visualizations** collapses each chart’s Python example by default. Open **Python code** to view it.
