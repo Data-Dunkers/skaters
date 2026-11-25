@@ -2,6 +2,7 @@
 
 ## 2026-11-25
 
+- **Visualizations** averages all bar chart metrics per student so groups of different sizes can be compared. The Python examples use the same aggregation.
 - **Collected Data** shows the Rocket League column and checks for Rocket League submissions only after Rocket League data has been collected.
 - **Collected Data** and **Visualizations** move their headings and content higher on the page while keeping the Home button clear on narrow screens.
 
