@@ -174,6 +174,8 @@
                 return;
             }
 
+            const showRocketLeague = globalRocketLeague.length > 0;
+
             // Get all unique distances
             const distances = new Set();
             globalShots.forEach(s => {
@@ -186,15 +188,19 @@
                 return a.localeCompare(b);
             });
 
-            // Columns layout: Nickname | Group | Traits | Photo | Rocket League | [Distance 1] | ...
             const trHead = document.createElement('tr');
             trHead.innerHTML = `
                 <th>Nickname</th>
                 <th class="extracted-style-4">Group</th>
                 <th class="extracted-style-4">Traits</th>
                 <th class="extracted-style-4">Photo</th>
-                <th class="extracted-style-4">Rocket League</th>
             `;
+            if (showRocketLeague) {
+                const th = document.createElement('th');
+                th.className = 'extracted-style-4';
+                th.textContent = 'Rocket League';
+                trHead.appendChild(th);
+            }
             sortedDistances.forEach(d => {
                 const th = document.createElement('th');
                 th.style.textAlign = 'center';
@@ -232,10 +238,12 @@
             tdPhotoCount.textContent = fPhotos.length;
             trSummary.appendChild(tdPhotoCount);
 
-            const tdRocketLeagueCount = document.createElement('td');
-            tdRocketLeagueCount.style.textAlign = 'center';
-            tdRocketLeagueCount.textContent = fRocketLeague.length;
-            trSummary.appendChild(tdRocketLeagueCount);
+            if (showRocketLeague) {
+                const tdRocketLeagueCount = document.createElement('td');
+                tdRocketLeagueCount.style.textAlign = 'center';
+                tdRocketLeagueCount.textContent = fRocketLeague.length;
+                trSummary.appendChild(tdRocketLeagueCount);
+            }
 
             sortedDistances.forEach(d => {
                 const tdShotCount = document.createElement('td');
@@ -286,13 +294,16 @@
                 tdPhoto.innerHTML = hasPhoto ? '<span class="extracted-style-5">✔</span>' : '<span class="extracted-style-6">✘</span>';
                 tr.appendChild(tdPhoto);
 
-                const hasRocketLeague = fRocketLeague.some(r => r.nickname && r.nickname.trim().toLowerCase() === nick.toLowerCase());
-                const tdRocketLeague = document.createElement('td');
-                tdRocketLeague.style.textAlign = 'center';
-                tdRocketLeague.innerHTML = hasRocketLeague ? '<span class="extracted-style-5">✔</span>' : '<span class="extracted-style-6">✘</span>';
-                tr.appendChild(tdRocketLeague);
+                let complete = hasTraits && hasPhoto;
+                if (showRocketLeague) {
+                    const hasRocketLeague = fRocketLeague.some(r => r.nickname && r.nickname.trim().toLowerCase() === nick.toLowerCase());
+                    const tdRocketLeague = document.createElement('td');
+                    tdRocketLeague.style.textAlign = 'center';
+                    tdRocketLeague.innerHTML = hasRocketLeague ? '<span class="extracted-style-5">✔</span>' : '<span class="extracted-style-6">✘</span>';
+                    tr.appendChild(tdRocketLeague);
+                    if (!hasRocketLeague) complete = false;
+                }
 
-                let complete = hasTraits && hasPhoto && hasRocketLeague;
                 sortedDistances.forEach(d => {
                     const hasShot = fShots.some(s => s.nickname && s.nickname.trim().toLowerCase() === nick.toLowerCase() && String(s.distance).trim() === d);
                     if (!hasShot) complete = false;

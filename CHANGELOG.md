@@ -2,6 +2,7 @@
 
 ## 2026-11-25
 
+- **Collected Data** shows the Rocket League column and checks for Rocket League submissions only after Rocket League data has been collected.
 - **Collected Data** and **Visualizations** move their headings and content higher on the page while keeping the Home button clear on narrow screens.
 
 ## 2026-11-24
