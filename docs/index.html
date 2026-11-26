@@ -113,8 +113,10 @@
         function clearEventKey() {
             localStorage.removeItem('event_key');
             paintEventKeyBackground(null);
-            document.getElementById('eventKeyInput').value = '';
+            const input = document.getElementById('eventKeyInput');
+            input.value = '';
             checkKey();
+            input.focus();
         }
 
         document.getElementById('eventKeyInput').addEventListener('keypress', function (e) {
