@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Data Skaters Maintenance</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=Barlow:wght@400;600;700&display=swap">
+    <style>
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            background: #edf3f8;
+            color: #15263a;
+            font: 1rem/1.5 Barlow, sans-serif;
+        }
+
+        .container {
+            width: min(100% - 2rem, 58rem);
+            margin-inline: auto;
+        }
+
+        header {
+            padding: 1.5rem 0 2.25rem;
+            background: #005ea6;
+            color: white;
+            border-bottom: 4px solid #ff6600;
+        }
+
+        .home-link { color: inherit; font-weight: 600; text-underline-offset: 0.22em; }
+
+        h1, h2 {
+            font-family: "Barlow Condensed", sans-serif;
+            line-height: 1.1;
+        }
+
+        h1 {
+            margin: 1.25rem 0 0;
+            font-size: clamp(2.6rem, 7vw, 4rem);
+            text-transform: uppercase;
+        }
+
+        .event-context {
+            margin: 0.5rem 0 0;
+            overflow-wrap: anywhere;
+        }
+
+        main { padding-block: 1.5rem 3rem; }
+
+        .status {
+            margin: 0 0 1.25rem;
+            padding: 0.75rem 1rem;
+            border-left: 3px solid #da5700;
+            border-radius: 0 0.4rem 0.4rem 0;
+            background: #fff6ed;
+        }
+
+        .workspace {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) minmax(0, 2.5fr);
+            gap: 1rem;
+            align-items: start;
+        }
+
+        .menu, .panel {
+            background: white;
+            border: 1px solid #ccd9e5;
+            border-radius: 0.75rem;
+        }
+
+        .menu {
+            display: grid;
+            gap: 0.25rem;
+            padding: 0.5rem;
+        }
+
+        button, input, select { font: inherit; }
+
+        .menu button {
+            min-height: 2.75rem;
+            padding: 0.55rem 0.75rem;
+            border: 0;
+            border-radius: 0.4rem;
+            background: transparent;
+            color: inherit;
+            text-align: left;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .menu button:hover, .menu button[aria-pressed="true"] {
+            background: #dfedfa;
+            color: #004e8c;
+        }
+
+        :focus-visible { outline: 2px solid #006bc2; outline-offset: 3px; }
+        .home-link:focus-visible { outline-color: white; }
+
+        .panel { padding: clamp(1rem, 4vw, 2rem); }
+        .panel h2 { margin: 0; font-size: 2rem; }
+        .panel p { margin: 0.55rem 0 1.25rem; }
+        #maintenance-lock .panel { max-width: 29rem; }
+
+        .fields {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(min(100%, 11rem), 1fr));
+            gap: 0.75rem;
+            width: min(100%, 29rem);
+            margin: 0 0 1rem;
+        }
+
+        label { display: grid; gap: 0.3rem; font-weight: 600; }
+
+        input, select {
+            width: 100%;
+            padding: 0.55rem 0.7rem;
+            border: 1px solid #bccbd8;
+            border-radius: 0.4rem;
+            background: #f4f7fa;
+            color: #34485b;
+        }
+
+        .action {
+            padding: 0.55rem 0.9rem;
+            border: 0;
+            border-radius: 0.4rem;
+            background: #005ea6;
+            color: white;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .action:disabled {
+            background: #e0e7ef;
+            color: #45576a;
+            cursor: default;
+        }
+
+        .status:empty, .result-state:empty { display: none; }
+        .result-section { margin-top: 1.25rem; }
+        .result-section h3 { margin-bottom: 0.5rem; }
+
+        .submission {
+            padding: 0.85rem;
+            margin-bottom: 0.6rem;
+            border: 1px solid #ccd9e5;
+            border-radius: 0.4rem;
+        }
+
+        .submission h4 { margin: 0; overflow-wrap: anywhere; }
+
+        .submission dl {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(min(100%, 9rem), 1fr));
+            gap: 0.65rem;
+            margin: 0.65rem 0 0;
+        }
+
+        .submission dt { font-weight: 600; }
+        .submission dd { margin: 0; overflow-wrap: anywhere; }
+        .submission a { color: #005ea6; }
+
+        @media (max-width: 40rem) {
+            .workspace { grid-template-columns: 1fr; }
+            .menu { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <a class="home-link" href="../index.html">Data Skaters Home</a>
+            <h1>Maintenance</h1>
+            <p id="event-context" class="event-context" hidden>Selected event <strong id="selected-event">None</strong></p>
+        </div>
+    </header>
+
+    <main id="maintenance-lock" class="container">
+        <section class="panel" aria-labelledby="unlock-title">
+            <h2 id="unlock-title">Unlock Maintenance</h2>
+            <form id="unlock-form" method="post">
+                <div class="fields">
+                    <label for="maintenance-password">Password
+                        <input id="maintenance-password" type="password" autocomplete="current-password" required>
+                    </label>
+                </div>
+                <button id="unlock-button" class="action" type="submit" disabled>Unlock</button>
+            </form>
+            <p id="unlock-status" class="result-state" role="status"></p>
+        </section>
+    </main>
+
+    <main id="maintenance-content" class="container" hidden>
+        <p id="maintenance-status" class="status" role="status">Select an event on Data Skaters Home to continue.</p>
+
+        <div class="workspace">
+            <div class="menu" role="group" aria-label="Maintenance options">
+                <button type="button" aria-controls="edit-player" aria-pressed="true">View and edit a player</button>
+                <button type="button" aria-controls="rename-player" aria-pressed="false">Rename a nickname</button>
+            </div>
+
+            <section class="panel" id="edit-player" aria-labelledby="edit-title">
+                <h2 id="edit-title">View and edit a player</h2>
+                <p>Look up submissions for a nickname in this event.</p>
+                <form id="lookup-form">
+                    <div class="fields">
+                        <label for="lookup-nickname">Player nickname
+                            <select id="lookup-nickname" required disabled>
+                                <option value="">Select a nickname</option>
+                            </select>
+                        </label>
+                    </div>
+                    <button id="find-player" class="action" type="submit" disabled>Find player</button>
+                </form>
+                <p id="lookup-status" class="result-state" role="status"></p>
+                <div id="player-results"></div>
+            </section>
+
+            <section class="panel" id="rename-player" aria-labelledby="rename-title" hidden>
+                <h2 id="rename-title">Rename a nickname</h2>
+                <p>Nickname changes will be available in a later update.</p>
+                <div class="fields">
+                    <label for="current-nickname">Current nickname
+                        <input id="current-nickname" type="text" placeholder="AB12" disabled>
+                    </label>
+                    <label for="new-nickname">New nickname
+                        <input id="new-nickname" type="text" placeholder="CD34" disabled>
+                    </label>
+                </div>
+                <button class="action" type="button" disabled>Preview rename</button>
+            </section>
+        </div>
+    </main>
+
+    <script src="maintenance.js"></script>
+</body>
+</html>

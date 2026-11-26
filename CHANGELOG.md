@@ -1,7 +1,12 @@
 # Changelog
 
+## 2026-11-26
+
+- **Maintenance** adds a password prompt for development and loads event nicknames after the page is unlocked.
+
 ## 2026-11-25
 
+- **Maintenance** adds a read-only player lookup with an alphabetical nickname dropdown populated from the selected event’s photo, traits, shooting, and Rocket League submissions.
 - **Visualizations** averages all bar chart metrics per student so groups of different sizes can be compared. The Python examples use the same aggregation.
 - **Collected Data** shows the Rocket League column and checks for Rocket League submissions only after Rocket League data has been collected.
 - **Collected Data** and **Visualizations** move their headings and content higher on the page while keeping the Home button clear on narrow screens.

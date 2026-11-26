@@ -13,6 +13,12 @@ Player cards are generated from the data collected during an event.
 
 To test the page with a smaller set of cards, use the [testing view](https://datadunkers.ca/skaters/card-creator/index.html?testing=true). To generate one player's card, add a `nickname` parameter, such as `?nickname=PS43`.
 
+## Viewing a player in Maintenance
+
+Select an event on Data Skaters Home, open `/skaters/maintenance/`, and enter the maintenance password. Choose a player nickname and click **Find player** to see that player's submissions.
+
+The development password prompt runs in the browser and can be bypassed. The page uses the existing PocketBase read API.
+
 ## Setting up a Data Skaters server on a Windows computer:
 
 * Press the Windows key and type `PowerShell`
