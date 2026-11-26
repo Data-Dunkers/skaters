@@ -8,6 +8,7 @@
 
     <link rel="stylesheet" href="../style.css">
     <script src="../event-key-bg.js"></script>
+    <script src="../nickname.js"></script>
 </head>
 <body>
 
@@ -27,7 +28,7 @@
             </div>
             <div class="form-group">
                 <label for="nickname">Nickname</label>
-                <input type="text" id="nickname" name="nickname" placeholder="PS43" required oninput="this.value = sanitizeNickname(this.value)" onblur="updateStats(this.value.trim())" maxlength="4" autocomplete="off">
+                <input type="text" id="nickname" name="nickname" placeholder="PS43 or PS43-T" required oninput="this.value = sanitizeNickname(this.value)" onblur="updateStats(this.value.trim())" maxlength="6" autocomplete="off">
             </div>
         </div>
     </div>
@@ -133,18 +134,6 @@ window.onload = () => {
     //if (savedNick)  updateStats(savedNick);
 };
 
-function sanitizeNickname(value) {
-    const cleaned = value.toUpperCase().replace(/[^A-Z0-9]/g, '');
-    let result = '';
-    for (const ch of cleaned) {
-        const isLetter = /[A-Z]/.test(ch);
-        if (result.length < 2 ? isLetter : (result.length < 4 && !isLetter)) {
-            result += ch;
-        }
-    }
-    return result;
-}
-
 
 // ── SHOTS-MADE BUTTON SELECTION ────────────────────────────────
 function selectDistanceShots(btn, value) {
@@ -167,6 +156,11 @@ async function handleSubmit() {
     
     if (!group || !nick || selectedRows.length === 0) {
         showStatus('Please fill in all required fields.', 'error'); return;
+    }
+
+    if (!nicknamePattern.test(nick)) {
+        showStatus(nicknameFormatMessage, 'error');
+        return;
     }
 
     const btn = document.getElementById('submitBtn');
@@ -229,9 +223,13 @@ function showStatus(msg, type) {
 async function updateStats(nick) {
     document.getElementById('statsFor').textContent = nick;
     try {
-        const key = localStorage.getItem('event_key');
-        const res  = await fetch(`${PB_URL}?filter=(nickname='${nick}'%20%26%26%20event_key='${key}')&sort=-created&perPage=50`);
-        const data = await res.json();
+        let items = [];
+        if (nicknamePattern.test(nick)) {
+            const key = localStorage.getItem('event_key');
+            const res = await fetch(`${PB_URL}?filter=(nickname='${nick}'%20%26%26%20event_key='${key}')&sort=-created&perPage=50`);
+            const data = await res.json();
+            items = data.items || [];
+        }
         const tbody = document.getElementById('statsBody');
         const table = document.getElementById('statsTable');
         const empty = document.getElementById('emptyState');
@@ -240,7 +238,7 @@ async function updateStats(nick) {
         tbody.innerHTML = '';
         distanceRows.forEach(row => row.querySelectorAll('.option-btn').forEach(button => button.disabled = false));
 
-        if (!data.items || data.items.length === 0) {
+        if (items.length === 0) {
             table.style.display = 'none';
             empty.style.display = 'block';
             return;
@@ -249,7 +247,7 @@ async function updateStats(nick) {
         table.style.display = 'table';
         empty.style.display = 'none';
 
-        const recordedDistances = new Set(data.items.map(record => String(record.distance)));
+        const recordedDistances = new Set(items.map(record => String(record.distance)));
         distanceRows.forEach(row => {
             if (!recordedDistances.has(row.dataset.distance)) return;
             row.querySelectorAll('.option-btn').forEach(button => {
@@ -260,7 +258,7 @@ async function updateStats(nick) {
             row.querySelector('.shots-made-value').value = '';
         });
 
-        data.items.forEach((r) => {
+        items.forEach((r) => {
             tbody.innerHTML += `<tr>
                 <td>${r.distance}</td>
                 <td>${r.shots_made}</td>

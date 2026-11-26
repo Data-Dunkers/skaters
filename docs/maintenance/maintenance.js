@@ -6,7 +6,6 @@ const nicknameSelect = document.getElementById('lookup-nickname');
 const findButton = document.getElementById('find-player');
 const lookupStatus = document.getElementById('lookup-status');
 const playerResults = document.getElementById('player-results');
-const nicknamePattern = /^[A-Z]{2}[0-9]{2}$/i;
 const maintenanceContent = document.getElementById('maintenance-content');
 const passwordInput = document.getElementById('maintenance-password');
 const unlockButton = document.getElementById('unlock-button');
@@ -149,9 +148,13 @@ document.getElementById('lookup-form').addEventListener('submit', async event =>
     lookupStatus.textContent = 'Looking up ' + nickname + '…';
     try {
         // Match legacy mixed-case nicknames without matching part of a nickname.
-        const mixedCases = [nickname, nickname.toLowerCase(),
-            nickname[0].toLowerCase() + nickname.slice(1),
-            nickname[0] + nickname.slice(1).toLowerCase()];
+        const [first, second] = nickname;
+        const digits = nickname.slice(2, 4);
+        const suffix = nickname.slice(4);
+        const suffixCases = suffix ? ['-T', '-t'] : [''];
+        const initialCases = [first + second, first.toLowerCase() + second,
+            first + second.toLowerCase(), (first + second).toLowerCase()];
+        const mixedCases = initialCases.flatMap(initials => suffixCases.map(ending => initials + digits + ending));
         const nicknameFilter = mixedCases.map(value => "nickname = '" + value + "'").join(' || ');
         const filter = eventFilter + ' && (' + nicknameFilter + ')';
         const groups = await Promise.allSettled(submissionGroups.map(([key, , labels]) => {

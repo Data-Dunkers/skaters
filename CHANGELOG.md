@@ -2,7 +2,7 @@
 
 ## 2026-11-26
 
-- **Photo Booth** accepts teacher nicknames with a `-T` suffix, such as `PS43-T`.
+- **Photo Booth**, **Traits**, **Shots**, and **Rocket League** accept teacher nicknames with a `-T` suffix, such as `PS43-T`. **Maintenance** includes them in player lookup.
 - **Home** focuses the event key field when you click **Change Event Key** or **Enter A Key** in demo mode.
 - **Visualizations** adds a **Hide outliers** checkbox to the Scatter Plot that uses Cook’s distance and refits the displayed trendline.
 - **Visualizations** hides Plotly’s default trace label on the ungrouped Scatter Plot.

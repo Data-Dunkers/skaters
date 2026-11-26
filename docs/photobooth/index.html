@@ -7,6 +7,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../style.css">
     <script src="../event-key-bg.js"></script>
+    <script src="../nickname.js"></script>
 </head>
 <body>
     <div class="page-header">
@@ -146,23 +147,10 @@
         const todaysNicknamesEl = document.getElementById('todays-nicknames');
         let todaysNicknames = [];
 
-        function sanitizeNickname(value) {
-            const [base, ...suffix] = value.toUpperCase().split('-');
-            const cleaned = base.replace(/[^A-Z0-9]/g, '');
-            let result = '';
-            for (const ch of cleaned) {
-                const isLetter = /[A-Z]/.test(ch);
-                if (result.length < 2 ? isLetter : (result.length < 4 && !isLetter)) {
-                    result += ch;
-                }
-            }
-            return [result, ...suffix].join('-');
-        }
-
         function validateNickname(value = nicknameInput.value) {
             let message = '';
-            if (value && !/^[A-Z]{2}[0-9]{2}(-T)?$/.test(value)) {
-                message = 'Use two letters and two digits, with an optional -T for teachers.';
+            if (value && !nicknamePattern.test(value)) {
+                message = nicknameFormatMessage;
             } else if (todaysNicknames.includes(value)) {
                 message = 'That nickname is already used.';
             }

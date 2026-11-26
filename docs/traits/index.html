@@ -7,6 +7,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../style.css">
     <script src="../event-key-bg.js"></script>
+    <script src="../nickname.js"></script>
 </head>
 <body>
 
@@ -21,7 +22,7 @@
         <div class="form-row cols-2">
             <div class="form-group">
                 <label for="nickname">Nickname</label>
-                <input type="text" id="nickname" name="nickname" placeholder="PS43" required oninput="this.value = sanitizeNickname(this.value)" maxlength="4" autocomplete="off" class="extracted-style-1">
+                <input type="text" id="nickname" name="nickname" placeholder="PS43 or PS43-T" required oninput="this.value = sanitizeNickname(this.value)" maxlength="6" autocomplete="off" class="extracted-style-1">
             </div>
             <div class="form-group">
                 <label for="handedness">Handedness</label>
@@ -172,18 +173,6 @@ window.onload = () => {
     syncReactionUI();
     syncHeartUI();
 };
-
-function sanitizeNickname(value) {
-    const cleaned = value.toUpperCase().replace(/[^A-Z0-9]/g, '');
-    let result = '';
-    for (const ch of cleaned) {
-        const isLetter = /[A-Z]/.test(ch);
-        if (result.length < 2 ? isLetter : (result.length < 4 && !isLetter)) {
-            result += ch;
-        }
-    }
-    return result;
-}
 
 function showStatus(msg, type) {
     const el = document.getElementById('statusMessage');
@@ -371,6 +360,11 @@ async function handleSubmit() {
 
     if (!nickname || Number.isNaN(heightCm) || Number.isNaN(wingspanCm) || Number.isNaN(skateSize) || !handedness || !birthMonth || Number.isNaN(restingHeartRate)) {
         showStatus('Please complete all required fields.', 'error');
+        return;
+    }
+
+    if (!nicknamePattern.test(nickname)) {
+        showStatus(nicknameFormatMessage, 'error');
         return;
     }
 
