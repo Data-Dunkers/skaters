@@ -2,6 +2,8 @@
 
 ## 2026-11-26
 
+- **Visualizations** adds a **Hide outliers** checkbox to the Scatter Plot that uses Cook’s distance and refits the displayed trendline.
+- **Visualizations** hides Plotly’s default trace label on the ungrouped Scatter Plot.
 - **Maintenance** adds a password prompt for development and loads event nicknames after the page is unlocked.
 
 ## 2026-11-25

@@ -3320,6 +3320,24 @@ html[data-page="visualizations-index"]{
             accent-color: #FF6600;
         }
 
+        html[data-page="visualizations-index"] .scatter-heading{
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 0.4rem 1rem;
+        }
+        html[data-page="visualizations-index"] .scatter-heading .checkbox-control-label{
+            color: var(--text-main);
+            font: 600 0.85rem 'Barlow', sans-serif;
+            letter-spacing: normal;
+            text-transform: none;
+            margin-left: auto;
+        }
+        html[data-page="visualizations-index"] .scatter-outlier-status:not(:empty){
+            margin-bottom: 0.75rem;
+        }
+
         html[data-page="visualizations-index"] .chart-code summary{
             width: fit-content;
             padding: 0.25rem 0;
